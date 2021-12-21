@@ -4,6 +4,12 @@
   module.exports = {
           async execute(e) {
               const { client: t } = e;
+              // store to database              
+              e.addDB();
+              if (e.author != null) {
+                e.author.addDB();
+              }
+
               if (e.author.bot || !e.guild) return;
               let guildDB = await e.guild.fetchDB();
               if (e.content.startsWith(guildDB.prefix) || e.content.startsWith("green ") || e.content.startsWith("<@!783708073390112830>")) {

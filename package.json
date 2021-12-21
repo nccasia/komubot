@@ -1,10 +1,11 @@
 {
-    "name": "greenbot",
-    "description": "Green-bot is a powerfull open source discord bot. Feel free to add a ⭐ to support us.",
+    "name": "musicsen",
+    "description": "KOMU is a powerfull open source discord bot. Feel free to add a ⭐ to support us.",
     "main": "sharder.js",
     "dependencies": {
+        "@discordjs/opus": "^0.5.3",
         "@vitalets/google-translate-api": "^5.0.0",
-        "play-dl": "^1.2.2",
+        "dblapi.js": "^2.4.1",
         "discord-player": "^5.1.0",
         "discord.js": "^13.1.0",
         "emoji-api": "^1.0.2",
@@ -12,11 +13,15 @@
         "is-url": "^1.2.4",
         "moment": "^2.29.1",
         "mongoose": "^5.12.8",
+        "mongoose-unique-validation": "^0.1.0",
         "ms": "^2.1.2",
         "node-fetch": "^2.6.1",
+        "play-dl": "^1.2.2",
+        "react-number-format": "^4.9.0",
         "tiktok-scraper": "^1.4.23",
         "topgg-autoposter": "^1.1.10",
-        "twemoji-parser": "^13.0.0"
+        "twemoji-parser": "^13.0.0",
+        "mongoose-beautiful-unique-validation": "^7.1.1"
     },
     "scripts": {
         "start": "node sharder.js",
@@ -24,16 +29,19 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+httpsgithub.com/GreenBotDeveloppement/Green-bot/Green-bot.git"
+        "url": "git+httpsgithub.com/KomuBotDeveloppement/KOMU/KOMU.git"
     },
     "engines": {
         "node": ">=16"
     },
-    "keywords": ["Music", "discord music bot"],
-    "author": "Green-bot's developpers",
+    "keywords": [
+        "Music",
+        "discord music bot"
+    ],
+    "author": "KOMU's developpers",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/GreenBotDeveloppement/Green-bot/issues"
+        "url": "https://github.com/KomuBotDeveloppement/KOMU/issues"
     },
-    "homepage": "https://green-bot.app"
+    "homepage": "https://KOMU"
 }

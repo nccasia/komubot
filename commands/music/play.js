@@ -27,7 +27,7 @@ module.exports = {
             return message.errorMessage(err);
         }
         if (name.startsWith("<")) return message.errorMessage("Hooks such as `[]` or `<>` must not be used when executing commands. Ex: `" + guildDB.prefix + "play Faded`")
-        if (name.includes("green-bot.app")) {
+        if (name.includes("KOMU")) {
             let errorM = await message.translate("NO_RESULTS", guildDB.lang)
             return message.errorMessage(errorM.replace("{query}", name));
         }

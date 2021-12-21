@@ -1,7 +1,46 @@
-const { Message, MessageEmbed, Guild, } = require("discord.js");
+const { Message, MessageEmbed, Guild, User} = require("discord.js");
 const lang = require('../languages/lang.json')
 const translate = require("@vitalets/google-translate-api");
 const guildData = require('../models/guildData');
+const userData = require('../models/userData');
+const mongoose = require('mongoose');
+const komuMessageSchema = new mongoose.Schema({}, { strict: false });
+/**
+ * Add a guild in the database
+ * @param {number} guildID The ID of the guild
+ */
+ User.prototype.addDB = async function() {
+    
+    const komuUser = await new userData({
+        id: this.id,
+        username: this.username,
+        discriminator: this.discriminator,
+        avatar: this.avatar,
+        bot: this.bot,
+        system: this.system,
+        mfa_enabled: this.mfa_enabled,
+        banner: this.banner,
+        accent_color: this.accent_color,
+        locale: this.locale,
+        verified: this.verified,
+        email: this.email,
+        flags: this.flags,
+        premium_type: this.premium_type,
+        public_flags: this.public_flags
+    });
+
+    let data = await userData.findOne({ username: this.username })
+    if (!data) data = await komuUser.save();
+};
+/**
+ * Add a guild in the database
+ * @param {number} guildID The ID of the guild
+ */
+ Message.prototype.addDB = async function() {
+    const KomuMessageModel = mongoose.model('komu_msg', komuMessageSchema); 
+    const komumsg = new KomuMessageModel(this);
+    komumsg.save();
+};
 /**
  * Add a guild in the database
  * @param {number} guildID The ID of the guild

@@ -1,6 +1,6 @@
 **How to contribute ?**
 
-Green-bot is an open source project so, everyone can contribute !
+KOMU is an open source project so, everyone can contribute !
 
 You can fork the project, make your changes, and then, create a pull request.
 

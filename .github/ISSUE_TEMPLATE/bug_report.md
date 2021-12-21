@@ -26,7 +26,7 @@ If applicable, add screenshots to help explain your problem.
 **Version**
 Please give these versions:
 NodeJs:
-Green-bot;
+KOMU;
 
 **Additional context**
 Add any other context about the problem here.

@@ -1,17 +1,17 @@
 module.exports = {
-    //IMPORTANT: If you need help with the installation of Green-bot, you can join our support server here: https://green-bot.app/discord
+    //IMPORTANT: If you need help with the installation of KOMU, you can join our support server here: https://KOMU/discord
     prefix: "*",
     // Your discord bot token. https://discord.com/developpers/bots
-    token: "TOKEN",
+    token: "OTIyMDAzMjM5ODg3NTgxMjA1.Yb7Ibg.E6LKhs3h_Z7O3asA0xGTHJ6YyQM",
     // Your ID
     // Your name/tag
-     owners: ["XXXXXXXXXXXX"],
+     owners: ["KOMU#0139"],
     //The footer of the embeds that the bot will send
-    footer: "Green-bot | green-bot.app ",
+    footer: "KOMU ",
     // The id of the support
     supportID: "729774155037278268",
     // The status of your bot
-    game: "Green-bot | green-bot.app ",
+    game: "KOMU ",
     //the color of the embeds
     color: "#3A871F",
     // OPTIONAL: Your top.gg token.
@@ -21,11 +21,11 @@ module.exports = {
     //the default bot language. fr or en
     defaultLanguage: "en",
     // If dev mod is enabled
-    devMode: true,
+    devMode: false,
     // The server where you test the commands
     devServer: "782661233622515772",
     // If you want to log every command,event etc. Usefull for debuging
-    logAll: true,
+    logAll: false,
     // If you want to test your configuration before starting the bot
     checkConfig: null,
     //The number of shards. Leave blank for auto
@@ -34,20 +34,22 @@ module.exports = {
     categories: {
         configuration: { enabled: true, name: "Configuration", desc: "Setup the bot with the configuration commands" },
         utilities: { enabled: true, name: "Utilities", desc: "Some usefull commands", aliases: ["general"] },
-        music: { enabled: true, name: "Music", desc: "Listen music with Green-bot" },
+        music: { enabled: true, name: "Music", desc: "Listen music with KOMU" },
+        task: {enabled: true, name: "Task", desc: "KOMU task manager" },
+        poll: {enabled: true, name: "Poll", desc: "KOMU poll manager" },
         owner: { hide: true, enabled: true, name: "Owner", desc: "Manage your bot with the owner commands" }
     },
     // some usefull links about your bot, if you don't have an information, put null.
     links: {
         support: "https://discord.gg/nrReAmApVJ",
-        website: "https://green-bot.app",
+        website: "https://komu.vn",
         invite: "https://discord.com/oauth2/authorize?client_id=783708073390112830&scope=bot&permissions=8",
-        commands: "https://green-bot.app/commands"
+        commands: "https://komu.vn/commands"
     },
     //Database
     database: {
         // The url of your mongodb database. Check mongodb.org
-        MongoURL: "MONGOURL",
+        MongoURL: "mongodb://localhost:27017/komubot",
         // If you want to cache the database. For big bots
         cached: false,
         delay: 300000 * 4,

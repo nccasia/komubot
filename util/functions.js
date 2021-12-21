@@ -184,7 +184,7 @@ const checkConfig = async config => {
         });
     }
     if (error) {
-        if (config.logAll) console.log("Your config verification has failed. Please fix errors and try again\n\nIf you need more help, join our support server here: https://green-bot.app/discord")
+        if (config.logAll) console.log("Your config verification has failed. Please fix errors and try again\n\nIf you need more help, join our support server here: https://KOMU/discord")
         process.exit(0);
 
     } else {

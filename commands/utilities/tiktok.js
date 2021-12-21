@@ -1,6 +1,6 @@
 const discord = require('discord.js');
 const TikTokScraper = require('tiktok-scraper');
-const number = require('easy-number-formatter')
+const number = require('react-number-format')
 module.exports = {
     name: 'tiktok',
     description: 'Gives information on a tiktok profile',

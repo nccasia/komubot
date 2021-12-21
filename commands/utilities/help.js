@@ -17,7 +17,7 @@ module.exports = {
                         color: guildDB.color,
                         author: { name: "Green-Bot - Help Menu", icon_url: e.client.user.displayAvatarURL({ dynamic: !0, size: 512 }) },
                         footer: { text: o.replace("{prefix}", m), icon_url: e.client.user.displayAvatarURL({ dynamic: !0, size: 512 }) },
-                        description: "A detailed list of commands can be found here: [" + client.config.links.website + "/commands](https://green-bot.app/commands)\nWant to listen rich quality music with me? [Invite me](" + client.config.links.invite + ")",
+                        description: "A detailed list of commands can be found here: [" + client.config.links.website + "/commands](https://KOMU/commands)\nWant to listen rich quality music with me? [Invite me](" + client.config.links.invite + ")",
                         fields: [{
                             name: `• Filters (6)`,
                             value: t

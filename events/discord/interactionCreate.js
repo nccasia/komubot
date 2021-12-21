@@ -240,7 +240,7 @@ module.exports = {
                 if (queue.metadata.controller) {
                     const embed = new Discord.MessageEmbed()
                         .setAuthor(interaction.guild.name, interaction.guild.icon ? interaction.guild.iconURL({ dynamic: true }) : "https://cdn.discordapp.com/attachments/748897191879245834/782271474450825226/0.png?size=128", "https://discord.com/oauth2/authorize?client_id=783708073390112830&scope=bot&permissions=19456")
-                        .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://green-bot.app/invite) | [Premium](https://green-bot.app/premium) | [Dashboard](https://green-bot.app) | [Commands](https://green-bot.app/commands)`)
+                        .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://KOMU/invite) | [Premium](https://KOMU/premium) | [Dashboard](https://KOMU) | [Commands](https://KOMU/commands)`)
                         .addField("Now playing", "__**Nothing playing**__")
                         .setImage(url = "https://cdn.discordapp.com/attachments/893185846876975104/900453806549127229/green_bot_banner.png")
 
@@ -250,13 +250,16 @@ module.exports = {
                 }
 
                 return
-
-
-
             }
         }
         if (!interaction.isCommand()) return;
-        await interaction.reply({ content: "`❌` Slash commands are under construction.\n Join the support server for more informations: https://discord.gg/synAXZtQHM" });
+        if (interaction.commandName === 'wiki') {
+            return;
+        }        
+        if (interaction.commandName === 'task') {
+            return;
+        }
+        await interaction.reply({ content: "`❌` Slash commands are under construction.\n"});
 
     }
 };

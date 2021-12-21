@@ -15,7 +15,7 @@ module.exports = {
                             icon_url: message.author.displayAvatarURL({ dynamic: true, size: 512 })
                         },
                         color: guildDB.color,
-                        description: `Want to invite Green-bot on your server? [Click here](${client.config.links.invite})`,
+                        description: `Want to invite KOMU on your server? [Click here](${client.config.links.invite})`,
                         footer: {
                             text: message.client.footer,
                             icon_url: message.client.user.displayAvatarURL({ dynamic: true, size: 512 })
@@ -34,7 +34,7 @@ module.exports = {
             const embed = new Discord.MessageEmbed()
             .setAuthor(`${message.author.username}`, message.author.displayAvatarURL({ dynamic: true, size: 512 }))
             .setColor(guildDB.color)
-            .setDescription(`${guildDB.lang === "fr" ? "Vous pouvez voter pour Green-bot [ici]("+client.config.topgg_url+"/vote)":" You can upvote me by clicking [here]("+client.config.topgg_url+"/vote)"}`)
+            .setDescription(`${guildDB.lang === "fr" ? "Vous pouvez voter pour KOMU [ici]("+client.config.topgg_url+"/vote)":" You can upvote me by clicking [here]("+client.config.topgg_url+"/vote)"}`)
             .setFooter(message.client.footer, message.client.user.displayAvatarURL({ dynamic: true, size: 512 }));
         message.channel.send({ embeds: [embed], allowedMentions: { repliedUser: false } })
         } else {

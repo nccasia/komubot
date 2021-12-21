@@ -44,7 +44,7 @@ const init = async function() {
         if (queue.metadata.controller) {
             const embed = new MessageEmbed()
                 .setAuthor(track.requestedBy.tag, track.requestedBy.displayAvatarURL(), "https://discord.com/oauth2/authorize?client_id=783708073390112830&scope=bot&permissions=19456")
-                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://green-bot.app/invite) | [Premium](https://green-bot.app/premium) | [Dashboard](https://green-bot.app) | [Commands](https://green-bot.app/commands)`)
+                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://KOMU/invite) | [Premium](https://KOMU/premium) | [Dashboard](https://KOMU) | [Commands](https://KOMU/commands)`)
                 .addField("Now playing", `[**${track.title}**](${track.url}) [<@${track.requestedBy.id}>] \`${track.duration}\``)
                 .setImage(url = "https://cdn.discordapp.com/attachments/893185846876975104/900453806549127229/green_bot_banner.png")
                 .setFooter(`${client.footer}`, client.user.displayAvatarURL({ dynamic: true, size: 512 }))
@@ -80,7 +80,7 @@ const init = async function() {
         if (queue.metadata.controller) {
             const embed = new MessageEmbed()
                 .setAuthor(`${client.footer}`, client.user.displayAvatarURL({ dynamic: true, size: 512 }), "https://discord.com/oauth2/authorize?client_id=783708073390112830&scope=bot&permissions=66186704")
-                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://green-bot.app/invite) | [Premium](https://green-bot.app/premium) | [Dashboard](https://green-bot.app) | [Commands](https://green-bot.app/commands)`)
+                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://KOMU/invite) | [Premium](https://KOMU/premium) | [Dashboard](https://KOMU) | [Commands](https://KOMU/commands)`)
                 .addField("Now playing", "__**Nothing playing**__")
                 .setImage(url = "https://cdn.discordapp.com/attachments/893185846876975104/900453806549127229/green_bot_banner.png")
 
@@ -100,7 +100,7 @@ const init = async function() {
         if (queue.metadata.controller) {
             const embed = new MessageEmbed()
                 .setAuthor(`${client.footer}`, client.user.displayAvatarURL({ dynamic: true, size: 512 }))
-                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://green-bot.app/invite) | [Premium](https://green-bot.app/premium) | [Dashboard](https://green-bot.app) | [Commands](https://green-bot.app/commands)`)
+                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://KOMU/invite) | [Premium](https://KOMU/premium) | [Dashboard](https://KOMU) | [Commands](https://KOMU/commands)`)
                 .addField("Now playing", "__**Nothing playing**__")
                 .setImage(url = "https://cdn.discordapp.com/attachments/893185846876975104/900453806549127229/green_bot_banner.png")
 

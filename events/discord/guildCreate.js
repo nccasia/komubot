@@ -12,26 +12,9 @@ module.exports = {
                     },
                     {
                         name: "Getting Started",
-                        value: `You can check the [Command list](https://green-bot.app/commands) to see the available commands.. To change my prefix, use \`*prefix\`
+                        value: `You can check the [Command list](https://komu.vn/commands) to see the available commands.. To change my prefix, use \`*prefix\`
         Not English? Change the language using \`*language\``
-                    },
-                    {
-                        name: "Support",
-                        value: `Join the [Support server](https://discord.gg/SQsBWtjzTv) if you need help with anything, the support team is here to answer all your questions! `
-
-                    }, {
-                        name: "Invite me",
-                        value: `[Click here](https://discord.com/oauth2/authorize?client_id=783708073390112830&scope=bot&permissions=19456)`,
-                        inline: !0
-                    }, {
-                        name: "Discord",
-                        value: `[Click here](https://discord.gg/SQsBWtjzTv)`,
-                        inline: !0
-                    }, {
-                        name: "Premium",
-                        value: `[Click here](https://green-bot.app/premium)`,
-                        inline: !0
-                    }
+                    }                    
                 ],
 
             }]

@@ -88,4 +88,4 @@ const channeldb = new mongoose.Schema({
         }
     },
 })
-const guildData = module.exports = mongoose.model('guildData', channeldb)
+const guildData = module.exports = mongoose.model('komu_guilddata', channeldb)

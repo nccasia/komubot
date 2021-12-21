@@ -33,7 +33,7 @@ module.exports = {
             let err = await message.translate("NOT_SAME_CHANNEL", guildDB.lang)
             return message.errorMessage(err);
         }
-        if (name.includes("green-bot.app")) {
+        if (name.includes("KOMU")) {
             let errorM = await message.translate("NO_RESULTS", guildDB.lang)
             return message.errorMessage(errorM.replace("{query}", name));
         }

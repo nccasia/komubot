@@ -121,25 +121,25 @@
 
         },
         "HELP_ERROR": {
-            "fr": "Je n'ai trouvé aucune commande pour `{text}`.Liste des commandes: **https://green-bot.app/commands**",
-            "en": "No commands found for `{text}`. The commands are there: **https://green-bot.app/commands**",
-            "de": "Keine Befehle für `{text}` gefunden. Die Kategorien sind da: **https://green-bot.app/commands**"
+            "fr": "Je n'ai trouvé aucune commande pour `{text}`.Liste des commandes: **https://KOMU/commands**",
+            "en": "No commands found for `{text}`. The commands are there: **https://KOMU/commands**",
+            "de": "Keine Befehle für `{text}` gefunden. Die Kategorien sind da: **https://KOMU/commands**"
 
         },
         "HELP": {
             "fr": {
                 "perms": "Vous n'avez pas besoin de permissions.",
-                "bot": "Green-bot n'a pas besoin de permissions.",
+                "bot": "KOMU n'a pas besoin de permissions.",
                 "s": "Statut de la commande"
             },
             "en": {
                 "perms": "You don't need any permissions.",
-                "bot": "Green-bot don't need any permissions.",
+                "bot": "KOMU don't need any permissions.",
                 "s": "Command status"
             },
             "de": {
                 "perms": "Du benötigst keine Berechtigungen.",
-                "bot": "Green-bot benötigt keine Berechtigungen.",
+                "bot": "KOMU benötigt keine Berechtigungen.",
                 "s": "Befehl Status"
             }
 
@@ -200,9 +200,9 @@
 
         },
         "DASHBOARD": {
-            "fr": "`💡` Vous pouvez aussi me configurer depuis mon [`Dashboard`](https://green-bot.app/)",
-            "en": "`💡` You can also configure me with my [`Dashboard`](https://green-bot.app/)",
-            "de": "`💡` Du kannst mich auch mit meinem [`Dashboard`](https://green-bot.app/) konfigurieren."
+            "fr": "`💡` Vous pouvez aussi me configurer depuis mon [`Dashboard`](https://KOMU/)",
+            "en": "`💡` You can also configure me with my [`Dashboard`](https://KOMU/)",
+            "de": "`💡` Du kannst mich auch mit meinem [`Dashboard`](https://KOMU/) konfigurieren."
 
         },
         "CHEARCHING": {
@@ -260,15 +260,15 @@
 
         },
         "COMMAND_DISABLED": {
-            "fr": "`❌` Désolé, mais cette commande est temporairement désactivée. Veuillez rejoindre le serveur de support pour plus d'informations: **https://green-bot.app/discord**",
-            "en": "`❌` Sorry, this command is disabled. Please join the support server for more informations: **https://green-bot.app/discord**",
-            "de": "`❌` Dieser Befehl ist leider deaktiviert. Bitte treten Sie dem Support-Server bei, um weitere Informationen zu erhalten: **https://green-bot.app/discord**"
+            "fr": "`❌` Désolé, mais cette commande est temporairement désactivée. Veuillez rejoindre le serveur de support pour plus d'informations: **https://KOMU/discord**",
+            "en": "`❌` Sorry, this command is disabled. Please join the support server for more informations: **https://KOMU/discord**",
+            "de": "`❌` Dieser Befehl ist leider deaktiviert. Bitte treten Sie dem Support-Server bei, um weitere Informationen zu erhalten: **https://KOMU/discord**"
 
         },
         "BLACKLIST": {
-            "fr": "`❌` Désolé, ce serveur a été blacklisté. Veuillez rejoindre le serveur de support pour plus d'informations: **https://green-bot.app/discord**",
-            "en": "`❌` Sorry, this server has been blacklisted. Please join the support server for more informations: **https://green-bot.app/discord**",
-            "de": "`❌` Entschuldigung, dieser Server wurde auf die schwarze Liste gesetzt. Bitte treten Sie dem Support-Server bei, um weitere Informationen zu erhalten: **https://green-bot.app/discord**"
+            "fr": "`❌` Désolé, ce serveur a été blacklisté. Veuillez rejoindre le serveur de support pour plus d'informations: **https://KOMU/discord**",
+            "en": "`❌` Sorry, this server has been blacklisted. Please join the support server for more informations: **https://KOMU/discord**",
+            "de": "`❌` Entschuldigung, dieser Server wurde auf die schwarze Liste gesetzt. Bitte treten Sie dem Support-Server bei, um weitere Informationen zu erhalten: **https://KOMU/discord**"
 
         },
         "GIVEAWAY_SUCCES": {
@@ -645,7 +645,7 @@
         },
         "NOT_SAME_CHANNEL": {
             "fr": "Nous ne sommes pas dans le même salon vocal.",
-            "en": "We are not in the same voice channel. Want to listen music with anoter Green-bot ? Try [Green-bot 2](https://discord.com/oauth2/authorize?client_id=902201674263851049&scope=bot&permissions=8)",
+            "en": "We are not in the same voice channel. Want to listen music with anoter KOMU ? Try [KOMU 2](https://discord.com/oauth2/authorize?client_id=902201674263851049&scope=bot&permissions=8)",
             "de": "Wir sind nicht im selben Sprachkanal."
 
         },
@@ -1336,7 +1336,7 @@
         },
         "QUEUE_END": {
             "fr": "Il n'y a plus de musique dans la queue.",
-            "en": "Queue has ended! Enjoying music with me ? Consider voting me on [Top.gg](https://top.gg/bot/783708073390112830) ",
+            "en": "Queue has ended! Enjoying music with KOMU?",
             "de": "Es ist keine Musik mehr in der Warteschlange."
 
         },
@@ -1449,9 +1449,9 @@
 
         },
         "LINKS": {
-            "fr": "Vous pouvez trouver ici les liens importants de [Green-bot](https://discord.com/oauth2/authorize?client_id=783708073390112830&response_type=code&permissions=19456&scope=applications.commands+bot&redirect_uri=https://green-bot.app/discord4).",
-            "en": "Here you can find the important links of [Green-bot](https://discord.com/oauth2/authorize?client_id=783708073390112830&response_type=code&permissions=19456&scope=applications.commands+bot&redirect_uri=https://green-bot.app/discord4).",
-            "de": "`📚` Hier findest du die wichtigen Links von [`Green-bot`](https://discord.com/oauth2/authorize?client_id=783708073390112830&response_type=code&permissions=19456&scope=applications.commands+bot&redirect_uri=https://green-bot.app/discord4)."
+            "fr": "Vous pouvez trouver ici les liens importants de [KOMU](https://discord.com/oauth2/authorize?client_id=783708073390112830&response_type=code&permissions=19456&scope=applications.commands+bot&redirect_uri=https://KOMU/discord4).",
+            "en": "Here you can find the important links of [KOMU](https://discord.com/oauth2/authorize?client_id=783708073390112830&response_type=code&permissions=19456&scope=applications.commands+bot&redirect_uri=https://KOMU/discord4).",
+            "de": "`📚` Hier findest du die wichtigen Links von [`KOMU`](https://discord.com/oauth2/authorize?client_id=783708073390112830&response_type=code&permissions=19456&scope=applications.commands+bot&redirect_uri=https://KOMU/discord4)."
 
         },
         "LANGNAME": {
@@ -1986,10 +1986,10 @@
         },
         "PREMIUM_NEED": {
             "en": {
-                "desc": "You need to upgrade your server to use this command. [Click here](https://green-bot.app/premium) to purchase the Premium."
+                "desc": "You need to upgrade your server to use this command. [Click here](https://KOMU/premium) to purchase the Premium."
             },
             "fr": {
-                "desc": "Vous devez mettre à jour ce serveur vers Premium pour utiliser cette commande. [Cliquez ici](https://green-bot.app/premium) pour acheter le premium."
+                "desc": "Vous devez mettre à jour ce serveur vers Premium pour utiliser cette commande. [Cliquez ici](https://KOMU/premium) pour acheter le premium."
 
 
 
@@ -1997,7 +1997,7 @@
 
             },
             "de": {
-                "desc": "You need to upgrade your server to use me.[Click here](https: //green-bot.app/premium) to purchase the Premium."
+                "desc": "You need to upgrade your server to use me.[Click here](https: //KOMU/premium) to purchase the Premium."
 
 
 
@@ -2125,7 +2125,7 @@
                 "text1": "The ticket autor marked this ticket as finished. To close it, react with 🗑️",
                 "title1": "Ticket ended",
                 "dm1": "Ticket closed in {guild}",
-                "dm2": "Your ticket has been deleted by `{tag}`. Thanks for using [me](https://green-bot.app)",
+                "dm2": "Your ticket has been deleted by `{tag}`. Thanks for using [me](https://KOMU)",
                 "desc": "This ticket is now marked as closed. Close it if you don't need help anymore",
                 "close:": "Close the ticket"
             },
@@ -2134,7 +2134,7 @@
                 "text1": "Der Ticketautor hat dieses Ticket als erledigt markiert. Um es zu schließen, reagiere mit 🗑️",
                 "title1": "Ticket beendet",
                 "dm1": "Ticket in {guild} geschlossen",
-                "dm2": "Dein Ticket wurde von `{tag}` gelöscht. Vielen Dank für die Nutzung von [mir](https://green-bot.app)",
+                "dm2": "Dein Ticket wurde von `{tag}` gelöscht. Vielen Dank für die Nutzung von [mir](https://KOMU)",
                 "desc": "Dieses Ticket ist jetzt als geschlossen gekennzeichnet. Schließe es, wenn du keine Hilfe mehr benötigst",
                 "close:": "Schließe das Ticket"
             }
@@ -2279,7 +2279,7 @@
                 "field3T": "Permissions du bot",
                 "field1D": "Pour enlever un rôle à tout le serveur\nExemple : `{prefix}massrole remove @user`",
                 "field2D": "Pour ajouter un rôle à tout le serveur\nExemple : `{prefix}massrole add @user`",
-                "field3D": "Vous devez être sur que Green-bot a la permission `Gérer les rôles` et son rôle le plus haut est au dessus du rôle voulu",
+                "field3D": "Vous devez être sur que KOMU a la permission `Gérer les rôles` et son rôle le plus haut est au dessus du rôle voulu",
                 "adding1": "<a:green_loading:824308769713815612> Ajout du rôle en cours à tous les membres qui n'ont pas le rôle",
                 "adding2": "<a:green_loading:824308769713815612> Ajout du rôle en cours à tous les membres qui n'ont pas le rôle (**{u}/{count}**)",
                 "addingOK": "<:green_succes:803264399808790529> Le rôle `{role}` à bien été donné aux **{count}** membres qui n'avaient pas ce rôle, opération réalisée en **{time}** minutes ",
@@ -2300,7 +2300,7 @@
                 "field3T": "Bot perms",
                 "field1D": "To remove a role from the entire server\nExemple : `{prefix}massrole remove @user`",
                 "field2D": "To add a role from the entire server\nExemple : `{prefix}massrole add @user`",
-                "field3D": "You must be sure that Green-bot has the `Manage Roles' permission and its highest role is above the desired role",
+                "field3D": "You must be sure that KOMU has the `Manage Roles' permission and its highest role is above the desired role",
                 "adding1": "<a:green_loading:824308769713815612> Add the current role to all members who do not have the role",
                 "adding2": "<a:green_loading:824308769713815612> Adding the current role to all members who do not have the role (**{u}/{count}**)",
                 "addingOK": "<:green_succes:803264399808790529> The `{role}` role has been given to the **{count}** members who did not have this role, operation executed in **{time}** minutes ",
@@ -2320,7 +2320,7 @@
                 "field3T": "Bot Berechtigungen",
                 "field1D": "So entfernst du eine Rolle vom gesamten Server\nBeispiel : `{prefix}massrole remove @user`",
                 "field2D": "So fügest du eine Rolle vom gesamten Server hinzu\nBeispiel : `{prefix}massrole add @user`",
-                "field3D": "Du musst sicher sein, dass Green-bot die Berechtigung `Rollen verwalten` hat und seine höchste Rolle über der gewünschten Rolle liegt",
+                "field3D": "Du musst sicher sein, dass KOMU die Berechtigung `Rollen verwalten` hat und seine höchste Rolle über der gewünschten Rolle liegt",
                 "adding1": "<a:green_loading:824308769713815612> Füge die aktuelle Rolle allen Mitgliedern hinzu, die die Rolle nicht haben",
                 "adding2": "<a:green_loading:824308769713815612> Hinzufügen der aktuellen Rolle zu allen Mitgliedern, die die Rolle nicht haben (**{u}/{count}**)",
                 "addingOK": "<:green_succes:803264399808790529> Die Rolle `{role}` wurde **{count}**-Mitgliedern zugewiesen, die diese Rolle nicht hatten, der Vorgang wurde in **{time}** Minuten ausgeführt",
@@ -2358,7 +2358,7 @@
                 "field1T": "Personnes",
                 "field1D": "Et **{rest}** autres personnes",
                 "force1": "Vous voulez des statistiques sur les discriminateurs  sur votre serveur ? ",
-                "force2": "[Invitez moi](https://green-bot.app/invite)"
+                "force2": "[Invitez moi](https://KOMU/invite)"
             },
             "en": {
                 "err": "There is nobody in the server who has as discriminator `{discrim}`.",
@@ -2366,7 +2366,7 @@
                 "field1T": "People",
                 "field1D": "And **{rest}** others..",
                 "force1": "Do you want statistics about discriminators on your server ? ",
-                "force2": "[Invite me](https://green-bot.app/invite)"
+                "force2": "[Invite me](https://KOMU/invite)"
             },
             "de": {
                 "err": "Es gibt niemanden auf dem Server, der als Diskriminator `{discrim}` hat. ",
@@ -2374,7 +2374,7 @@
                 "field1T": "Personen",
                 "field1D": "Und **{rest}** andere..",
                 "force1": "Möchtest du Statistiken über Diskriminatoren auf deinem Server?",
-                "force2": "[Lad mich ein](https://green-bot.app/invite)"
+                "force2": "[Lad mich ein](https://KOMU/invite)"
             }
         },
         "BANLIST": {
@@ -3127,19 +3127,19 @@
         },
         "HELP_COMMAND": {
             "fr": {
-                "desc": "Vous pouvez trouver la liste des commandes sur le site:\n https://green-bot.app/commands\n\n**Informations sur une commande**\n• Faîtes `{prefix}help <commande>`  Pour plus d'informations sur une commande et `{prefix}help <catégorie>` pour plus d'informations sur une catégorie.\n**Exemple**: `{prefix}help music`\n• Vous pouvez faire `{prefix}help commands` pour voir la liste des commandes sans passer par le site\n\n**Préfixe**\nMon préfixe sur **{guild}** est `{prefix}`.Pour éxécuter des commandes, mettez d'abord le préfixe puis le nom de la commande, exemple: `{prefix}play`.\nFaîtes `{prefix}setprefix <prefix>` pour changer le préfixe",
-                "title": "Commandes de Green-bot",
+                "desc": "Vous pouvez trouver la liste des commandes sur le site:\n https://KOMU/commands\n\n**Informations sur une commande**\n• Faîtes `{prefix}help <commande>`  Pour plus d'informations sur une commande et `{prefix}help <catégorie>` pour plus d'informations sur une catégorie.\n**Exemple**: `{prefix}help music`\n• Vous pouvez faire `{prefix}help commands` pour voir la liste des commandes sans passer par le site\n\n**Préfixe**\nMon préfixe sur **{guild}** est `{prefix}`.Pour éxécuter des commandes, mettez d'abord le préfixe puis le nom de la commande, exemple: `{prefix}play`.\nFaîtes `{prefix}setprefix <prefix>` pour changer le préfixe",
+                "title": "Commandes de KOMU",
                 "dm": "`✅` Regardez vos messages privés !"
 
             },
             "en": {
-                "desc": "You can find the command list directly on the website:\n https://green-bot.app/commands\n\n**Details of a command**\n• Use `{prefix}help <command>`  for more information about a command and `{prefix}help <category>` for more informations about a category.\n**Example**: `{prefix}help music`\n• You can use `{prefix}help commands` to see the commands list without going through the site\n\n**Prefix**\nMy prefix on **{guild}** is `{prefix}`.To execute commands, first write the prefix and then the command, example: `{prefix}play`.\nDo `{prefix}setprefix <prefix>` to change the prefix",
-                "title": "Green-bot commands",
+                "desc": "You can find the command list directly on the website:\n https://KOMU/commands\n\n**Details of a command**\n• Use `{prefix}help <command>`  for more information about a command and `{prefix}help <category>` for more informations about a category.\n**Example**: `{prefix}help music`\n• You can use `{prefix}help commands` to see the commands list without going through the site\n\n**Prefix**\nMy prefix on **{guild}** is `{prefix}`.To execute commands, first write the prefix and then the command, example: `{prefix}play`.\nDo `{prefix}setprefix <prefix>` to change the prefix",
+                "title": "KOMU commands",
                 "dm": "`✅` Check your private messages !"
 
             },
             "de": {
-                "desc": "Du findest die Befehlsliste direkt auf der Website:\n https://green-bot.app/commands\n\n**Details eines Befehls**\n• Verwende `{prefix}help <command>` für weitere Informationen zu einem Befehl und `{prefix}help <category>` für weitere Informationen zu einer Kategorie.\n**Beispiel**: `{prefix}help music`\n• Du kannst `{prefix}help commands` verwenden um die Befehlsliste zu sehen, ohne die Site zu durchlaufen\n\n**Prefix**\nMein Prefix auf **{guild}** ist `{prefix}`. Um Befehle auszuführen, schreibe zuerst die Prefix und dann den Befehl, Beispiel: `{prefix}play`.\nMache `{prefix}setprefix <prefix>` um die Prefix zu ändern",
+                "desc": "Du findest die Befehlsliste direkt auf der Website:\n https://KOMU/commands\n\n**Details eines Befehls**\n• Verwende `{prefix}help <command>` für weitere Informationen zu einem Befehl und `{prefix}help <category>` für weitere Informationen zu einer Kategorie.\n**Beispiel**: `{prefix}help music`\n• Du kannst `{prefix}help commands` verwenden um die Befehlsliste zu sehen, ohne die Site zu durchlaufen\n\n**Prefix**\nMein Prefix auf **{guild}** ist `{prefix}`. Um Befehle auszuführen, schreibe zuerst die Prefix und dann den Befehl, Beispiel: `{prefix}play`.\nMache `{prefix}setprefix <prefix>` um die Prefix zu ändern",
                 "title": "Green-Bot Befehle",
                 "dm": "`✅` Überprüfe deine privaten Nachrichten!"
 
@@ -3230,7 +3230,7 @@
         "STATS": {
             "fr": {
                 "desc": "",
-                "field": "**Serveurs:**\n `{server}`\n**Utilisateurs:**\n `{users}`\n**Commandes:**\n `92`\n**Version:**\n `5.1`\n**Team:**\n [Click here](https://green-bot.app/team)",
+                "field": "**Serveurs:**\n `{server}`\n**Utilisateurs:**\n `{users}`\n**Commandes:**\n `92`\n**Version:**\n `5.1`\n**Team:**\n [Click here](https://KOMU/team)",
                 "field1": "`Discord.js` : **v13-dev**\n`Owner` : **<@688402229245509844>\n**`Database` : **MongoDB**",
 
                 "links": "Liens"
@@ -3241,7 +3241,7 @@
             "en": {
 
                 "desc": "",
-                "field": "**Guilds:**\n `{server}`\n**Users:**\n `{users}`\n**Commands:**\n `92`\n**Version:**\n `5.1`\n**Team:**\n [Click here](https://green-bot.app/team)",
+                "field": "**Guilds:**\n `{server}`\n**Users:**\n `{users}`\n**Commands:**\n `92`\n**Version:**\n `5.1`\n**Team:**\n [Click here](https://KOMU/team)",
                 "field1": "`Discord.js` : **v13-dev**\n`Owner` : **<@688402229245509844>\n**`Database` : **MongoDB**",
 
                 "links": "Links"
@@ -3252,8 +3252,8 @@
             },
             "de": {
 
-                "desc": "Ich bin ein **vollständig** kostenloser Multipropose Discord-Bot und bin Open Source auf [Github](https://github.com/Pauldb09/Green-bot) füge gerne einen Stern hinzu ⭐. Unterstütze uns gerne durch [Stimmen für den Bot](https://top.gg/bot/783708073390112830/vote)\nDie Emojis stammen aus dem [`Emoji-Land`](https://discord.gg/yVRtEyweeC)\nDu kannst ein [Feedback](https://green-bot.app/feedback) um mich zu verbessern!",
-                "field": "**Server:**\n `{server}`\n**Benutzer:**\n `{users}`\n**Befehle:**\n `92`\n**Version:**\n `5.1`\n**Besitzer:**\n [Click here](https://green-bot.app/team)",
+                "desc": "Ich bin ein **vollständig** kostenloser Multipropose Discord-Bot und bin Open Source auf [Github](https://github.com/Pauldb09/KOMU) füge gerne einen Stern hinzu ⭐. Unterstütze uns gerne durch [Stimmen für den Bot](https://top.gg/bot/783708073390112830/vote)\nDie Emojis stammen aus dem [`Emoji-Land`](https://discord.gg/yVRtEyweeC)\nDu kannst ein [Feedback](https://KOMU/feedback) um mich zu verbessern!",
+                "field": "**Server:**\n `{server}`\n**Benutzer:**\n `{users}`\n**Befehle:**\n `92`\n**Version:**\n `5.1`\n**Besitzer:**\n [Click here](https://KOMU/team)",
                 "field1": "`Discord.js` : **v13-dev**\n`Besitzer` : **<@688402229245509844>\n**`Datenbank` : **MongoDB**",
 
                 "links": "Links"

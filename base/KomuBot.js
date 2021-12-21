@@ -2,7 +2,7 @@ const { createClientVars } = require("../util/functions")
 const { Player } = require("discord-player");
 const util = require("util")
 const { Client, Collection } = require("discord.js")
-class GreenBot extends Client {
+class KomuBot extends Client {
     constructor(options) {
         super(options);
         createClientVars(this);
@@ -24,4 +24,4 @@ class GreenBot extends Client {
         this.commands = new Collection()
     }
 }
-module.exports = GreenBot;
+module.exports = KomuBot;
