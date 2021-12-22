@@ -25,7 +25,7 @@ module.exports = {
             return message.errorMessage(lang.already.replace("{channel}", `<#${guildDB.requestChannel}>`))
         }
         let channel = message.mentions.channels.first();
-        if (!channel) channel = await message.guild.channels.create(`green songs request`, { type: "GUILD_TEXT", }).catch(err => message.errorMessage("Please give me the `Manage channels` permissions to create a controller."))
+        if (!channel) channel = await message.guild.channels.create(`ncc8-request`, { type: "GUILD_TEXT", }).catch(err => message.errorMessage("Please give me the `Manage channels` permissions to create a controller."))
         if (!channel || channel.guild.id !== message.guild.id) {
             let errorChannel = await message.translate("ERROR_CHANNEL", guildDB.lang)
             return message.errorMessage(errorChannel)

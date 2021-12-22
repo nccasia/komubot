@@ -21,7 +21,8 @@
         "tiktok-scraper": "^1.4.23",
         "topgg-autoposter": "^1.1.10",
         "twemoji-parser": "^13.0.0",
-        "mongoose-beautiful-unique-validation": "^7.1.1"
+        "express": "^4.17.2",
+        "body-parser": "^1.19.0"
     },
     "scripts": {
         "start": "node sharder.js",
@@ -43,5 +44,5 @@
     "bugs": {
         "url": "https://github.com/KomuBotDeveloppement/KOMU/issues"
     },
-    "homepage": "https://KOMU"
+    "homepage": "https://komu.vn"
 }

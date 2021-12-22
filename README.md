@@ -1,4 +1,4 @@
-<img width="150" height="150" align="left" style="float: left; margin: 0 10px 0 0;" alt="Green bot" src="https://cdn.discordapp.com/attachments/858004328170520606/870335874313904158/green-bot.png">
+<img width="150" height="150" align="left" style="float: left; margin: 0 10px 0 0;" alt="Green bot" src="https://img.shgstatic.com/clutchco-static/image/scale/60x60/s3fs-public/logos/nccsoft_vietnam_logo.png">
     <h3>KOMU</h3>
         If you liked this repository, feel free to leave a star ⭐ , it supports us a lot! Thanks you!
     <br><br>
@@ -15,28 +15,28 @@
                 color: white;
                 border-radius: 8px;
                 font-size: 16px;
-                font-weight: bold;" rel="nofollow" class="blue-btn" href="https://KOMU/invite"> Add the main bot •</a>
+                font-weight: bold;" rel="nofollow" class="blue-btn" href="https://komu.vn/invite"> Add the main bot •</a>
             <a target="_blank" onclick="trackCampaignWebClick('', 'description');" rel="nofollow" style="  margin: 2px 5px;
                 padding: 8px 15px;
                 background-color: white;
                 color: black;
                 border-radius: 8px;
                 font-size: 16px;
-                font-weight: bold;" href="https://KOMU/discord"> Support server •</a>
+                font-weight: bold;" href="https://komu.vn/discord"> Support server •</a>
             <a target="_blank" onclick="trackCampaignWebClick('', 'description');" rel="nofollow" style="  margin: 2px 5px;
                 padding: 8px 15px;
                 background-color: #3A871F;
                 color: white;
                 border-radius: 8px;
                 font-size: 16px;
-                font-weight: bold;" href="https://KOMU/profile"> Dashboard •</a>
+                font-weight: bold;" href="https://komu.vn/profile"> Dashboard •</a>
             <a target="_blank" onclick="trackCampaignWebClick('', 'description');" rel="nofollow" style="  margin: 2px 5px;
                        padding: 8px 15px;
                        background-color: white;
                        color: black;
                        border-radius: 8px;
                        font-size: 16px;
-                       font-weight: bold;" href="https://KOMU/commands"> Commands list </a>
+                       font-weight: bold;" href="https://komu.vn/commands"> Commands list </a>
         </div>
     </center>
     
@@ -61,7 +61,7 @@
  
 **📁 Installation**
 
-Note: If you need help with the installation, you can join our [Discord Server](https://KOMU/discord).
+Note: If you need help with the installation, you can join our [Discord Server](https://komu.vn/discord).
 
 You are looking for the All-in-One bot? [Click here](https://github.com/KomuBotDeveloppement/KOMU/tree/multipropose)
 

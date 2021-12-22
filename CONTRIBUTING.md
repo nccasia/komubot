@@ -4,7 +4,7 @@ This document is for people who want to contribute to this project!
 # How it works
 To contribute to KOMU, start with [Forking the repo](https://github.com/KomuBotDeveloppement/KOMU/fork).
 Then make your changes and Create a pull request.
-We can help you on the [Discord Server](https://KOMU/discord)
+We can help you on the [Discord Server](https://komu.vn/discord)
 
 ## Formatting
 We are using **[Prettier](https://prettier.io)** to format the code.

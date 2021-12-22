@@ -1,5 +1,13 @@
+require("../../util/extenders.js");
+
 module.exports = {
     async execute(e, client) {
-        console.log("[32m%s[0m", "NEW GUILD ", "[0m", `${e.name} [${e.memberCount.toLocaleString()} Members]\nID: ${e.id}`)        
+        // try {
+        //     if (e.author != null) {
+        //         e.author.addDB();
+        //     }
+        // } catch(err) {
+        //     console.log(err);
+        // }
     }
 };

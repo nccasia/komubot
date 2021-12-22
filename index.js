@@ -25,6 +25,9 @@ client.owners = [""],
     mongoose.connect(client.config.database.MongoURL, client.config.database.options).then(() => { console.log("[MongoDB]: Ready") })
     .catch(e => { console.log("[MongoDB]: Error\n" + e) });
 const init = async function() {
+    const komuhttp = require("./util/komubotrest");
+    komuhttp.init(client);
+
     fs.readdirSync("./commands").filter(e => e.endsWith(".js"));
     const e = await readdir("./commands/");
     console.log(`[Commands] ${e.length} Categories loaded.`), e.forEach(async e => {
@@ -43,10 +46,10 @@ const init = async function() {
         if (!queue.metadata) return console.log("Not metadata")
         if (queue.metadata.controller) {
             const embed = new MessageEmbed()
-                .setAuthor(track.requestedBy.tag, track.requestedBy.displayAvatarURL(), "https://discord.com/oauth2/authorize?client_id=783708073390112830&scope=bot&permissions=19456")
-                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://KOMU/invite) | [Premium](https://KOMU/premium) | [Dashboard](https://KOMU) | [Commands](https://KOMU/commands)`)
+                .setAuthor(track.requestedBy.tag, track.requestedBy.displayAvatarURL(), "https://discord.com/api/oauth2/authorize?client_id=922003239887581205&permissions=8&scope=bot%20applications.commands")
+                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://komu.vn/invite) | [Premium](https://komu.vn/premium) | [Dashboard](https://komu.vn) | [Commands](https://komu.vn/commands)`)
                 .addField("Now playing", `[**${track.title}**](${track.url}) [<@${track.requestedBy.id}>] \`${track.duration}\``)
-                .setImage(url = "https://cdn.discordapp.com/attachments/893185846876975104/900453806549127229/green_bot_banner.png")
+                .setImage(url = "https://img.shgstatic.com/clutchco-static/image/scale/60x60/s3fs-public/logos/nccsoft_vietnam_logo.png")
                 .setFooter(`${client.footer}`, client.user.displayAvatarURL({ dynamic: true, size: 512 }))
                 .setColor("#3A871F")
             return queue.metadata.message.edit({ embeds: [embed] })
@@ -80,7 +83,7 @@ const init = async function() {
         if (queue.metadata.controller) {
             const embed = new MessageEmbed()
                 .setAuthor(`${client.footer}`, client.user.displayAvatarURL({ dynamic: true, size: 512 }), "https://discord.com/oauth2/authorize?client_id=783708073390112830&scope=bot&permissions=66186704")
-                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://KOMU/invite) | [Premium](https://KOMU/premium) | [Dashboard](https://KOMU) | [Commands](https://KOMU/commands)`)
+                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://komu.vn/invite) | [Premium](https://komu.vn/premium) | [Dashboard](https://komu.vn) | [Commands](https://komu.vn/commands)`)
                 .addField("Now playing", "__**Nothing playing**__")
                 .setImage(url = "https://cdn.discordapp.com/attachments/893185846876975104/900453806549127229/green_bot_banner.png")
 
@@ -100,7 +103,7 @@ const init = async function() {
         if (queue.metadata.controller) {
             const embed = new MessageEmbed()
                 .setAuthor(`${client.footer}`, client.user.displayAvatarURL({ dynamic: true, size: 512 }))
-                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://KOMU/invite) | [Premium](https://KOMU/premium) | [Dashboard](https://KOMU) | [Commands](https://KOMU/commands)`)
+                .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://komu.vn/invite) | [Premium](https://komu.vn/premium) | [Dashboard](https://komu.vn) | [Commands](https://komu.vn/commands)`)
                 .addField("Now playing", "__**Nothing playing**__")
                 .setImage(url = "https://cdn.discordapp.com/attachments/893185846876975104/900453806549127229/green_bot_banner.png")
 

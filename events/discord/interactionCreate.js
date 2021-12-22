@@ -3,7 +3,14 @@ const ms = require("ms")
 module.exports = {
     async execute(interaction, client) {
         if (interaction.isButton()) {
-            console.log("BUTTON USED")
+            if (interaction.customId == "komu_checkin_yes" || interaction.customId == "komu_checkin_no") {
+                console.log(interaction.user.username + " check in! " + interaction.customId);
+                return;
+            }
+            if (interaction.customId == "komu_wfh_lbl1" || interaction.customId == "komu_wfh_lbl2") {
+                console.log(interaction.user.username + " wfh in! " + interaction.customId);
+                return;
+            }
             const guildDB = await interaction.guild.fetchDB()
             const queue = await client.player.getQueue(interaction.guild.id)
             if (!queue) {
@@ -240,7 +247,7 @@ module.exports = {
                 if (queue.metadata.controller) {
                     const embed = new Discord.MessageEmbed()
                         .setAuthor(interaction.guild.name, interaction.guild.icon ? interaction.guild.iconURL({ dynamic: true }) : "https://cdn.discordapp.com/attachments/748897191879245834/782271474450825226/0.png?size=128", "https://discord.com/oauth2/authorize?client_id=783708073390112830&scope=bot&permissions=19456")
-                        .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://KOMU/invite) | [Premium](https://KOMU/premium) | [Dashboard](https://KOMU) | [Commands](https://KOMU/commands)`)
+                        .setDescription(`Send a music name/link bellow this message to play music.\n[Invite me](https://komu.vn/invite) | [Premium](https://komu.vn/premium) | [Dashboard](https://komu.vn) | [Commands](https://komu.vn/commands)`)
                         .addField("Now playing", "__**Nothing playing**__")
                         .setImage(url = "https://cdn.discordapp.com/attachments/893185846876975104/900453806549127229/green_bot_banner.png")
 

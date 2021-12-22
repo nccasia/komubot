@@ -178,13 +178,13 @@ const checkConfig = async config => {
         error = true;
     } else {
         const mongoose = require('mongoose');
-        await mongoose.connect(config.database.MongoURL, { useUnifiedTopology: true, useNewUrlParser: true }).catch(() => {
+        await mongoose.connect(config.database.MongoURL, { useUnifiedTopology: true, useNewUrlParser: true, autoIndex: false }).catch(() => {
             console.error('✗ Your mongodb url isn\'t correct');
             error = true;
         });
     }
     if (error) {
-        if (config.logAll) console.log("Your config verification has failed. Please fix errors and try again\n\nIf you need more help, join our support server here: https://KOMU/discord")
+        if (config.logAll) console.log("Your config verification has failed. Please fix errors and try again\n\nIf you need more help, join our support server here: https://komu.vn/discord")
         process.exit(0);
 
     } else {

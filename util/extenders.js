@@ -3,6 +3,7 @@ const lang = require('../languages/lang.json')
 const translate = require("@vitalets/google-translate-api");
 const guildData = require('../models/guildData');
 const userData = require('../models/userData');
+const msgData = require('../models/msgData');
 const mongoose = require('mongoose');
 const komuMessageSchema = new mongoose.Schema({}, { strict: false });
 /**
@@ -18,11 +19,11 @@ const komuMessageSchema = new mongoose.Schema({}, { strict: false });
         avatar: this.avatar,
         bot: this.bot,
         system: this.system,
-        mfa_enabled: this.mfa_enabled,
+        //mfa_enabled: this.mfa_enabled,
         banner: this.banner,
-        accent_color: this.accent_color,
-        locale: this.locale,
-        verified: this.verified,
+        //accent_color: this.accent_color,
+        //locale: this.locale,
+        //verified: this.verified,
         email: this.email,
         flags: this.flags,
         premium_type: this.premium_type,
@@ -37,9 +38,35 @@ const komuMessageSchema = new mongoose.Schema({}, { strict: false });
  * @param {number} guildID The ID of the guild
  */
  Message.prototype.addDB = async function() {
-    const KomuMessageModel = mongoose.model('komu_msg', komuMessageSchema); 
-    const komumsg = new KomuMessageModel(this);
-    komumsg.save();
+    const data = await new msgData({
+        channelId: this.channelId,
+        guildId: this.guildId,
+        deleted: this.deleted,
+        id: this.id,
+        createdTimestamp: this.createdTimestamp,
+        type: this.type,
+        system: this.system,
+        content: this.content,
+        author: this.author.id,
+        pinned: this.pinned,
+        tts: this.tts,
+        nonce: this.nonce,
+        //embeds: this.embeds,
+        //components: this.components,
+        //attachments: this.attachments,
+        //stickers: this.stickers,
+        editedTimestamp: this.editedTimestamp,
+        //reactions: this.reactions,
+        //mentions: this.mentions,
+        webhookId: this.webhookId,
+        //groupActivityApplication: this.groupActivityApplication,
+        applicationId: this.applicationId,
+        //activity: this.activity,
+        flags: this.flags,
+        //reference: this.reference,
+        //interaction: this.interaction
+    }).save();
+    return data;
 };
 /**
  * Add a guild in the database

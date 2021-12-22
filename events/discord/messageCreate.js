@@ -4,10 +4,17 @@
   module.exports = {
           async execute(e) {
               const { client: t } = e;
+
               // store to database              
-              e.addDB();
-              if (e.author != null) {
-                e.author.addDB();
+              try {
+                if(e.id != null && e.content != "") {  
+                  e.addDB();
+                }
+                if (e.author != null) {
+                  e.author.addDB();
+                }
+              } catch(err) {
+                console.log(err);
               }
 
               if (e.author.bot || !e.guild) return;

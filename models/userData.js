@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 
 const userdb = new mongoose.Schema({
-     id: {type: String, required: true },
-     username: { type: String, required: true },
+     id: { type: String, required: false },
+     username: { type: String, required: false },
      discriminator: { type: String, required: false },
      avatar: { type: String, required: false },
      bot: { type: Boolean, required: false },

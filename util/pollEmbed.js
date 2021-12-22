@@ -47,7 +47,9 @@ const pollEmbed = async (msg, title, options, timeout = 12, emojiList = defEmoji
 				const lastVote = poll.reactions.cache.get(votedEmoji);
 				lastVote.count -= 1;
 				lastVote.users.remove(user.id);
-				emojiInfo[votedEmoji].votes -= 1;
+				if (emojiInfo[votedEmoji] !== undefined) {
+					emojiInfo[votedEmoji].votes -= 1;
+				}
 				voterInfo.set(user.id, { emoji: reaction.emoji.name });
 			}
 			if (emojiInfo[reaction.emoji.name] !== undefined) {

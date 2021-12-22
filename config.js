@@ -1,8 +1,8 @@
 module.exports = {
-    //IMPORTANT: If you need help with the installation of KOMU, you can join our support server here: https://KOMU/discord
+    //IMPORTANT: If you need help with the installation of KOMU, you can join our support server here: https://komu.vn/discord
     prefix: "*",
     // Your discord bot token. https://discord.com/developpers/bots
-    token: "OTIyMDAzMjM5ODg3NTgxMjA1.Yb7Ibg.E6LKhs3h_Z7O3asA0xGTHJ6YyQM",
+    token: "",
     // Your ID
     // Your name/tag
      owners: ["KOMU#0139"],
@@ -42,9 +42,9 @@ module.exports = {
     // some usefull links about your bot, if you don't have an information, put null.
     links: {
         support: "https://discord.gg/nrReAmApVJ",
-        website: "https://komu.vn",
+        website: "https://komu.vn.vn",
         invite: "https://discord.com/oauth2/authorize?client_id=783708073390112830&scope=bot&permissions=8",
-        commands: "https://komu.vn/commands"
+        commands: "https://komu.vn.vn/commands"
     },
     //Database
     database: {
@@ -53,5 +53,15 @@ module.exports = {
         // If you want to cache the database. For big bots
         cached: false,
         delay: 300000 * 4,
+        Options: { autoIndex: false }
     },
+    // The default language of the bot
+    komubotrest: {
+        http_port: 3000,
+        http_ip: "0.0.0.0",
+        komu_bot_secret_key: "KOMU_BOT_SECRET_KEY",
+        machleo_channel_id: "921339190090797106", 
+        thongbao_channel_id: "921239248991055885",
+        thaobao_pm_channel_id: "923146541433233428"
+    }
 }
