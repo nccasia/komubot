@@ -42,9 +42,9 @@ module.exports = {
     // some usefull links about your bot, if you don't have an information, put null.
     links: {
         support: "https://discord.gg/nrReAmApVJ",
-        website: "https://komu.vn.vn",
+        website: "https://komu.vn",
         invite: "https://discord.com/oauth2/authorize?client_id=783708073390112830&scope=bot&permissions=8",
-        commands: "https://komu.vn.vn/commands"
+        commands: "https://komu.vn/commands"
     },
     //Database
     database: {

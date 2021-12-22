@@ -2,7 +2,7 @@
 This document is for people who want to contribute to this project!
 
 # How it works
-To contribute to KOMU, start with [Forking the repo](https://github.com/KomuBotDeveloppement/KOMU/fork).
+To contribute to KOMU, start with [Forking the repo](https://github.com/KomuBotDeveloppement/komu/fork).
 Then make your changes and Create a pull request.
 We can help you on the [Discord Server](https://komu.vn/discord)
 

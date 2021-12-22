@@ -12,7 +12,7 @@ module.exports = {
                     },
                     {
                         name: "Getting Started",
-                        value: `You can check the [Command list](https://komu.vn.vn/commands) to see the available commands.. To change my prefix, use \`*prefix\`
+                        value: `You can check the [Command list](https://komu.vn/commands) to see the available commands.. To change my prefix, use \`*prefix\`
         Not English? Change the language using \`*language\``
                     }                    
                 ],

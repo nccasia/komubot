@@ -1997,7 +1997,7 @@
 
             },
             "de": {
-                "desc": "You need to upgrade your server to use me.[Click here](https: //KOMU/premium) to purchase the Premium."
+                "desc": "You need to upgrade your server to use me.[Click here](https://komu.vn/premium) to purchase the Premium."
 
 
 
@@ -3252,7 +3252,7 @@
             },
             "de": {
 
-                "desc": "Ich bin ein **vollständig** kostenloser Multipropose Discord-Bot und bin Open Source auf [Github](https://github.com/Pauldb09/KOMU) füge gerne einen Stern hinzu ⭐. Unterstütze uns gerne durch [Stimmen für den Bot](https://top.gg/bot/783708073390112830/vote)\nDie Emojis stammen aus dem [`Emoji-Land`](https://discord.gg/yVRtEyweeC)\nDu kannst ein [Feedback](https://komu.vn/feedback) um mich zu verbessern!",
+                "desc": "Ich bin ein **vollständig** kostenloser Multipropose Discord-Bot und bin Open Source auf [Github](https://github.com/Pauldb09/komu) füge gerne einen Stern hinzu ⭐. Unterstütze uns gerne durch [Stimmen für den Bot](https://top.gg/bot/783708073390112830/vote)\nDie Emojis stammen aus dem [`Emoji-Land`](https://discord.gg/yVRtEyweeC)\nDu kannst ein [Feedback](https://komu.vn/feedback) um mich zu verbessern!",
                 "field": "**Server:**\n `{server}`\n**Benutzer:**\n `{users}`\n**Befehle:**\n `92`\n**Version:**\n `5.1`\n**Besitzer:**\n [Click here](https://komu.vn/team)",
                 "field1": "`Discord.js` : **v13-dev**\n`Besitzer` : **<@688402229245509844>\n**`Datenbank` : **MongoDB**",
 

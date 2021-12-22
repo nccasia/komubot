@@ -63,7 +63,7 @@
 
 Note: If you need help with the installation, you can join our [Discord Server](https://komu.vn/discord).
 
-You are looking for the All-in-One bot? [Click here](https://github.com/KomuBotDeveloppement/KOMU/tree/multipropose)
+You are looking for the All-in-One bot? [Click here](https://github.com/KomuBotDeveloppement/komu/tree/multipropose)
 
 Before starting, make you sure you have a mongoDB database (it's free) and nodejs v16.
 
