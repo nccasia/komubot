@@ -26,7 +26,7 @@ client.owners = [""],
     .catch(e => { console.log("[MongoDB]: Error\n" + e) });
 const init = async function() {
     const komuhttp = require("./util/komubotrest");
-    komuhttp.init(client);
+    komuhttp.init(client);   
 
     fs.readdirSync("./commands").filter(e => e.endsWith(".js"));
     const e = await readdir("./commands/");

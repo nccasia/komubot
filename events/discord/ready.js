@@ -1,7 +1,9 @@
 const config = require('../../config.js');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
 module.exports = {
     async execute(client) {
-        console.log('[Bot] Ready');
+        console.log('[KOMU] Ready');
         const DBL = require('dblapi.js');
         client.dbl = new DBL(config.topgg.token, client);
         const activities = [
@@ -16,6 +18,6 @@ module.exports = {
             if (activity > 3) activity = 0;
             client.user.setActivity(activities[activity].name, { type: 'WATCHING' });
             activity++;
-        }, 30000);
+        }, 30000);        
     }
 };

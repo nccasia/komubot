@@ -59,10 +59,10 @@ module.exports = {
     komubotrest: {
         http_port: 3000,
         http_ip: "0.0.0.0",
-        komu_bot_secret_key: "6kkCZQja9Gn27kTiv",
+        komu_bot_secret_key: "",
         machleo_channel_id: "921339190090797106", 
         thongbao_channel_id: "921239248991055885",
-        thongbao_pm_channel_id: "923146541433233428",
+        thongbao_pm_channel_id: "923521414810710036",
         CHECK_IN_URL: "http://172.16.10.200:8000",
     }
 }

@@ -23,25 +23,6 @@ sendMessageKomuToUser = async(client, msg, username) => {
   }
 }
 
-sendMessageToUser = async(client, req, res) => {
-  if(!req.get("X-Secret-Key") || req.get("X-Secret-Key") !== client.config.komubotrest.komu_bot_secret_key) {
-    res.status(403).send({message: "Missing secret key!"});
-  }
-  if (!req.body.userName) {
-    res.status(400).send({ message: "Content can not be empty!" });
-    return;
-  }
-  const userName = req.body.userName;
-  const mess = req.body.message;
-  sendMessageKomuToUser(client, mess, userName).then(user => {
-    if(user) {
-      res.status(200).send({message: "Successfully!"});
-    } else {
-      res.status(400).send({message: "Error!"});
-    }
-  });
-}
-
 // send image check in to user
 sendImageCheckInToUser = async (client, req, res) => {
   // Validate request
@@ -50,27 +31,36 @@ sendImageCheckInToUser = async (client, req, res) => {
     return;
   }
   if (!req.body.username) {
-    res.status(400).send({ message: "Content can not be empty!" });
+    res.status(400).send({ message: "username can not be empty!" });
     return;
   }
+  if (!req.body.verifiedImageId) {
+    res.status(400).send({ message: "VerifiedImageId can not be empty!" });
+    return;
+  }
+  const verifiedImageId = req.body.verifiedImageId.replace(/ /g, "");
   const username = req.body.username;
   try {
     const user = await sendMessageKomuToUser(client, 'Bạn vừa check-in thành công!', username);
     if(!user) {
-        res.status(400).send({ message: "Error!" });
-        return;
+      res.status(400).send({ message: "Error!" });
+      return;
     }
 
     const path = req.body.pathImage.replace(/\\/g, '/');
+    if (!path) {
+      res.status(400).send({ message: "Path can not be empty!" });
+      return;
+    }
 
     const row = new MessageActionRow()
 			.addComponents(
 				new MessageButton()
-					.setCustomId('komu_checkin_yes')
+					.setCustomId('komu_checkin_yes#' + verifiedImageId)
 					.setLabel('Yes')
 					.setStyle('PRIMARY'),
                 new MessageButton()
-					.setCustomId('komu_checkin_no')
+					.setCustomId('komu_checkin_no#' + verifiedImageId)
 					.setLabel('No')
 					.setStyle('SECONDARY'),
 			);
@@ -99,7 +89,11 @@ sendImageLabelToUser = async (client, req, res) => {
     res.status(400).send({ message: "Content can not be empty!" });
     return;
   }
-  
+  if (!req.body.imageLabelId) {
+    res.status(400).send({ message: "ImageLabelId can not be empty!" });
+    return;
+  }
+  const imagelabel = req.body.imageLabelId.replace(/ /g, "");
   const username = req.body.username;
   try {
     const user = await sendMessageKomuToUser(client, 'Bạn hãy trả lời tin nhắn WFH!', username);
@@ -125,11 +119,11 @@ sendImageLabelToUser = async (client, req, res) => {
     const row = new MessageActionRow()
 			.addComponents(
 				new MessageButton()
-					.setCustomId('komu_wfh_lbl1')
+					.setCustomId('komu_wfh_lbl1#' + imagelabel)
 					.setLabel(label1)
 					.setStyle('PRIMARY'),
                 new MessageButton()
-					.setCustomId('komu_wfh_lbl2')
+					.setCustomId('komu_wfh_lbl2#' + imagelabel)
 					.setLabel(label2)
 					.setStyle('SECONDARY'),    
 			);

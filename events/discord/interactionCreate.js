@@ -4,41 +4,52 @@ const axios = require('axios')
 module.exports = {
     async execute(interaction, client) {
         if (interaction.isButton()) {
-            if (interaction.customId == "komu_checkin_yes" || interaction.customId == "komu_checkin_no") {
-                console.log(interaction.user.username + " check in! " + interaction.customId);
-                const msg = `👍 Have a good day!!!`;
-                if (interaction.customId == "komu_checkin_yes") {
-                    msg = "`👎 Let me check!`";
+            if (interaction.customId.startsWith("komu_")) {                
+                const arrIds = interaction.customId.split("#");
+                const customId = arrIds[0];
+                const labelImageId = (arrIds.length > 1)?interaction.customId.split("#")[1]:"";
+                var isCheckin = true;
+                var msg = "";
+                if (customId == "komu_checkin_yes" || customId == "komu_checkin_no") {
+                    console.log(interaction.user.username + " check in! " + customId);                
+                    msg = `👍 Have a good day!!!`;
+                    if (customId == "komu_checkin_no") {
+                        msg = `👎 Let me check!`;
+                    }                    
+                } else if (customId == "komu_wfh_lbl1" || customId == "komu_wfh_lbl2") {
+                    console.log(interaction.user.username + " wfh in! " + customId);
+                    msg = `👍 Let's rock!!!`;
+                    if (customId == "komu_wfh_lbl2") {
+                        msg = "`👎 Thanks!`";
+                    }
+                    isCheckin = false;                    
+                } else {
+                    interaction.reply("Invalid customId " + customId);
+                    return;
                 }
-                interaction.reply({ content: msg, ephemeral: true })
-                return;
-            }
-            if (interaction.customId == "komu_wfh_lbl1" || interaction.customId == "komu_wfh_lbl2") {
-                console.log(interaction.user.username + " wfh in! " + interaction.customId);
-
                 /*try {
-                    const imageLabelId = interaction.user.username;
-                    const answerFaceConfirm = interaction.customId;
-                    const emotion = interaction.user.id;
+                    const verifiedImageId = labelImageId;
+                    const imageLabelId = labelImageId;
+                    const answerFaceConfirm = interaction.user.username;
+                    const emotion = customId;
                     await axios.put(`${client.config.komubotrest.CHECK_IN_URL}/v1/employees/image-label/update-image-label`,
                     {
+                        verifiedImageId,
                         imageLabelId,
                         answerFaceConfirm,
-                        emotion
+                        emotion,
+                        isCheckin
                     }, 
                     { headers: { 'X-Secret-Key': client.config.komubotrest.komu_bot_secret_key} });
                     console.log('Update update message WFH successfully!');
                 } catch (error) {
                     console.log('Update update message WFH! - ERROR: ' + error);
                 }*/
-                const msg = `👍 Let's rock!!!`;
-                if (interaction.customId == "komu_wfh_lbl2") {
-                    msg = "`👎 Thanks!`";
-                }
-
-                interaction.reply({ content: msg, ephemeral: true })
+                // end process wfh command
+                interaction.reply({ content: msg, ephemeral: true });
                 return;
             }
+
             const guildDB = await interaction.guild.fetchDB()
             const queue = await client.player.getQueue(interaction.guild.id)
             if (!queue) {
@@ -288,12 +299,6 @@ module.exports = {
             }
         }
         if (!interaction.isCommand()) return;
-        if (interaction.commandName === 'wiki') {
-            return;
-        }        
-        if (interaction.commandName === 'task') {
-            return;
-        }
         await interaction.reply({ content: "`❌` Slash commands are under construction.\n"});
 
     }
