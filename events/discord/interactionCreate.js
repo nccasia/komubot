@@ -1,14 +1,42 @@
 const Discord = require("discord.js")
 const ms = require("ms")
+const axios = require('axios')
 module.exports = {
     async execute(interaction, client) {
         if (interaction.isButton()) {
             if (interaction.customId == "komu_checkin_yes" || interaction.customId == "komu_checkin_no") {
                 console.log(interaction.user.username + " check in! " + interaction.customId);
+                const msg = `👍 Have a good day!!!`;
+                if (interaction.customId == "komu_checkin_yes") {
+                    msg = "`👎 Let me check!`";
+                }
+                interaction.reply({ content: msg, ephemeral: true })
                 return;
             }
             if (interaction.customId == "komu_wfh_lbl1" || interaction.customId == "komu_wfh_lbl2") {
                 console.log(interaction.user.username + " wfh in! " + interaction.customId);
+
+                /*try {
+                    const imageLabelId = interaction.user.username;
+                    const answerFaceConfirm = interaction.customId;
+                    const emotion = interaction.user.id;
+                    await axios.put(`${client.config.komubotrest.CHECK_IN_URL}/v1/employees/image-label/update-image-label`,
+                    {
+                        imageLabelId,
+                        answerFaceConfirm,
+                        emotion
+                    }, 
+                    { headers: { 'X-Secret-Key': client.config.komubotrest.komu_bot_secret_key} });
+                    console.log('Update update message WFH successfully!');
+                } catch (error) {
+                    console.log('Update update message WFH! - ERROR: ' + error);
+                }*/
+                const msg = `👍 Let's rock!!!`;
+                if (interaction.customId == "komu_wfh_lbl2") {
+                    msg = "`👎 Thanks!`";
+                }
+
+                interaction.reply({ content: msg, ephemeral: true })
                 return;
             }
             const guildDB = await interaction.guild.fetchDB()

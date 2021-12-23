@@ -155,8 +155,17 @@ sendMessageToChannel = async(client, req, res) => {
     return;
   }
 
+  if (!req.body.channelid) {
+    res.status(400).send({ message: "ChannelId can not be empty!" });
+    return;
+  }
+
+  if (!req.body.message) {
+    res.status(400).send({ message: "Message can not be empty!" });
+    return;
+  }
   const message = req.body.message;
-  const channelid = req.body.channelid;
+  const channelid = req.body.channelid;  
 
   try {
     client.channels.cache.get(channelid).send(message).then(() => {
@@ -171,7 +180,15 @@ sendMessageToChannel = async(client, req, res) => {
 
 sendMessageToMachLeo = async(client, req, res) => {
   req.body.channelid = client.config.komubotrest.machleo_channel_id;
-  req.body.message =  `<@${userName}> không trả lời tin nhắn WFH lúc ${createDate} !`;
+  if (!req.body.username) {
+    res.status(400).send({ message: "username can not be empty!" });
+    return;
+  }
+  if (!req.body.createdate) {
+    res.status(400).send({ message: "createdate can not be empty!" });
+    return;
+  }
+  req.body.message =  `@${req.body.username} không trả lời tin nhắn WFH lúc ${req.body.createdate} !`;
   await sendMessageToChannel(client, req, res);
 }
 
