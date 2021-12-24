@@ -213,7 +213,17 @@ sendMessageToMachLeo = async(client, req, res) => {
     res.status(400).send({ message: "createdate can not be empty!" });
     return;
   }
-  req.body.message =  `@${req.body.username} không trả lời tin nhắn WFH lúc ${req.body.createdate} !`;
+
+  const userdb = await userData.findOne({username: req.body.username});
+  var userid = "";
+  if (!userdb) {
+    console.log("User not found in DB!", req.body.username);
+    userid = req.body.username;
+  } else {
+    userid = userdb.id;
+  }
+
+  req.body.message =  `<@${userid}> không trả lời tin nhắn WFH lúc ${req.body.createdate} !`;
   await sendMessageToChannel(client, req, res);
 }
 

@@ -27,7 +27,7 @@ module.exports = {
                     interaction.reply("Invalid customId " + customId);
                     return;
                 }
-                /*try {
+                try {
                     const verifiedImageId = labelImageId;
                     const imageLabelId = labelImageId;
                     const answerFaceConfirm = interaction.user.username;
@@ -44,7 +44,7 @@ module.exports = {
                     console.log('Update update message WFH successfully!');
                 } catch (error) {
                     console.log('Update update message WFH! - ERROR: ' + error);
-                }*/
+                }
                 // end process wfh command
                 interaction.reply({ content: msg, ephemeral: true });
                 return;
