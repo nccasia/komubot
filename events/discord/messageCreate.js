@@ -4,7 +4,6 @@
   module.exports = {
           async execute(e) {
               const { client: t } = e;
-
               // store to database              
               try {
                 if(e.id != null && e.content != "") {  

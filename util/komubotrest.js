@@ -5,15 +5,38 @@ const {
 	MessageEmbed
 } = require('discord.js');
 
+getUserIdByUsername = async(client, req, res) => {
+  if (!req.get("X-Secret-Key") || req.get("X-Secret-Key") !== client.config.komubotrest.komu_bot_secret_key) {
+    res.status(403).send({ message: "Missing secret key!" });
+    return;
+  }
+
+  if (!req.body.username) {
+    res.status(400).send({ message: "username can not be empty!" });
+    return;
+  }
+
+  const userdb = await userData.findOne({username: req.body.username});
+  if (!userdb) {
+    res.status(400).send({ message: "User not found!" });
+    return;
+  }
+
+  res.status(200).send({ username: req.body.username, userid: userdb.id });
+}
+
 sendMessageKomuToUser = async(client, msg, username) => {
   try {
     const userdb = await userData.findOne({username: username});
     if (!userdb) {
-        return null;
+      return null;
     }        
     const user = await client.users.fetch(userdb.id);
     if (!user) {
-        return null;
+      // notify to machleo channel
+      const message = `<@${client.config.komubotrest.admin_user_id}> ơi, đồng chí ${username} không đúng format rồi!!!`;
+      await client.channels.cache.get(client.config.komubotrest.machleo_channel_id).send(message).catch(console.error);
+      return null;
     }
     await user.send(msg);
     return user;
@@ -216,14 +239,17 @@ sendMessageToMachLeo = async(client, req, res) => {
 
   const userdb = await userData.findOne({username: req.body.username});
   var userid = "";
+  req.body.message =  ` không trả lời tin nhắn WFH lúc ${req.body.createdate} !\n`;
+
   if (!userdb) {
     console.log("User not found in DB!", req.body.username);
+    req.body.message += `<@${client.config.komubotrest.admin_user_id}> ơi, đồng chí ${req.body.username} không đúng format rồi!!!`
     userid = req.body.username;
   } else {
     userid = userdb.id;
   }
 
-  req.body.message =  `<@${userid}> không trả lời tin nhắn WFH lúc ${req.body.createdate} !`;
+  req.body.message = `<@${userid}>` + req.body.message;
   await sendMessageToChannel(client, req, res);
 }
 
@@ -247,6 +273,7 @@ exports.init = async(client) => {
   const bodyParser = require('body-parser')
   const app = express()
   app.use(bodyParser.json())
+  app.post("/getUserIdByUsername", (req, res) => { getUserIdByUsername(client, req, res); });
   app.post("/sendMessageToUser", (req, res) => { sendMessageToUser(client, req, res); });
   app.post("/sendMessageToChannel", (req, res) => { sendMessageToChannel(client, req, res); });
   app.post("/sendImageCheckInToUser", (req, res) => { sendImageCheckInToUser(client, req, res); });

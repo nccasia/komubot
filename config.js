@@ -64,7 +64,8 @@ module.exports = {
         thongbao_channel_id: "921239248991055885",
         finance_channel_id: "922344796218093619",
         thongbao_pm_channel_id: "923521414810710036",
-        CHECK_IN_URL: "http://172.16.10.200:8000",
+        CHECK_IN_URL: "http://172.16.100.153:8000",
+        admin_user_id: "840420960162152470",
     },
     wiki: {
         options: [
