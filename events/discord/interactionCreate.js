@@ -34,11 +34,11 @@ module.exports = {
                     const answerValue = customId;
                     await axios.put(`${client.config.komubotrest.CHECK_IN_URL}/v1/employees/image-label/update-image-label`,
                     {
-                        verifiedImageId,
-                        imageLabelId,
-                        answerFaceConfirm,
-                        answerValue,
-                        isCheckin
+                        verifiedImageId: verifiedImageId,
+                        imageLabelId: imageLabelId,
+                        answerFaceConfirm: answerFaceConfirm,
+                        answerValue: answerValue,
+                        isCheckin: isCheckin
                     }, 
                     { headers: { 'X-Secret-Key': client.config.komubotrest.komu_bot_secret_key} });
                     console.log('Update update message WFH successfully!');
@@ -46,7 +46,7 @@ module.exports = {
                     console.log('Update update message WFH! - ERROR: ' + error);
                 }
                 // end process wfh command
-                interaction.reply({ content: msg, ephemeral: true });
+                interaction.reply({ content: msg, ephemeral: true }).catch(console.error);
                 return;
             }
 

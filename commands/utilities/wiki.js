@@ -5,8 +5,11 @@ module.exports = {
     description: 'manage wiki',
     cat: 'utilities',
     async execute(message, args, client, guildDB) {
-        if (args[0] == "help" || !client.config.wiki.options.includes(args[0])) {
-            message.reply("Available commands: \n" + client.config.wiki.options.map(x => `\`${x}\``).join(' '));
+        var supportTypes = await taskData.find().distinct('type');        
+        supportTypes = supportTypes.concat(client.config.wiki.options);
+        supportTypes = [ ...new Set(supportTypes)];
+        if (args[0] == "help" || !supportTypes.includes(args[0])) {
+            message.reply("Available commands: \n" + supportTypes.map(x => `\`${x}\``).join(' '));
             return;
         }
         var filter = {type: args[0]};
@@ -26,11 +29,10 @@ module.exports = {
             }
             let result = "\`\`\`\n";
             docs.forEach(doc => {
-                result += `*${doc.name}*\n`;
+                result += `${doc.name}\n`;
                 result += `${doc.value}\n\n`;
             });
             result += "\`\`\`";
-            console.log(result);
             message.reply(result);
             return;
         });
