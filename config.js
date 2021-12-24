@@ -62,7 +62,31 @@ module.exports = {
         komu_bot_secret_key: "",
         machleo_channel_id: "921339190090797106", 
         thongbao_channel_id: "921239248991055885",
+        finance_channel_id: "922344796218093619",
         thongbao_pm_channel_id: "923521414810710036",
         CHECK_IN_URL: "http://172.16.10.200:8000",
+    },
+    wiki: {
+        options: [
+            'all',
+            'link',
+            'code',
+            'file',
+            'image',
+            'cmd',
+            'event',
+            'pm',
+            'hr',
+            'komu',
+            'policy',
+            'office',
+            'project',
+            'ot', 
+            'checkpoint',
+            'timesheet',
+            'tx8',
+            'fun',
+            "help",
+        ]
     }
 }
