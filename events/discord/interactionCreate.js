@@ -31,13 +31,13 @@ module.exports = {
                     const verifiedImageId = labelImageId;
                     const imageLabelId = labelImageId;
                     const answerFaceConfirm = interaction.user.username;
-                    const emotion = customId;
+                    const answerValue = customId;
                     await axios.put(`${client.config.komubotrest.CHECK_IN_URL}/v1/employees/image-label/update-image-label`,
                     {
                         verifiedImageId,
                         imageLabelId,
                         answerFaceConfirm,
-                        emotion,
+                        answerValue,
                         isCheckin
                     }, 
                     { headers: { 'X-Secret-Key': client.config.komubotrest.komu_bot_secret_key} });

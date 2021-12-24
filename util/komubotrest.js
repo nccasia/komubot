@@ -23,6 +23,37 @@ sendMessageKomuToUser = async(client, msg, username) => {
   }
 }
 
+sendMessageToUser = async(client, req, res) => {
+  if (!req.get("X-Secret-Key") || req.get("X-Secret-Key") !== client.config.komubotrest.komu_bot_secret_key) {
+    res.status(403).send({ message: "Missing secret key!" });
+    return;
+  }
+
+  if (!req.body.username) {
+    res.status(400).send({ message: "username can not be empty!" });
+    return;
+  }
+
+  if (!req.body.message) {
+    res.status(400).send({ message: "Message can not be empty!" });
+    return;
+  }
+  const username = req.body.username;
+  const message = req.body.message;
+
+  try {
+    const user = await sendMessageKomuToUser(client, message, username);
+    if(!user) {
+      res.status(400).send({ message: "Error!" });
+      return;
+    }
+    res.status(200).send({ message: "Successfully!" });
+  } catch (error) {
+    console.log('error', error);
+    res.status(400).send({ message: error });
+  }
+}
+
 // send image check in to user
 sendImageCheckInToUser = async (client, req, res) => {
   // Validate request
@@ -196,23 +227,24 @@ sendMessageToThongBao = async(client, req, res) => {
   await sendMessageToChannel(client, req, res);
 }
 
+sendMessageToFinance = async(client, req, res) => {
+  req.body.channelid = client.config.komubotrest.finance_channel_id;
+  await sendMessageToChannel(client, req, res);
+}
+
 exports.init = async(client) => {
   const express = require("express")
   const bodyParser = require('body-parser')
   const app = express()
   app.use(bodyParser.json())
-  
+  app.post("/sendMessageToUser", (req, res) => { sendMessageToUser(client, req, res); });
   app.post("/sendMessageToChannel", (req, res) => { sendMessageToChannel(client, req, res); });
-
   app.post("/sendImageCheckInToUser", (req, res) => { sendImageCheckInToUser(client, req, res); });
-
   app.post("/sendImageLabelToUser", (req, res) => { sendImageLabelToUser(client, req, res); });
-
   app.post("/sendMessageToMachLeo", (req, res) => { sendMessageToMachLeo(client, req, res); });
-
   app.post("/sendMessageToThongBao", (req, res) => { sendMessageToThongBao(client, req, res); });
-
   app.post("/sendMessageToThongBaoPM", (req, res) => { sendMessageToThongBaoPM(client, req, res); });
+  app.post("/sendMessageToFinance", (req, res) => { sendMessageToFinance(client, req, res); });
 
   app.listen(client.config.komubotrest.http_port, client.config.komubotrest.http_ip, () => console.log(`Server is listening on port ${client.config.komubotrest.bodyParserhttp_port}!`));
 }
