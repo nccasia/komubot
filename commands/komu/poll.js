@@ -2,7 +2,7 @@ const pollEmbed = require("../../util/pollEmbed.js");
 module.exports = {
     name: 'poll',
     description: 'create a poll',
-    cat: 'utilities',
+    cat: 'komu',
     async execute(message, args, client, guildDB) {
         const cmds = args.join(" ").split("+");
         const options = cmds.slice(1);

@@ -299,13 +299,11 @@ module.exports = {
             }
         }
         if (!interaction.isCommand()) return;
-        const cmd = interaction.commandName.substring(0, 7);
-        if (cmd === 'machleo') {
-            const message = interaction.options.get("message").value;
-            await client.channels.cache.get(client.config.komubotrest.machleo_channel_id).send(message).catch(console.error);
-            interaction.reply({ content: `\`✅\` Message sent to #macleo.`, ephemeral: true });
-            return;
+        const slashcmdexec = client.slashexeccommands.get(interaction.commandName);
+        if (slashcmdexec != null && slashcmdexec != undefined) {
+            slashcmdexec(interaction, client).catch(console.error);
+        } else {
+            await interaction.reply({ content: "`❌` Slash commands are under construction.\n"});
         }
-        await interaction.reply({ content: "`❌` Slash commands are under construction.\n"});
     }
 };

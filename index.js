@@ -28,11 +28,13 @@ const init = async function() {
     const komuhttp = require("./util/komubotrest");
     komuhttp.init(client);
     client.slashcommands = [];
+    client.slashexeccommands = new Collection();
     // Loading commands from the commands folder
     const commandFiles = fs.readdirSync('./slashcommands').filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
         const command = require(`./slashcommands/${file}`);
         client.slashcommands.push(command.data.toJSON());
+        client.slashexeccommands.set(command.data.name, command.execute);
     }
     fs.readdirSync("./commands").filter(e => e.endsWith(".js"));
     const e = await readdir("./commands/");

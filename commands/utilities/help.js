@@ -21,7 +21,7 @@ module.exports = {
                         fields: [{
                             name: "• KOMU (" + t.filter((e) => "komu" === e.cat).size + ")",
                             value: t
-                                .filter((e) => "moku" === e.cat)
+                                .filter((e) => "komu" === e.cat)
                                 .map((e) => `\`${e.name}\``)
                                 .join(", "),
                         }, {
