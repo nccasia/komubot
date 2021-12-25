@@ -15,11 +15,10 @@ module.exports = {
         const { data } = await axios
         .get(
             `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`,
-        ).catch((err) => console.log("WTF WTF WTF " + err));
-
-        if (!data || !data.length || data === undefined) {
-            return message.channel.send(`Nothing match... **${word}**.`);
-        }
+        ).catch((err) => {
+            console.log("WTF WTF WTF", err);
+            return message.reply({ content: `Nothing match... **${word}**.`, ephemeral: true });
+        });
 
         const botTexts = [];
         const botExamples = [];
@@ -56,6 +55,6 @@ module.exports = {
                 { name: "phonetics", value: botTexts.join("\n"), inline: false },
                 { name: "meanings", value: botExamples.join("\n").substring(0, 1024), inline: false },
             );
-        message.reply({ embeds: [embed] }).catch((err) => console.log(err));    
+        message.reply({ embeds: [embed], ephemeral: true }).catch((err) => console.log(err));    
     },
 };

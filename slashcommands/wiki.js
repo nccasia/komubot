@@ -15,7 +15,7 @@ module.exports = {
         supportTypes = supportTypes.concat(client.config.wiki.options);
         supportTypes = [ ...new Set(supportTypes)];
         if (topic == "help" || !supportTypes.includes(topic)) {
-            message.reply("Available commands: \n" + supportTypes.map(x => `\`${x}\``).join(' '));
+            message.reply({ content: "Available commands: \n" + supportTypes.map(x => `\`${x}\``).join(' '), ephemeral: true });
             return;
         }
         var filter = {type: topic};
@@ -25,11 +25,11 @@ module.exports = {
         wikiData.find(filter, (err, docs) => {
             if (err) {
                 console.log(err);
-                message.reply("Error");
+                message.reply({ content:"Error", ephemeral: true });
                 return;
             }
             if (docs.length === 0) {
-                message.reply("No data");
+                message.reply({ content:"No data", ephemeral: true });
                 return;
             }
             let result = "\`\`\`\n";
@@ -38,7 +38,7 @@ module.exports = {
                 result += `${doc.value}\n\n`;
             });
             result += "\`\`\`";
-            message.reply(result);
+            message.reply({ content: result, ephemeral: true });
             return;
         });
     }         

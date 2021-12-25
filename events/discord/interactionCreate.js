@@ -303,7 +303,7 @@ module.exports = {
         if (slashcmdexec != null && slashcmdexec != undefined) {
             slashcmdexec(interaction, client).catch(console.error);
         } else {
-            await interaction.reply({ content: "`❌` Slash commands are under construction.\n"});
+            await interaction.reply({ content: "`❌` Slash commands are under construction.\n", ephemeral: true });
         }
     }
 };
