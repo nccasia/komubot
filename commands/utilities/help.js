@@ -19,6 +19,12 @@ module.exports = {
                         footer: { text: o.replace("{prefix}", m), icon_url: e.client.user.displayAvatarURL({ dynamic: !0, size: 512 }) },
                         description: "A detailed list of commands can be found here: [" + client.config.links.website + "/commands](https://komu.vn/commands)\nWant to listen rich quality music with me? [Invite me](" + client.config.links.invite + ")",
                         fields: [{
+                            name: "• KOMU (" + t.filter((e) => "komu" === e.cat).size + ")",
+                            value: t
+                                .filter((e) => "moku" === e.cat)
+                                .map((e) => `\`${e.name}\``)
+                                .join(", "),
+                        }, {
                             name: `• Filters (6)`,
                             value: t
                                 .filter((e) => "filters" === e.cat)

@@ -4,6 +4,22 @@ const { Routes } = require('discord-api-types/v9');
 module.exports = {
     async execute(client) {
         console.log('[KOMU] Ready');
+
+        const CLIENT_ID = client.user.id;
+        const rest = new REST({
+            version: '9'
+        }).setToken(client.token);
+        (async () => {
+            try {
+                await rest.put(                    
+                    Routes.applicationCommands(CLIENT_ID), {body: client.slashcommands},
+                );
+                console.log('Successfully registered application commands globally');
+            } catch (error) {
+                if (error) console.error(error);
+            }
+        })();
+
         const DBL = require('dblapi.js');
         client.dbl = new DBL(config.topgg.token, client);
         const activities = [

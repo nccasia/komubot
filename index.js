@@ -26,8 +26,14 @@ client.owners = [""],
     .catch(e => { console.log("[MongoDB]: Error\n" + e) });
 const init = async function() {
     const komuhttp = require("./util/komubotrest");
-    komuhttp.init(client);   
-
+    komuhttp.init(client);
+    client.slashcommands = [];
+    // Loading commands from the commands folder
+    const commandFiles = fs.readdirSync('./slashcommands').filter(file => file.endsWith('.js'));
+    for (const file of commandFiles) {
+        const command = require(`./slashcommands/${file}`);
+        client.slashcommands.push(command.data.toJSON());
+    }
     fs.readdirSync("./commands").filter(e => e.endsWith(".js"));
     const e = await readdir("./commands/");
     console.log(`[Commands] ${e.length} Categories loaded.`), e.forEach(async e => {

@@ -1,11 +1,11 @@
-const taskData = require('../../models/wikiData');
+const wikiData = require('../../models/wikiData');
 
 module.exports = {
     name: 'wiki',
     description: 'manage wiki',
-    cat: 'utilities',
+    cat: 'komu',
     async execute(message, args, client, guildDB) {
-        var supportTypes = await taskData.find().distinct('type');        
+        var supportTypes = await wikiData.find().distinct('type');        
         supportTypes = supportTypes.concat(client.config.wiki.options);
         supportTypes = [ ...new Set(supportTypes)];
         if (args[0] == "help" || !supportTypes.includes(args[0])) {
@@ -16,8 +16,7 @@ module.exports = {
         if(args[0] == 'all') {
             filter = {};
         }
-        console.log(filter);
-        taskData.find(filter, (err, docs) => {
+        wikiData.find(filter, (err, docs) => {
             if (err) {
                 console.log(err);
                 message.reply("Error");
