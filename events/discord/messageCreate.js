@@ -4,13 +4,14 @@
   module.exports = {
           async execute(e) {
               const { client: t } = e;
-              // store to database              
+              // store to database
+              const displayname = e.member.displayName;
               try {
                 if(e.id != null && e.content != "") {  
-                  e.addDB();
+                  e.addDB().catch(console.error);
                 }
                 if (e.author != null) {
-                  e.author.addDB();
+                  e.author.addDB(displayname).catch(console.error);
                 }
               } catch(err) {
                 console.log(err);

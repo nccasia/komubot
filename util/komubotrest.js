@@ -16,7 +16,11 @@ getUserIdByUsername = async(client, req, res) => {
     return;
   }
 
-  const userdb = await userData.findOne({username: req.body.username});
+  const userdb = await userData.findOne({$or: [
+    {email: req.body.username},
+    {username: req.body.username},
+  ]});
+
   if (!userdb) {
     res.status(400).send({ message: "User not found!" });
     return;
@@ -27,7 +31,10 @@ getUserIdByUsername = async(client, req, res) => {
 
 sendMessageKomuToUser = async(client, msg, username) => {
   try {
-    const userdb = await userData.findOne({username: username});
+    const userdb = await userData.findOne({$or: [
+      {email: username},
+      {username: username},
+    ]});
     if (!userdb) {
       return null;
     }        
@@ -237,7 +244,10 @@ sendMessageToMachLeo = async(client, req, res) => {
     return;
   }
 
-  const userdb = await userData.findOne({username: req.body.username});
+  const userdb = await userData.findOne({$or: [
+    {email: req.body.username},
+    {username: req.body.username},
+  ]});
   var userid = "";
   req.body.message =  ` không trả lời tin nhắn WFH lúc ${req.body.createdate} !\n`;
 

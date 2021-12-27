@@ -10,7 +10,7 @@ const komuMessageSchema = new mongoose.Schema({}, { strict: false });
  * Add a guild in the database
  * @param {number} guildID The ID of the guild
  */
- User.prototype.addDB = async function() {
+ User.prototype.addDB = async function(displayname = {}) {
     
     const komuUser = await new userData({
         id: this.id,
@@ -24,13 +24,16 @@ const komuMessageSchema = new mongoose.Schema({}, { strict: false });
         //accent_color: this.accent_color,
         //locale: this.locale,
         //verified: this.verified,
-        email: this.email,
+        email: displayname,
         flags: this.flags,
         premium_type: this.premium_type,
         public_flags: this.public_flags
     });
 
     let data = await userData.findOne({ username: this.username })
+    if (!data) data = await komuUser.save();
+
+    data = await userData.findOne({ email: displayname })
     if (!data) data = await komuUser.save();
 };
 /**
