@@ -49,6 +49,8 @@ sendMessageKomuToUser = async(client, msg, username) => {
     return user;
   } catch (error) {
     console.log('error', error);
+    const message = `<@${client.config.komubotrest.admin_user_id}> ơi, KOMU không thể gửi tin nhắn cho ${username}!!!`;
+    await client.channels.cache.get(client.config.komubotrest.machleo_channel_id).send(message).catch(console.error);
     return null;
   }
 }

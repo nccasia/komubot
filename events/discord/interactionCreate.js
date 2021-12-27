@@ -40,14 +40,19 @@ module.exports = {
                         answerValue: answerValue,
                         isCheckin: isCheckin
                     }, 
-                    { headers: { 'X-Secret-Key': client.config.komubotrest.komu_bot_secret_key} });
+                    { headers: { 'X-Secret-Key': client.config.komubotrest.komu_bot_secret_key} })
+                    .catch(error => {
+                        console.log(error);
+                        item.reply("Error: " + error).catch(console.error);
+                    });
                     console.log('Update update message WFH successfully!');
+                    // end process wfh command
+                    interaction.reply({ content: msg, ephemeral: false }).catch(console.error);
+                    return;
                 } catch (error) {
                     console.log('Update update message WFH! - ERROR: ' + error);
+                    interaction.reply("Error! " + error).catch(console.error);
                 }
-                // end process wfh command
-                interaction.reply({ content: msg, ephemeral: true }).catch(console.error);
-                return;
             }
 
             const guildDB = await interaction.guild.fetchDB()
@@ -300,10 +305,12 @@ module.exports = {
         }
         if (!interaction.isCommand()) return;
         const slashcmdexec = client.slashexeccommands.get(interaction.commandName);
+        //await interaction.deferReply();
         if (slashcmdexec != null && slashcmdexec != undefined) {
             slashcmdexec(interaction, client).catch(console.error);
-        } else {
-            await interaction.reply({ content: "`❌` Slash commands are under construction.\n", ephemeral: true });
+        } else {            
+            await interaction.reply({ content: "`❌` Slash commands are under construction.\n", ephemeral: true });            
         }
+        //await interaction.editReply("Done");
     }
 };
