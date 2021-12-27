@@ -11,7 +11,7 @@ module.exports = {
 				.setRequired(true)),
     async execute(message, client) {
         const topic = message.options.get("topic").value;
-        var supportTypes = await wikiData.find().distinct('type');        
+        var supportTypes = await wikiData.find().distinct('type');
         supportTypes = supportTypes.concat(client.config.wiki.options);
         supportTypes = [ ...new Set(supportTypes)];
         if (topic == "help" || !supportTypes.includes(topic)) {
