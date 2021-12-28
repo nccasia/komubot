@@ -3,8 +3,8 @@ const wikiData = require('../models/ticketData');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('tiket')
-		.setDescription('manage tiket')
+		.setName('ticket')
+		.setDescription('manage ticket')
 		.addStringOption(option =>
 			option.setName('query')
 				.setDescription('query is add|remove|list')

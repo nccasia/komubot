@@ -68,6 +68,8 @@ module.exports = {
         admin_user_id: "840420960162152470",
     },
     wiki: {
+        api_url: "http://project-api.dev.nccsoft.vn/api/services/app/User/GetEmployeeInformation?email=",
+        api_key_secret: "",
         options: [
             'all',
             'link',
