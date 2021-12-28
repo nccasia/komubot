@@ -17,7 +17,8 @@ module.exports = {
             `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`,
         ).catch((err) => {
             console.log("WTF WTF WTF", err);
-            return message.reply({ content: `Nothing match... **${word}**.`, ephemeral: true });
+            message.reply({ content: `Nothing match... **${word}**.`, ephemeral: true });
+            return { data: "There was an error!" };
         });
 
         const botTexts = [];

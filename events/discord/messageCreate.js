@@ -23,7 +23,7 @@ module.exports = {
 
         if (e.author.bot || !e.guild) return;
         let guildDB = await e.guild.fetchDB();
-        if (e.content.startsWith(guildDB.prefix) || e.content.startsWith("komu ") || e.content.startsWith("<@!922003239887581205>")) {
+        if (e.content.startsWith(guildDB.prefix) || e.content.startsWith("komu ") || e.content.startsWith(`<@!${e.client.user.id}>`)) {
             if (e.content.endsWith("*") && !e.content.includes("prefix")) return;
             if (e.content.match(new RegExp(`^<@!?${e.client.user.id}>( |)$`))) {
                 let a = await e.translate("HELLO_NEED_HELP", guildDB.lang);
@@ -43,7 +43,7 @@ module.exports = {
                 console.log("[32m%s[0m", "PING OF THE BOT ", "[0m", `${e.author.tag} pinged the bot succesfully on ${e.guild.name}`);
                 return
             }
-            e.content.startsWith(guildDB.prefix) && (a = e.content.slice(guildDB.prefix.length).trim().split(/ +/)), e.content.startsWith("komu ") && (a = e.content.slice(5).trim().split(/ +/)), e.content.startsWith("<@!922003239887581205>") && (a = e.content.slice(22).trim().split(/ +/));
+            e.content.startsWith(guildDB.prefix) && (a = e.content.slice(guildDB.prefix.length).trim().split(/ +/)), e.content.startsWith("komu ") && (a = e.content.slice(5).trim().split(/ +/)), e.content.startsWith(`<@!${e.client.user.id}>`) && (a = e.content.slice(22).trim().split(/ +/));
             const r = a.shift().toLowerCase(),
                 i = t.commands.get(r) || t.commands.find(e => e.aliases && e.aliases.includes(r));
             if (!i) return;

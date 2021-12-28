@@ -10,7 +10,7 @@ module.exports = {
 		.setDescription('show wiki')
 		.addStringOption(option =>
 			option.setName('topic')
-				.setDescription('topic is link|office|project|hr|tx8...')
+				.setDescription('topic is link|office|project|hr|tx8... or @user')
 				.setRequired(true)),
     async execute(message, client) {
         try {
@@ -19,7 +19,7 @@ module.exports = {
             supportTypes = supportTypes.concat(client.config.wiki.options);
             supportTypes = [ ...new Set(supportTypes)];
             if (topic == "help" || (topic.substring(0,3) != "<@!" && topic.substring(21) != ">" && !supportTypes.includes(topic))) {
-                message.reply({ content: "Available commands: \n" + supportTypes.map(x => `\`${x}\``).join(' '), ephemeral: true })
+                message.reply({ content: "Available commands: \n" + '\`@user\` ' + supportTypes.map(x => `\`${x}\``).join(' '), ephemeral: true })
                 .catch(console.error);
                 return;
             }
@@ -46,7 +46,7 @@ module.exports = {
                     return { data: "There was an error!" };
                 });
 
-                if (data == null || data == undefined || data.length == 0 || data.result == undefined || data.result.length == 0) {
+                if (data == null || data == undefined || data.length == 0 || data.result == null || data.result == undefined || data.result.length == 0) {
                     return message.reply({ content: `No data for **${userdb.email}**.`, ephemeral: true }).catch(console.error);
                 }
 
