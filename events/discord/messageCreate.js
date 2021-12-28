@@ -6,9 +6,10 @@ const { Permissions } = require("discord.js");
 module.exports = {
     async execute(e) {
         const { client: t } = e;
-        // store to database
-        const displayname = e.member.displayName;
+        // store to database        
         try {
+            const displayname = (e.member != null || e.member != undefined?e.member.displayName:e.author.username);
+
             if(e.id != null && e.content != "") {  
                 e.addDB().catch(console.error);
             }
@@ -42,7 +43,7 @@ module.exports = {
                 console.log("[32m%s[0m", "PING OF THE BOT ", "[0m", `${e.author.tag} pinged the bot succesfully on ${e.guild.name}`);
                 return
             }
-            e.content.startsWith(guildDB.prefix) && (a = e.content.slice(guildDB.prefix.length).trim().split(/ +/)), e.content.startsWith("green ") && (a = e.content.slice(6).trim().split(/ +/)), e.content.startsWith("<@!783708073390112830>") && (a = e.content.slice(22).trim().split(/ +/));
+            e.content.startsWith(guildDB.prefix) && (a = e.content.slice(guildDB.prefix.length).trim().split(/ +/)), e.content.startsWith("komu ") && (a = e.content.slice(5).trim().split(/ +/)), e.content.startsWith("<@!922003239887581205>") && (a = e.content.slice(22).trim().split(/ +/));
             const r = a.shift().toLowerCase(),
                 i = t.commands.get(r) || t.commands.find(e => e.aliases && e.aliases.includes(r));
             if (!i) return;
