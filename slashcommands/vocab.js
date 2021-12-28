@@ -21,6 +21,11 @@ module.exports = {
             return { data: "There was an error!" };
         });
 
+        if (data == undefined || data.length == undefined || data.length == 0) {
+            message.reply({ content: `Nothing match... **${word}**.`, ephemeral: true });
+            return;
+        }
+
         const botTexts = [];
         const botExamples = [];
 

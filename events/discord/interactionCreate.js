@@ -52,6 +52,7 @@ module.exports = {
                 } catch (error) {
                     console.log('Update update message WFH! - ERROR: ' + error);
                     interaction.reply("Error! " + error).catch(console.error);
+                    return;
                 }
             }
 

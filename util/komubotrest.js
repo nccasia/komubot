@@ -39,6 +39,9 @@ sendMessageKomuToUser = async(client, msg, username) => {
       return null;
     }        
     const user = await client.users.fetch(userdb.id);
+    if (msg == null) {
+      return user;
+    }
     if (!user) {
       // notify to machleo channel
       const message = `<@${client.config.komubotrest.admin_user_id}> ơi, đồng chí ${username} không đúng format rồi!!!`;
@@ -104,7 +107,7 @@ sendImageCheckInToUser = async (client, req, res) => {
   const verifiedImageId = req.body.verifiedImageId.replace(/ /g, "");
   const username = req.body.username;
   try {
-    const user = await sendMessageKomuToUser(client, 'Bạn vừa check-in thành công!', username);
+    const user = await sendMessageKomuToUser(client, null, username);
     if(!user) {
       res.status(400).send({ message: "Error!" });
       return;
@@ -130,7 +133,7 @@ sendImageCheckInToUser = async (client, req, res) => {
 
     const embed = new MessageEmbed()
 			.setColor('RANDOM')
-			.setTitle('Komu daily checkin')
+			.setTitle('Bạn vừa check-in thành công!')
 			.setURL('https://komu.vn')
 			.setImage('attachment://checkin.jpg')
 			.setDescription('Đây có phải là bạn không?');
@@ -159,7 +162,7 @@ sendImageLabelToUser = async (client, req, res) => {
   const imagelabel = req.body.imageLabelId.replace(/ /g, "");
   const username = req.body.username;
   try {
-    const user = await sendMessageKomuToUser(client, 'Bạn hãy trả lời tin nhắn WFH!', username);
+    const user = await sendMessageKomuToUser(client, null, username);
     if(!user) {
       res.status(400).send({ message: "Error!" });
       return;
@@ -193,7 +196,7 @@ sendImageLabelToUser = async (client, req, res) => {
 
     const embed = new MessageEmbed()
 			.setColor('RANDOM')
-			.setTitle('Komu WFH ping pong')
+			.setTitle('Bạn hãy trả lời tin nhắn WFH!')
 			.setURL('https://komu.vn')
 			.setImage('attachment://checkin.jpg')
 			.setDescription(messages);

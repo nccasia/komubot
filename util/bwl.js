@@ -37,11 +37,13 @@ const bwl = async (message, client) => {
         });
         message.attachments.forEach(attachment => {
             try {
-                const imageLink = attachment.proxyURL;
-                console.log("downloading attachment " + imageLink);
-                const filename = uuidv4() + "_" + imageLink.split('/').pop();
-                download_image(imageLink, filename);                
-                links.push(filename);
+                if (attachment.contentType.startsWith("image")) {
+                    const imageLink = attachment.proxyURL;
+                    console.log("downloading attachment " + imageLink);
+                    const filename = uuidv4() + "_" + attachment.name;
+                    download_image(imageLink, filename);                
+                    links.push(filename);
+                }                
             } catch (error) {
                 console.error(error);
             }

@@ -53,18 +53,17 @@ module.exports = {
                 const infos = [];
                 const projects = [];
 
-                infos.push(`*${data.result.employeeName}*`);
-                infos.push(`*${data.result.emailAddress}*`);
-                infos.push(`*${data.result.phoneNumber}*`);
-                infos.push(`*${data.result.roleType}*`);
-                infos.push(`*${data.result.branch}*`);
+                infos.push(data.result.employeeName);
+                infos.push(data.result.emailAddress);
+                infos.push(data.result.phoneNumber);
+                infos.push(data.result.roleType);
+                infos.push(data.result.branch);
 
                 data.result.projectDtos.forEach(item => {                    
                     projects.push(item.projectName);
                     projects.push(item.pmName);
                     projects.push(item.startTime);
-                    projects.push(item.projectRole);
-                    projects.push("\n");
+                    projects.push(item.projectRole);                    
                 })
 
                 const embed = new MessageEmbed()
