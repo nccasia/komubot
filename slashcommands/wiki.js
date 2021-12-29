@@ -26,7 +26,7 @@ module.exports = {
                 return;
             }
             if (topic.substring(0,4) == "note") {
-                keepData.find({userid: message.user.id, status : "active"}, (err, docs) => {
+                await keepData.find({userid: message.user.id, status : "active"}, (err, docs) => {
                     if (err) {
                         console.log(err);
                         message.reply({ content:"Error", ephemeral: true });
@@ -42,8 +42,8 @@ module.exports = {
                     });
                     result += "\`\`\`";
                     message.reply({ content: result, ephemeral: true }).catch(console.error);
-                    return;
-                });               
+                });
+                return;
             }
             if (topic.substring(0,3) == "<@!" && topic.substring(21) == ">") {
                 topic = topic.substring(3,21);
