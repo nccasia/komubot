@@ -6,8 +6,9 @@ module.exports = {
   description: "BWL leaderboard",
   cat: "komu",
   async execute(message, args, client, guildDB) {
-    const channelId = "925073000573849601";
-    const top = 5;
+      try {
+    const channelId = args[0];
+    const top = parseInt(args[1]);
     const aggregatorOpts = [
       {
         $match: { channelId },
@@ -61,9 +62,14 @@ module.exports = {
       .then((docs) => {
         let name = 'nobody';
         if (docs.length) {
-            name = docs[0].author.username;
+            name = docs.map((doc, index) => {
+                return `Top ${index + 1} ${doc.author.username}: ${doc.totalReact} votes`;
+            })
         }
-        message.channel.send("1K TX8 cho top1: " + name).catch(console.error);
+        message.channel.send("```" + name.join('\n') + "```").catch(console.error);
       });
+    } catch (e) {
+        console.log(e)
+    }
   },
 };
