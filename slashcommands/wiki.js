@@ -2,6 +2,8 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require("discord.js");
 const wikiData = require('../models/wikiData');
 const userData = require('../models/userData');
+const keepData = require('../models/keepData');
+
 const axios = require("axios");
 
 module.exports = {
@@ -22,6 +24,26 @@ module.exports = {
                 message.reply({ content: "Available commands: \n" + '\`@user\` ' + supportTypes.map(x => `\`${x}\``).join(' '), ephemeral: true })
                 .catch(console.error);
                 return;
+            }
+            if (topic.substring(0,4) == "note") {
+                keepData.find({userid: message.user.id, status : "active"}, (err, docs) => {
+                    if (err) {
+                        console.log(err);
+                        message.reply({ content:"Error", ephemeral: true });
+                        return;
+                    }
+                    if (docs.length === 0) {
+                        message.reply({ content:"No data", ephemeral: true }).catch(console.error);
+                        return;
+                    }
+                    let result = "\`\`\`\n";
+                    docs.forEach(doc => {
+                        result += `${doc.note}\n`;
+                    });
+                    result += "\`\`\`";
+                    message.reply({ content: result, ephemeral: true }).catch(console.error);
+                    return;
+                });               
             }
             if (topic.substring(0,3) == "<@!" && topic.substring(21) == ">") {
                 topic = topic.substring(3,21);
