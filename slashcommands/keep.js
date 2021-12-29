@@ -25,6 +25,6 @@ module.exports = {
             createdAt: new Date(),
             status: 'active'
         }).save()
-        message.reply({ content: `\`✅\` Note saved.`, ephemeral: true });                
+        message.reply({ content: `\`✅\` Note saved. Use \`/wiki note\` to list.`, ephemeral: true });                
     }         
 };

@@ -2,7 +2,7 @@ module.exports = {
     //IMPORTANT: If you need help with the installation of KOMU, you can join our support server here: https://komu.vn/discord
     prefix: "*",
     // Your discord bot token. https://discord.com/developpers/bots
-    token: "OTI1NzA1Nzg2OTE3ODAyMDE0.YcxAsg.EfxdnVAKaz_RoRCZcLTjO5hG6T4",
+    token: "",
     // Your ID
     // Your name/tag
      owners: ["KOMU#0139"],
@@ -51,7 +51,7 @@ module.exports = {
         // The url of your mongodb database. Check mongodb.org
         MongoURL: "mongodb://localhost:27017/komubot",
         // If you want to cache the database. For big bots
-        cached: false,
+        cached: true,
         delay: 300000 * 4,
         Options: { autoIndex: false }
     },
@@ -72,6 +72,7 @@ module.exports = {
         api_key_secret: "",
         options: [
             'all',
+            'note',
             'link',
             'code',
             'file',

@@ -1,8 +1,8 @@
 const permes = require("../../util/permissions.json");
 require("../../util/extenders.js");
 const bwl = require("../../util/bwl.js");
-
 const { Permissions } = require("discord.js");
+
 module.exports = {
     async execute(e) {
         const { client: t } = e;

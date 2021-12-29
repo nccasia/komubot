@@ -6,54 +6,54 @@ module.exports = {
   description: "BWL leaderboard",
   cat: "komu",
   async execute(message, args, client, guildDB) {
-      try {
-    const channelId = args[0];
-    const top = parseInt(args[1]);
-    const aggregatorOpts = [
-      {
-        $match: { channelId },
-      },
-      {
-        $group: {
-          _id: "$messageId",
-          totalReact: { $addToSet: "$authorId" },
+    try {
+        const channelId = args[0];
+        const top = parseInt(args[1]);
+        const aggregatorOpts = [
+        {
+            $match: { channelId },
         },
-      },
-      {
-        $project: {
-          _id: 0,
-          messageId: "$_id",
-          totalReact: {
-            $size: "$totalReact",
-          },
+        {
+            $group: {
+                _id: "$messageId",
+                totalReact: { $addToSet: "$authorId" },
+            },
         },
-      },
-      {
-        $lookup: {
-          from: "komu_bwls",
-          localField: "messageId",
-          foreignField: "messageId",
-          as: "author_message",
+        {
+            $project: {
+                _id: 0,
+                messageId: "$_id",
+                totalReact: {
+                    $size: "$totalReact",
+                },
+            },
         },
-      },
-      {
-        $unwind: "$author_message",
-      },
-      {
-        $lookup: {
-          from: "komu_users",
-          localField: "author_message.authorId",
-          foreignField: "id",
-          as: "author",
+        {
+            $lookup: {
+                from: "komu_bwls",
+                localField: "messageId",
+                foreignField: "messageId",
+                as: "author_message",
+            },
         },
-      },
-      {
-        $unwind: "$author",
-      },
-      {
-        $sort: { totalReact: -1 },
-      },
-      { $limit: top },
+        {
+            $unwind: "$author_message",
+        },
+        {
+            $lookup: {
+                from: "komu_users",
+                localField: "author_message.authorId",
+                foreignField: "id",
+                as: "author",
+            },
+        },
+        {
+            $unwind: "$author",
+        },
+        {
+            $sort: { totalReact: -1 },
+        },
+        { $limit: top },
     ];
 
     bwlReactData

@@ -1,4 +1,5 @@
 const bwlData = require('../models/bwlData.js');
+const channelData = require("../models/channelData.js");
 const fs = require('fs');
 const downloader = require('image-downloader')
 const { v4: uuidv4 } = require('uuid');
@@ -59,6 +60,18 @@ const bwl = async (message, client) => {
                 createdTimestamp: createdTimestamp
             }).save().catch(console.error);
         }
+
+        const data = await new channelData({
+            id: chid,
+            name: client.channels.cache.get(chid).name,
+            type: client.channels.cache.get(chid).type,
+            nsfw: client.channels.cache.get(chid).nsfw,
+            rawPosition: client.channels.cache.get(chid).rawPosition,
+            lastMessageId: client.channels.cache.get(chid).lastMessageId,
+            rateLimitPerUser: client.channels.cache.get(chid).rateLimitPerUser,
+        });
+        const datachk = await channelData.findOne({ id: chid }).catch(console.error);
+        if (!datachk) data.save().catch(console.error);        
     } catch (error) {
         console.error(error);
     }
