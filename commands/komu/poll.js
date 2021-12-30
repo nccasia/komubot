@@ -9,6 +9,6 @@ module.exports = {
 
         await pollEmbed(message, cmds[0].trim(), options.map(element => {
             return element.trim();
-          }));
+          })).catch(console.error);
     },
 };
