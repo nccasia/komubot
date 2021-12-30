@@ -68,7 +68,7 @@ module.exports = {
         .exec()
         .then((docs) => {
           let name = "nobody";
-          console.log(docs);
+          //console.log(docs);
           if (docs.length) {
             name = docs.map((doc, index) => {
               return `Top ${index + 1} ${doc.author.username}: ${

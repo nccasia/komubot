@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const channeldb = new mongoose.Schema({
      id: { type: String, required: true },
-     name: { type: String, required: true },
+     name: { type: String, required: false },
      type: { type: String, required: true },
      nsfw: { type: Boolean, required: false },
      rawPosition: { type: Number, required: false },
