@@ -22,10 +22,7 @@ module.exports = {
         }
 
         if (e.author.bot || !e.guild) return;
-        let guildDB = await e.guild.fetchDB();
-        if (e.channel.id != guidlDB.requestChannel) {
-            return e.channel.send("This command is only available in the request channel.").catch(console.error);
-        }
+        let guildDB = await e.guild.fetchDB();        
         if (e.content.startsWith(guildDB.prefix) || e.content.startsWith("komu ") || e.content.startsWith(`<@!${e.client.user.id}>`)) {
             if (e.content.endsWith("*") && !e.content.includes("prefix")) return;
             if (e.content.match(new RegExp(`^<@!?${e.client.user.id}>( |)$`))) {
