@@ -7,69 +7,81 @@ module.exports = {
   cat: "komu",
   async execute(message, args, client, guildDB) {
     try {
-        const channelId = args[0];
-        const top = parseInt(args[1]);
-        const aggregatorOpts = [
+      const channelId = args[0];
+      const top = parseInt(args[1]);
+      const aggregatorOpts = [
         {
-            $match: { channelId },
+          $match: { channelId },
         },
         {
-            $group: {
-                _id: "$messageId",
-                totalReact: { $addToSet: "$authorId" },
+          $group: {
+            _id: "$messageId",
+            totalReact: { $addToSet: "$authorId" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            messageId: "$_id",
+            totalReact: {
+              $size: "$totalReact",
             },
+          },
         },
         {
-            $project: {
-                _id: 0,
-                messageId: "$_id",
-                totalReact: {
-                    $size: "$totalReact",
-                },
-            },
+          $lookup: {
+            from: "komu_bwls",
+            localField: "messageId",
+            foreignField: "messageId",
+            as: "author_message",
+          },
         },
         {
-            $lookup: {
-                from: "komu_bwls",
-                localField: "messageId",
-                foreignField: "messageId",
-                as: "author_message",
-            },
+          $unwind: "$author_message",
         },
         {
-            $unwind: "$author_message",
+          $lookup: {
+            from: "komu_users",
+            localField: "author_message.authorId",
+            foreignField: "id",
+            as: "author",
+          },
         },
         {
-            $lookup: {
-                from: "komu_users",
-                localField: "author_message.authorId",
-                foreignField: "id",
-                as: "author",
-            },
+          $unwind: "$author",
         },
         {
-            $unwind: "$author",
+          $group: {
+            _id: "$author.id",
+            author: { $first: '$author' },
+            totalReact: { $first: '$totalReact' }
+          }
         },
         {
-            $sort: { totalReact: -1 },
+          $sort: { totalReact: -1 },
         },
         { $limit: top },
-    ];
+      ];
 
-    bwlReactData
-      .aggregate(aggregatorOpts)
-      .exec()
-      .then((docs) => {
-        let name = 'nobody';
-        if (docs.length) {
+      bwlReactData
+        .aggregate(aggregatorOpts)
+        .exec()
+        .then((docs) => {
+          let name = "nobody";
+          console.log(docs);
+          if (docs.length) {
             name = docs.map((doc, index) => {
-                return `Top ${index + 1} ${doc.author.username}: ${doc.totalReact} votes`;
-            })
-        }
-        message.channel.send("```" + name.join('\n') + "```").catch(console.error);
-      });
+              return `Top ${index + 1} ${doc.author.username}: ${
+                doc.totalReact
+              } votes`;
+            });
+          }
+          message.channel
+            .send("```" + name.join("\n") + "```")
+            .catch(console.error);
+        });
     } catch (e) {
-        console.log(e)
+      console.log(e);
     }
   },
 };
