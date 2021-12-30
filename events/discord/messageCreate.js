@@ -113,7 +113,7 @@ module.exports = {
                 const { player } = e.client;
                 let name = e.content;
                 let queue;
-                const messageController = await e.guild.channels.cache.get(e.channel.id).messages.fetch(guildDB.requestMessage);
+                const messageController = await e.guild.channels.cache.get(e.channel.id).messages.fetch(guildDB.requestMessage).catch(console.error);
                 if (!e.client.player.getQueue(e.guild.id)) {
                     queue = player.createQueue(e.guild, {
                         metadata: { controller: true, message: messageController, dj: e.author, guildDB: guildDB,m:e },

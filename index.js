@@ -63,7 +63,7 @@ const init = async function() {
                 .setImage(url = "https://img.shgstatic.com/clutchco-static/image/scale/60x60/s3fs-public/logos/nccsoft_vietnam_logo.png")
                 .setFooter(`${client.footer}`, client.user.displayAvatarURL({ dynamic: true, size: 512 }))
                 .setColor("#3A871F")
-            return queue.metadata.message.edit({ embeds: [embed] })
+            return queue.metadata.message.edit({ embeds: [embed] }).catch(console.error)
         } else {
             if (queue.metadata.guildDB.announce) queue.metadata.channel.send({
                 embeds: [{
