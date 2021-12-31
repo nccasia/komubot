@@ -77,7 +77,7 @@ module.exports = {
       const top =
         !isNaN(parseFloat(args[1])) && !isNaN(args[1] - 0) && parseInt(args[1]);
       const time = args[2];
-      if (!channelId || !top || !getTimeWeek(time)) {
+      if (!channelId || !getTimeWeek(time)) {
         return message.channel.send("```no result```");
       }
 
@@ -152,7 +152,7 @@ module.exports = {
         {
           $sort: { totalReact: -1 },
         },
-        { $limit: top },
+        { $limit: top ? top : 5 },
       ];
 
       bwlReactData
