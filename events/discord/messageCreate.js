@@ -5,22 +5,7 @@ const { Permissions } = require("discord.js");
 
 module.exports = {
     async execute(e) {
-        const { client: t } = e;
-        // store to database        
-        try {
-            const displayname = (e.member != null || e.member != undefined?e.member.displayName:e.author.username);
-
-            if(e.id != null && e.content != "") {  
-                e.addDB().catch(console.error);
-            }
-            if (e.author != null) {
-                e.author.addDB(displayname).catch(console.error);
-            }
-            await bwl(e, t).catch(console.error);
-        } catch(err) {
-            console.log(err);
-        }
-
+        const { client: t } = e;        
         if (e.author.bot || !e.guild) return;
         let guildDB = await e.guild.fetchDB();        
         if (e.content.startsWith(guildDB.prefix) || e.content.startsWith("komu ") || e.content.startsWith(`<@!${e.client.user.id}>`)) {
