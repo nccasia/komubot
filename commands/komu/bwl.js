@@ -63,7 +63,7 @@ module.exports = {
   cat: "komu",
   async execute(message, args, client, guildDB) {
     try {
-      if (args[0] === "help" || !args[0]) {
+      if (args[0] === "help") {
         return message.channel.send(
           "```" +
             "*bwl channel_id top dd/mm/yyyy" +
@@ -73,7 +73,8 @@ module.exports = {
         );
       }
 
-      const channelId = args[0];
+      const channelId = args[0] || message.channel.id;
+
       const top =
         !isNaN(parseFloat(args[1])) && !isNaN(args[1] - 0) && parseInt(args[1]);
       const time = args[2];
