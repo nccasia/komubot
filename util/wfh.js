@@ -14,12 +14,19 @@ const wfh = async (interaction, client) => {
     var isCheckin = true;
     var msg = "";
     
-    if (arrIds.length > 1 && arrIds[0] == "komu_wfh_complain" && 
-    labelImageId == interaction.user.id && 
-    interaction.message.author.id == client.user.id) {
+    if (arrIds.length > 1 && 
+        (arrIds[0] == "komu_wfh_complain" || 
+            arrIds[0] == "komu_wfh_accept" || 
+            arrIds[0] == "komu_wfh_accept_but") && 
+        labelImageId == interaction.user.id && 
+        interaction.message.author.id == client.user.id) {
+        if (arrIds[0] == "komu_wfh_accept" || arrIds[0] == "komu_wfh_accept_but") {
+            interaction.reply({ content: "Thanks!!!", ephemeral: true });
+            return;
+        }  
         if (arrIds.length == 2) {
             // send message to PM
-            const userdb = await userData.findOne({ id: interaction.message.author.id }).catch(console.error);
+            const userdb = await userData.findOne({ id: labelImageId }).catch(console.error);
             if (!userdb) {
                 return interaction.reply("`User is not valid`").catch(console.error);
             }
@@ -30,13 +37,19 @@ const wfh = async (interaction, client) => {
                 interaction.reply(`Error while looking up for **${userdb.email}**.`).catch(console.error);
                 return { data: "There was an error!" };
             });
-            var pmid;
             if (data == null || data == undefined || data.length == 0 || data.result == null || data.result == undefined || data.result.length == 0) {
-                pmid = client.config.komubotrest.pmid;
-                console.log(`There is no PM to confirm for **${userdb.email}**. Please confirm with SAODO!!!`);
-            } else {
-                pmid = data.result.projectDtos[0].pmUsername;
+                const msg = `There is no PM to confirm for **${userdb.email}**. Please contact to your PM`;
+                console.log(msg);
+                interaction.reply(msg);
+                return;
             }
+
+            const pmdb = await userData.findOne({ $or: [{username: data.result.projectDtos[0].pmUsername}, 
+                {email: data.result.projectDtos[0].pmUsername}]}).catch(console.error);
+            if (!pmdb) {
+                interaction.reply(`Cannot fetch data for PM ${data.result.projectDtos[0].pmUsername}`);
+                return;
+            }    
             const row = new MessageActionRow()
             .addComponents(
                 new MessageButton()
@@ -52,7 +65,11 @@ const wfh = async (interaction, client) => {
                     .setColor('RANDOM')
                     .setTitle("Xác nhận WFH Complain")
                     .setDescription(`<@${labelImageId}> vừa complain v/v không trả lời msg WFH. Hãy xác nhận?`);
-            const user = await client.users.fetch(pmid).catch(console.error);
+            const user = await client.users.fetch(pmdb.id).catch(console.error);
+            if (!user) {
+                interaction.reply(`Cannot fetch username ${pmdb.username}, id ${pmdb.id}`);
+                return;
+            }
             await user.send({ embeds: [embed], components: [row] }).catch(console.error);
             // update database
             await wfhData.updateOne({
@@ -63,17 +80,15 @@ const wfh = async (interaction, client) => {
             await interaction.reply(`<@${labelImageId}> your complain is sent to <@${pmid}>.`).catch(console.error);
         } else if (arrIds.length >= 3) {
             // If PM approved, send message to channel
-            if (arrIds.length > 2 && arrIds[2] == "confirm") {
+            if (arrIds.length > 2 && (arrIds[2] == "confirm" || arrIds[2] == "reject")) {
                 if (arrIds.length > 3) {
                     const pmid = arrIds[3];
-                    const message = `<@${pmid}> đã xác nhận WFH Complain của <@${labelImageId}>`;
+                    const message = `<@${pmid}> đã ${arrIds[2]} WFH Complain của <@${labelImageId}>`;
                     await wfhData.updateOne(
-                        { userid: labelImageId }, { confirm: true, data: message, status: "APPROVED" }
+                        { userid: labelImageId }, { confirm: (arrIds[2] == "confirm"), data: message, status: "APPROVED" }
                     ).catch(console.error);
                     await client.channels.cache.get(client.config.komubotrest.machleo_channel_id).send(message).catch(console.error);
                     await interaction.reply(`You just confirmed WFH complain for <@${labelImageId}>`).catch(console.error);
-                } else if(arrIds.length > 2 && arrIds[2] == "reject") {
-                    await interaction.reply(`You just rejected WFH complain for <@${labelImageId}>`).catch(console.error);
                 }
             }
         }
