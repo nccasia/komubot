@@ -17,14 +17,18 @@ module.exports = {
 				.setDescription('what ever you want to keep')
 				.setRequired(true)),
     async execute(message, client) {
-        const note = message.options.get("note").value;
-        
-        const data = await new keepData({
-            userid: message.user.id,
-            note: note,
-            createdAt: new Date(),
-            status: 'active'
-        }).save()
-        message.reply({ content: `\`✅\` Note saved. Use \`/wiki note\` to list.`, ephemeral: true });                
+		try {
+			const note = message.options.get("note").value;
+			
+			const data = await new keepData({
+				userid: message.user.id,
+				note: note,
+				createdAt: new Date(),
+				status: 'active'
+			}).save()
+			message.reply({ content: `\`✅\` Note saved. Use \`/wiki note\` to list.`, ephemeral: true });
+		} catch (err) {
+			console.log(err);
+		}              
     }         
 };

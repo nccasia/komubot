@@ -1,61 +1,18 @@
 const Discord = require("discord.js")
 const ms = require("ms")
 const axios = require('axios')
+const wfh = require('../../util/wfh.js')
 module.exports = {
     async execute(interaction, client) {
-        if (interaction.isButton()) {
-            if (interaction.customId.startsWith("komu_")) {                
-                const arrIds = interaction.customId.split("#");
-                const customId = arrIds[0];
-                const labelImageId = (arrIds.length > 1)?interaction.customId.split("#")[1]:"";
-                var isCheckin = true;
-                var msg = "";
-                if (customId == "komu_checkin_yes" || customId == "komu_checkin_no") {
-                    console.log(interaction.user.username + " check in! " + customId);                
-                    msg = `👍 Have a good day!!!`;
-                    if (customId == "komu_checkin_no") {
-                        msg = `👎 Let me check!`;
-                    }                    
-                } else if (customId == "komu_wfh_lbl1" || customId == "komu_wfh_lbl2") {
-                    console.log(interaction.user.username + " wfh in! " + customId);
-                    msg = `👍 Let's rock!!!`;
-                    if (customId == "komu_wfh_lbl2") {
-                        msg = "`👎 Thanks!`";
-                    }
-                    isCheckin = false;                    
-                } else {
-                    interaction.reply("Invalid customId " + customId);
-                    return;
-                }
-                try {
-                    const verifiedImageId = labelImageId;
-                    const imageLabelId = labelImageId;
-                    const answerFaceConfirm = interaction.user.username;
-                    const answerValue = customId;
-                    await axios.put(`${client.config.komubotrest.CHECK_IN_URL}/v1/employees/image-label/update-image-label`,
-                    {
-                        verifiedImageId: verifiedImageId,
-                        imageLabelId: imageLabelId,
-                        answerFaceConfirm: answerFaceConfirm,
-                        answerValue: answerValue,
-                        isCheckin: isCheckin
-                    }, 
-                    { headers: { 'X-Secret-Key': client.config.komubotrest.komu_bot_secret_key} })
-                    .catch(error => {
-                        console.log(error);
-                        item.reply("Error: " + error).catch(console.error);
-                    });
-                    console.log('Update update message WFH successfully!');
-                    // end process wfh command
-                    interaction.reply({ content: msg, ephemeral: false }).catch(console.error);
-                    return;
-                } catch (error) {
-                    console.log('Update update message WFH! - ERROR: ' + error);
-                    interaction.reply("Error! " + error).catch(console.error);
-                    return;
-                }
+        if (interaction.isButton()) {            
+            // handle wfh button
+            if (interaction.customId.startsWith("komu_")) {
+                await wfh(interaction, client).catch(console.error);
+                return;
             }
-
+            if (!interaction.guild) {
+                return;
+            }
             const guildDB = await interaction.guild.fetchDB()
             const queue = await client.player.getQueue(interaction.guild.id)
             if (!queue) {

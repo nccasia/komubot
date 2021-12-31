@@ -1,4 +1,5 @@
 const userData = require('../models/userData');
+const wfhData = require('../models/wfhData');
 const {
   MessageActionRow,
   MessageButton,
@@ -34,11 +35,11 @@ sendMessageKomuToUser = async(client, msg, username) => {
     const userdb = await userData.findOne({$or: [
       {email: username},
       {username: username},
-    ]});
+    ]}).catch(console.error);
     if (!userdb) {
       return null;
     }        
-    const user = await client.users.fetch(userdb.id);
+    const user = await client.users.fetch(userdb.id).catch(console.error);
     if (msg == null) {
       return user;
     }
@@ -125,7 +126,7 @@ sendImageCheckInToUser = async (client, req, res) => {
 					.setCustomId('komu_checkin_yes#' + verifiedImageId)
 					.setLabel('Yes')
 					.setStyle('PRIMARY'),
-                new MessageButton()
+        new MessageButton()
 					.setCustomId('komu_checkin_no#' + verifiedImageId)
 					.setLabel('No')
 					.setStyle('SECONDARY'),
@@ -224,8 +225,27 @@ sendMessageToChannel = async(client, req, res) => {
     res.status(400).send({ message: "Message can not be empty!" });
     return;
   }
-  const message = req.body.message;
-  const channelid = req.body.channelid;  
+  var message = req.body.message;
+  const channelid = req.body.channelid;
+  
+  if (req.body.machleo == true && req.body.machleo_userid != undefined) {
+    const row = new MessageActionRow()
+			.addComponents(
+				new MessageButton()
+					.setCustomId('komu_wfh_complain#'+req.body.machleo_userid)
+					.setLabel('Complain')
+					.setStyle('DANGER'),
+				new MessageButton()
+					.setCustomId('komu_wfh_accept#'+req.body.machleo_userid)
+					.setLabel('Accept')
+					.setStyle('PRIMARY'),	
+				new MessageButton()
+					.setCustomId('komu_wfh_accept_but#'+req.body.machleo_userid)
+					.setLabel('Accept But...')
+					.setStyle('SECONDARY'),	
+			);
+    message = { content: message, components: [row] };
+  }
 
   try {
     client.channels.cache.get(channelid).send(message).then(() => {
@@ -261,10 +281,22 @@ sendMessageToMachLeo = async(client, req, res) => {
     req.body.message += `<@${client.config.komubotrest.admin_user_id}> ơi, đồng chí ${req.body.username} không đúng format rồi!!!`
     userid = req.body.username;
   } else {
+    req.body.machleo_userid = userdb.id;
     userid = userdb.id;
   }
 
   req.body.message = `<@${userid}>` + req.body.message;
+  req.body.machleo = true;
+
+  // store to db
+  await new wfhData({
+    userid: userid,
+    wfhMsg: req.body.message,
+    complain: false,
+    pmconfirm: false,
+    status: "ACTIVE",
+  }).save().catch(console.error);
+
   await sendMessageToChannel(client, req, res);
 }
 
