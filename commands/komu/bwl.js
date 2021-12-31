@@ -4,11 +4,15 @@ const bwlReactData = require("../../models/bwlReactData.js");
 function getTimeWeek(time) {
   let curr;
   if (time) {
+    if (!validateTimeDDMMYYYY(time)) {
+      return;
+    }
     const timeFormat = formatDayMonth(time);
     curr = new Date(timeFormat);
   } else {
     curr = new Date();
   }
+
   let first = curr.getDate() - curr.getDay() + 1;
   let last = first + 7;
 
@@ -47,6 +51,12 @@ function formatDate(time) {
   return `${dd}/${mm}/${yyyy}`;
 }
 
+function validateTimeDDMMYYYY(time) {
+  return /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/.test(
+    time
+  );
+}
+
 module.exports = {
   name: "bwl",
   description: "BWL leaderboard",
@@ -54,11 +64,13 @@ module.exports = {
   async execute(message, args, client, guildDB) {
     try {
       const channelId = args[0];
-      const top = parseInt(args[1]);
+      const top =
+        !isNaN(parseFloat(args[1])) && !isNaN(args[1] - 0) && parseInt(args[1]);
       const time = args[2];
-      if (!channelId || Number.isNaN(top)) {
-        message.channel.send("```no result```");
+      if (!channelId || !top || !getTimeWeek(time)) {
+        return message.channel.send("```no result```");
       }
+
       const aggregatorOpts = [
         {
           $match: { channelId },
