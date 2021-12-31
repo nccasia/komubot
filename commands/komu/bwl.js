@@ -64,7 +64,13 @@ module.exports = {
   async execute(message, args, client, guildDB) {
     try {
       if (args[0] === "help" || !args[0]) {
-        return message.channel.send("``` *bwl channelId top dd/mm/yyyy ```");
+        return message.channel.send(
+          "```" +
+            "*bwl channel_id top dd/mm/yyyy" +
+            "\n" +
+            "channel_id : right click to the channel & copy" +
+            "```"
+        );
       }
 
       const channelId = args[0];
