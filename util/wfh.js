@@ -21,6 +21,9 @@ const wfh = async (interaction, client) => {
         labelImageId == interaction.user.id && 
         interaction.message.author.id == client.user.id) {
         if (arrIds[0] == "komu_wfh_accept" || arrIds[0] == "komu_wfh_accept_but") {
+            await wfhData.updateOne(
+                { userid: labelImageId }, { confirm: false, data: arrIds[0], status: "ACCEPT" }
+            ).catch(console.error);
             interaction.reply({ content: "Thanks!!!", ephemeral: true });
             return;
         }  
