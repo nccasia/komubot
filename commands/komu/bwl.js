@@ -1,6 +1,52 @@
 const userData = require("../../models/userData.js");
 const bwlReactData = require("../../models/bwlReactData.js");
 
+function getTimeWeek(time) {
+  let curr;
+  if (time) {
+    const timeFormat = formatDayMonth(time);
+    curr = new Date(timeFormat);
+  } else {
+    curr = new Date();
+  }
+  let first = curr.getDate() - curr.getDay() + 1;
+  let last = first + 7;
+
+  let firstday = new Date(curr.setDate(first)).toUTCString();
+  let lastday = new Date(curr.setDate(last)).toUTCString();
+
+  return {
+    firstday: {
+      timestamp: new Date(withoutTime(firstday)).getTime(),
+      date: formatDate(new Date(withoutTime(firstday))),
+    },
+    lastday: {
+      timestamp: new Date(withoutTime(lastday)).getTime(),
+      date: formatDate(new Date(withoutTime(lastday))),
+    },
+  };
+}
+
+function withoutTime(dateTime) {
+  var date = new Date(dateTime);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+function formatDayMonth(time) {
+  const day = time.split("").slice(0, 2).join("");
+  const month = time.split("").slice(3, 5).join("");
+  const year = time.split("").slice(6, 10).join("");
+  return `${month}/${day}/${year}`;
+}
+
+function formatDate(time) {
+  let today = new Date(time);
+  let dd = String(today.getDate()).padStart(2, "0");
+  let mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+  let yyyy = today.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
 module.exports = {
   name: "bwl",
   description: "BWL leaderboard",
@@ -9,6 +55,10 @@ module.exports = {
     try {
       const channelId = args[0];
       const top = parseInt(args[1]);
+      const time = args[2];
+      if (!channelId || Number.isNaN(top)) {
+        message.channel.send("```no result```");
+      }
       const aggregatorOpts = [
         {
           $match: { channelId },
@@ -51,11 +101,31 @@ module.exports = {
           $unwind: "$author",
         },
         {
+          $sort: { totalReact: -1 },
+        },
+        {
           $group: {
             _id: "$author.id",
-            author: { $first: '$author' },
-            totalReact: { $first: '$totalReact' }
-          }
+            author: { $first: "$author" },
+            message: { $first: "$author_message" },
+            totalReact: { $first: "$totalReact" },
+          },
+        },
+        {
+          $match: {
+            $and: [
+              {
+                "message.createdTimestamp": {
+                  $gte: getTimeWeek(time).firstday.timestamp,
+                },
+              },
+              {
+                "message.createdTimestamp": {
+                  $lte: getTimeWeek(time).lastday.timestamp,
+                },
+              },
+            ],
+          },
         },
         {
           $sort: { totalReact: -1 },
@@ -67,8 +137,7 @@ module.exports = {
         .aggregate(aggregatorOpts)
         .exec()
         .then((docs) => {
-          let name = "nobody";
-          //console.log(docs);
+          let name = [];
           if (docs.length) {
             name = docs.map((doc, index) => {
               return `Top ${index + 1} ${doc.author.username}: ${
@@ -76,9 +145,21 @@ module.exports = {
               } votes`;
             });
           }
-          message.channel
-            .send("```" + name.join("\n") + "```")
-            .catch(console.error);
+          if (Array.isArray(name) && name.length === 0) {
+            message.channel.send("```no result```");
+          } else {
+            message.channel
+              .send(
+                "```" +
+                  getTimeWeek(time).firstday.date +
+                  " - " +
+                  getTimeWeek(time).lastday.date +
+                  "\n" +
+                  name.join("\n") +
+                  "```"
+              )
+              .catch(console.error);
+          }
         });
     } catch (e) {
       console.log(e);
