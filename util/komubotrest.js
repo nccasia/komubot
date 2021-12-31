@@ -298,5 +298,5 @@ exports.init = async(client) => {
   app.post("/sendMessageToThongBaoPM", (req, res) => { sendMessageToThongBaoPM(client, req, res); });
   app.post("/sendMessageToFinance", (req, res) => { sendMessageToFinance(client, req, res); });
 
-  app.listen(client.config.komubotrest.http_port, client.config.komubotrest.http_ip, () => console.log(`Server is listening on port ${client.config.komubotrest.bodyParserhttp_port}!`));
+  app.listen(client.config.komubotrest.http_port, client.config.komubotrest.http_ip, () => console.log(`Server is listening on port ${client.config.komubotrest.http_port}!`));
 }
