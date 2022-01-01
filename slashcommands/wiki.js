@@ -20,7 +20,8 @@ module.exports = {
             var supportTypes = await wikiData.find().distinct('type');
             supportTypes = supportTypes.concat(client.config.wiki.options);
             supportTypes = [ ...new Set(supportTypes)];
-            if (topic == "help" || (topic.substring(0,3) != "<@!" && topic.substring(21) != ">" && !supportTypes.includes(topic))) {
+            topic = topic.replace(/!/g, '');
+            if (topic == "help" || (topic.substring(0,2) != "<@" && topic.substring(20) != ">" && !supportTypes.includes(topic))) {
                 message.reply({ content: "Available commands: \n" + '\`@user\` ' + supportTypes.map(x => `\`${x}\``).join(' '), ephemeral: true })
                 .catch(console.error);
                 return;
@@ -45,9 +46,8 @@ module.exports = {
                 });
                 return;
             }
-            if (topic.substring(0,3) == "<@!" && topic.substring(21) == ">") {
-                topic = topic.substring(3,21);
-
+            if (topic.substring(0,2) == "<@" && topic.substring(20) == ">") {
+                topic = topic.substring(2,20);
                 const userdb = await userData.findOne({$and: [
                     { id: topic },
                     { email: { $ne: null } },
