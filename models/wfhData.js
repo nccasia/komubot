@@ -10,4 +10,4 @@ const wfhdb = new mongoose.Schema({
      status: { type: String, required: false },
      data: { type: String, required: false },
 })
-const wfhData = module.exports = mongoose.model('komu_wfhdb', wfhdb)
+const wfhData = module.exports = mongoose.model('komu_wfh', wfhdb)

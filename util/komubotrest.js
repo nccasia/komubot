@@ -232,17 +232,17 @@ sendMessageToChannel = async(client, req, res) => {
     const row = new MessageActionRow()
 			.addComponents(
 				new MessageButton()
-					.setCustomId('komu_wfh_complain#'+req.body.machleo_userid)
+					.setCustomId('komu_wfh_complain#'+req.body.machleo_userid+'#'+req.body.wfhid)
 					.setLabel('Complain')
 					.setStyle('DANGER'),
 				new MessageButton()
-					.setCustomId('komu_wfh_accept#'+req.body.machleo_userid)
+					.setCustomId('komu_wfh_accept#'+req.body.machleo_userid+'#'+req.body.wfhid)
 					.setLabel('Accept')
 					.setStyle('PRIMARY'),	
 				new MessageButton()
-					.setCustomId('komu_wfh_accept_but#'+req.body.machleo_userid)
+					.setCustomId('komu_wfh_accept_but#'+req.body.machleo_userid+'#'+req.body.wfhid)
 					.setLabel('Accept But...')
-					.setStyle('SECONDARY'),	
+					.setStyle('SECONDARY'),
 			);
     message = { content: message, components: [row] };
   }
@@ -289,13 +289,14 @@ sendMessageToMachLeo = async(client, req, res) => {
   req.body.machleo = true;
 
   // store to db
-  await new wfhData({
+  const data = await new wfhData({
     userid: userid,
     wfhMsg: req.body.message,
     complain: false,
     pmconfirm: false,
     status: "ACTIVE",
   }).save().catch(console.error);
+  req.body.wfhid = data._id;
 
   await sendMessageToChannel(client, req, res);
 }
