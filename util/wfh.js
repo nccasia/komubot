@@ -36,7 +36,7 @@ const wfh = async (interaction, client) => {
             }
             const msec = new Date() - new Date(wfhdata.createdAt);
             if (msec > 3600000) {
-                interaction.reply({ content: "Complain WFH is expired. You have 1hour to complian.", ephemeral: true });
+                interaction.reply({ content: "WFH complain is expired. You have an hour to request.", ephemeral: true });
                 return;
             }
 
@@ -78,11 +78,11 @@ const wfh = async (interaction, client) => {
             );
             const embed = new MessageEmbed()
                     .setColor('RANDOM')
-                    .setTitle("Xác nhận WFH Complain")
-                    .setDescription(`<@${labelImageId}> vừa complain v/v không trả lời msg WFH. Hãy xác nhận?`);
+                    .setTitle("Verify WFH Complain")
+                    .setDescription(`<@${labelImageId}> just sent WFH complain. Please check?`);
             const user = await client.users.fetch(pmdb.id).catch(console.error);
             if (!user) {
-                interaction.reply({ content: `Cannot fetch username ${pmdb.username}, id ${pmdb.id}`, ephemeral: true }).catch(console.error);
+                interaction.reply({ content: `Cannot fetch username: ${pmdb.username}, with id: ${pmdb.id}`, ephemeral: true }).catch(console.error);
                 return;
             }
             await user.send({ embeds: [embed], components: [row] }).catch(console.error);
@@ -92,18 +92,18 @@ const wfh = async (interaction, client) => {
             }, {
                 complain: true,
             }).catch(console.error);
-            await interaction.reply({ content: `<@${labelImageId}> your complain is sent to <@${pmdb.id}>.`, ephemeral: true }).catch(console.error);
+            await interaction.reply({ content: `<@${labelImageId}> your WFH complain is sent to <@${pmdb.id}>.`, ephemeral: true }).catch(console.error);
         } else if (arrIds.length >= 3) {
             // If PM approved, send message to channel
             if (arrIds.length > 2 && (arrIds[3] == "confirm" || arrIds[3] == "reject")) {
                 if (arrIds.length > 3) {
                     const pmid = arrIds[4];
-                    const message = `<@${pmid}> đã ${arrIds[3]} WFH Complain của <@${labelImageId}>`;
+                    const message = `<@${pmid}> just ${arrIds[3]}ed WFH complain from <@${labelImageId}>`;
                     await wfhData.updateOne(
                         { _id: wfhid }, { confirm: (arrIds[3] == "confirm"), data: message, status: "APPROVED" }
                     ).catch(console.error);
                     await client.channels.cache.get(client.config.komubotrest.machleo_channel_id).send(message).catch(console.error);
-                    await interaction.reply({ content: `You just confirmed WFH complain for <@${labelImageId}>`, ephemeral: true }).catch(console.error);
+                    await interaction.reply({ content: `You just ${arrIds[3]}ed WFH complain for <@${labelImageId}>`, ephemeral: true }).catch(console.error);
                 }
             }
         }
@@ -123,7 +123,7 @@ const wfh = async (interaction, client) => {
         }
         isCheckin = false;
     } else {
-        interaction.reply({ content: "You are not the right people to do that:)", ephemeral: true }).catch(console.error);
+        interaction.reply({ content: "You are not the right people to complain:)", ephemeral: true }).catch(console.error);
         return;
     }
     try {
