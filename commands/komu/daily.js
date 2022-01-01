@@ -6,12 +6,12 @@ module.exports = {
   cat: "komu",
   async execute(message, args, client, guildDB) {
     try {
-      const daily = args[0];
+      const daily = args.join(" ");
       if (!daily || daily == undefined) {
         return message.reply({ content: "```please add your daily text```", ephemeral: true }).catch(console.error);
       }
       const data = await new dailyData({
-          userid: message.user.id,
+          userid: message.author.id,
           daily: daily,
           createdAt: new Date(),
           channelid: message.channel.id
