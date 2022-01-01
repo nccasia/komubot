@@ -31,36 +31,36 @@ const wfh = async (interaction, client) => {
             // send message to PM
             const userdb = await userData.findOne({ id: labelImageId }).catch(console.error);
             if (!userdb) {
-                return interaction.reply("`User is not valid`").catch(console.error);
+                return interaction.reply({ content: "`User is not valid`", ephemeral: true }).catch(console.error);
             }
             const { data } = await axios.get(
                 `${client.config.wiki.api_url}${userdb.email}@ncc.asia`,
                 { headers: { 'X-Secret-Key': client.config.wiki.api_key_secret} }
             ).catch((err) => {
-                interaction.reply(`Error while looking up for **${userdb.email}**.`).catch(console.error);
+                interaction.reply({ content: `Error while looking up for **${userdb.email}**.`, ephemeral: true }).catch(console.error);
                 return { data: "There was an error!" };
             });
             if (data == null || data == undefined || data.length == 0 || data.result == null || data.result == undefined || data.result.length == 0) {
                 const msg = `There is no PM to confirm for **${userdb.email}**. Please contact to your PM`;
                 console.log(msg);
-                interaction.reply(msg);
+                interaction.reply({ content: msg, ephemeral: true }).catch(console.error);
                 return;
             }
 
             const pmdb = await userData.findOne({ $or: [{username: data.result.projectDtos[0].pmUsername}, 
                 {email: data.result.projectDtos[0].pmUsername}]}).catch(console.error);
             if (!pmdb) {
-                interaction.reply(`Cannot fetch data for PM ${data.result.projectDtos[0].pmUsername}`);
+                interaction.reply({ content: `Cannot fetch data for PM ${data.result.projectDtos[0].pmUsername}`, ephemeral: true }).catch(console.error);
                 return;
             }    
             const row = new MessageActionRow()
             .addComponents(
                 new MessageButton()
-                    .setCustomId('komu_wfh_complain#' + labelImageId + '#reject#' + pmid)
+                    .setCustomId('komu_wfh_complain#' + labelImageId + '#reject#' + pmdb.id)
                     .setLabel("Reject")
                     .setStyle('PRIMARY'),
                 new MessageButton()
-                    .setCustomId('komu_wfh_complain#' + labelImageId + '#confirm#' + pmid)
+                    .setCustomId('komu_wfh_complain#' + labelImageId + '#confirm#' + pmdb.id)
                     .setLabel("Confirm")
                     .setStyle('SECONDARY'),
             );
@@ -70,7 +70,7 @@ const wfh = async (interaction, client) => {
                     .setDescription(`<@${labelImageId}> vừa complain v/v không trả lời msg WFH. Hãy xác nhận?`);
             const user = await client.users.fetch(pmdb.id).catch(console.error);
             if (!user) {
-                interaction.reply(`Cannot fetch username ${pmdb.username}, id ${pmdb.id}`);
+                interaction.reply({ content: `Cannot fetch username ${pmdb.username}, id ${pmdb.id}`, ephemeral: true }).catch(console.error);
                 return;
             }
             await user.send({ embeds: [embed], components: [row] }).catch(console.error);
@@ -80,7 +80,7 @@ const wfh = async (interaction, client) => {
             }, {
                 complain: true,
             }).catch(console.error);
-            await interaction.reply(`<@${labelImageId}> your complain is sent to <@${pmid}>.`).catch(console.error);
+            await interaction.reply({ content: `<@${labelImageId}> your complain is sent to <@${pmdb.id}>.`, ephemeral: true }).catch(console.error);
         } else if (arrIds.length >= 3) {
             // If PM approved, send message to channel
             if (arrIds.length > 2 && (arrIds[2] == "confirm" || arrIds[2] == "reject")) {
@@ -91,7 +91,7 @@ const wfh = async (interaction, client) => {
                         { userid: labelImageId }, { confirm: (arrIds[2] == "confirm"), data: message, status: "APPROVED" }
                     ).catch(console.error);
                     await client.channels.cache.get(client.config.komubotrest.machleo_channel_id).send(message).catch(console.error);
-                    await interaction.reply(`You just confirmed WFH complain for <@${labelImageId}>`).catch(console.error);
+                    await interaction.reply({ content: `You just confirmed WFH complain for <@${labelImageId}>`, ephemeral: true }).catch(console.error);
                 }
             }
         }
@@ -111,7 +111,7 @@ const wfh = async (interaction, client) => {
         }
         isCheckin = false;
     } else {
-        interaction.reply("Invalid customId " + customId);
+        interaction.reply({ content: "You are not the right people to do that:)", ephemeral: true }).catch(console.error);
         return;
     }
     try {

@@ -13,7 +13,7 @@ module.exports = {
         if (args[0] && args[0].toLowerCase() === 'disable') {
             if (guildDB.requestChannel) {
                 message.guild.channels.cache.get(guildDB.requestChannel) ? message.guild.channels.cache.get(guildDB.requestChannel).delete() : ""
-                guildDB.requestChannel = "922439043030069290"
+                guildDB.requestChannel = ""
                 guildDB.save()
                 return message.succesMessage(lang.disable)
             } else {
