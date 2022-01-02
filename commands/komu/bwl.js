@@ -76,10 +76,10 @@ module.exports = {
       const channelId = args[0] || message.channel.id;
 
       const top =
-        !isNaN(parseFloat(args[1])) && !isNaN(args[1] - 0) && parseInt(args[1]);
+        !isNaN(parseFloat(args[1])) && !isNaN(args[1] - 0) && parseInt(args[1]) || 5;
       const time = args[2];
       if (!channelId || !getTimeWeek(time)) {
-        return message.channel.send("```no result```");
+        return message.channel.send("```invalid channel or time```");
       }
 
       const aggregatorOpts = [
