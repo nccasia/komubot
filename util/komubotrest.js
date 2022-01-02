@@ -233,15 +233,18 @@ sendMessageToChannel = async(client, req, res) => {
 			.addComponents(
 				new MessageButton()
 					.setCustomId('komu_wfh_complain#'+req.body.machleo_userid+'#'+req.body.wfhid)
-					.setLabel('Complain')
+					.setLabel('I\'am in daily call')
+          .setEmoji('⏳')
 					.setStyle('DANGER'),
 				new MessageButton()
 					.setCustomId('komu_wfh_accept#'+req.body.machleo_userid+'#'+req.body.wfhid)
 					.setLabel('Accept')
+          .setEmoji('✍')
 					.setStyle('PRIMARY'),	
 				new MessageButton()
 					.setCustomId('komu_wfh_accept_but#'+req.body.machleo_userid+'#'+req.body.wfhid)
 					.setLabel('Accept But...')
+          .setEmoji('✍')
 					.setStyle('SECONDARY'),
 			);
     message = { content: message, components: [row] };

@@ -27,7 +27,7 @@ const wfh = async (interaction, client) => {
             ).catch(console.error);
             interaction.reply({ content: "Thanks!!!", ephemeral: true });
             return;
-        }  
+        }
         if (arrIds.length == 3) {
             const wfhdata = await wfhData.findOne({ _id: wfhid}).catch(console.error);
             if (!wfhdata) {
@@ -64,7 +64,7 @@ const wfh = async (interaction, client) => {
             if (!pmdb) {
                 interaction.reply({ content: `Cannot fetch data for PM ${data.result.projectDtos[0].pmUsername}`, ephemeral: true }).catch(console.error);
                 return;
-            }    
+            }
             const row = new MessageActionRow()
             .addComponents(
                 new MessageButton()

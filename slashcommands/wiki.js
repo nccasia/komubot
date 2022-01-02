@@ -85,7 +85,7 @@ module.exports = {
                     projects.push(item.projectName);
                     projects.push(item.pmName);
                     projects.push(item.startTime);
-                    projects.push(item.projectRole);                    
+                    projects.push(item.projectRole);          
                 })
 
                 const embed = new MessageEmbed()
