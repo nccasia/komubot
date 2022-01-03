@@ -81,7 +81,7 @@ module.exports = {
         5;
       const time = args[2];
       if (!channelId || !getTimeWeek(time)) {
-        return message.channel.send("```no result```");
+        return message.channel.send("```invalid channel or time```");
       }
       console.log("chanelid", message.channel.id);
       console.log("top", top);
