@@ -12,21 +12,20 @@ function getTimeWeek(time) {
   } else {
     curr = new Date();
   }
-
-  let first = curr.getDate() - curr.getDay() + 1;
-  let last = first + 7;
-
-  let firstday = new Date(curr.setDate(first)).toUTCString();
-  let lastday = new Date(curr.setDate(last)).toUTCString();
+  // current date of week
+  let currentWeekDay = curr.getDay();
+  let lessDays = currentWeekDay == 0 ? 6 : currentWeekDay - 1;
+  let firstweek = new Date(new Date(curr).setDate(curr.getDate() - lessDays));
+  let lastweek = new Date(new Date(firstweek).setDate(firstweek.getDate() + 7));
 
   return {
     firstday: {
-      timestamp: new Date(withoutTime(firstday)).getTime(),
-      date: formatDate(new Date(withoutTime(firstday))),
+      timestamp: new Date(withoutTime(firstweek)).getTime(),
+      date: formatDate(new Date(withoutTime(firstweek))),
     },
     lastday: {
-      timestamp: new Date(withoutTime(lastday)).getTime(),
-      date: formatDate(new Date(withoutTime(lastday))),
+      timestamp: new Date(withoutTime(lastweek)).getTime(),
+      date: formatDate(new Date(withoutTime(lastweek))),
     },
   };
 }
@@ -76,11 +75,17 @@ module.exports = {
       const channelId = args[0] || message.channel.id;
 
       const top =
-        !isNaN(parseFloat(args[1])) && !isNaN(args[1] - 0) && parseInt(args[1]);
+        (!isNaN(parseFloat(args[1])) &&
+          !isNaN(args[1] - 0) &&
+          parseInt(args[1])) ||
+        5;
       const time = args[2];
       if (!channelId || !getTimeWeek(time)) {
         return message.channel.send("```no result```");
       }
+      console.log("chanelid", message.channel.id);
+      console.log("top", top);
+      console.log("time", getTimeWeek());
 
       const aggregatorOpts = [
         {
@@ -153,7 +158,7 @@ module.exports = {
         {
           $sort: { totalReact: -1 },
         },
-        { $limit: top ? top : 5 },
+        { $limit: top },
       ];
 
       bwlReactData
