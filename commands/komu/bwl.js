@@ -83,9 +83,6 @@ module.exports = {
       if (!channelId || !getTimeWeek(time)) {
         return message.channel.send("```invalid channel or time```");
       }
-      console.log("chanelid", message.channel.id);
-      console.log("top", top);
-      console.log("time", getTimeWeek());
 
       const aggregatorOpts = [
         {
