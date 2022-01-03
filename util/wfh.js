@@ -14,11 +14,13 @@ const wfh = async (interaction, client) => {
     var isCheckin = true;
     var msg = "";
     
+    //console.log(arrIds, labelImageId, interaction.user.id, interaction.message.author.id, client.user.id);
+
     if (arrIds.length > 2 && 
         (arrIds[0] == "komu_wfh_complain" || 
             arrIds[0] == "komu_wfh_accept" || 
             arrIds[0] == "komu_wfh_accept_but") && 
-        labelImageId == interaction.user.id && 
+        //labelImageId == interaction.user.id && 
         interaction.message.author.id == client.user.id) {
         const wfhid = arrIds[2];    
         if (arrIds[0] == "komu_wfh_accept" || arrIds[0] == "komu_wfh_accept_but") {
@@ -100,7 +102,7 @@ const wfh = async (interaction, client) => {
                     const pmid = arrIds[4];
                     const message = `<@${pmid}> just ${arrIds[3]}ed WFH complain from <@${labelImageId}>`;
                     await wfhData.updateOne(
-                        { _id: wfhid }, { confirm: (arrIds[3] == "confirm"), data: message, status: "APPROVED" }
+                        { _id: wfhid }, { pmconfirm: (arrIds[3] == "confirm"), data: message, status: "APPROVED" }
                     ).catch(console.error);
                     await client.channels.cache.get(client.config.komubotrest.machleo_channel_id).send(message).catch(console.error);
                     await interaction.reply({ content: `You just ${arrIds[3]}ed WFH complain for <@${labelImageId}>`, ephemeral: true }).catch(console.error);

@@ -241,17 +241,22 @@ sendMessageToChannel = async(client, req, res) => {
 					.setLabel('Accept')
           .setEmoji('✍')
 					.setStyle('PRIMARY'),	
-				new MessageButton()
-					.setCustomId('komu_wfh_accept_but#'+req.body.machleo_userid+'#'+req.body.wfhid)
-					.setLabel('Accept But...')
-          .setEmoji('✍')
-					.setStyle('SECONDARY'),
+				//new MessageButton()
+				//	.setCustomId('komu_wfh_accept_but#'+req.body.machleo_userid+'#'+req.body.wfhid)
+				//	.setLabel('Accept But...')
+        //  .setEmoji('✍')
+				//	.setStyle('SECONDARY'),
 			);
     message = { content: message, components: [row] };
   }
 
   try {
-    client.channels.cache.get(channelid).send(message).then(() => {
+    client.channels.cache.get(channelid).send(message).then((msg) => {
+      //if (req.body.machleo == true && req.body.machleo_userid != undefined && req.body.wfhid != undefined) {
+      //  wfhData.updateOne({ _id: req.body.wfhid }, {
+      //    messageid: msg.id,
+      //  }).catch(console.error);
+      //}
       res.status(200).send({ message: "Successfully!" });
     }).catch(err => {
       res.status(400).send({ message: err });
