@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 const wfhdb = new mongoose.Schema({
      userid: { type: String, required: true },
+     messageid: { type: String, required: true },
      wfhMsg: { type: String, required: true },
      createdAt: { type: Date, default: Date.now },
      complain: { type: Boolean, required: false },
