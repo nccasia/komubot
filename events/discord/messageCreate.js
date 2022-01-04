@@ -1,11 +1,15 @@
 const permes = require("../../util/permissions.json");
 require("../../util/extenders.js");
-const bwl = require("../../util/bwl.js");
 const { Permissions } = require("discord.js");
+const dmmessage = require("../../util/dmmessage.js");
 
 module.exports = {
     async execute(e) {
-        const { client: t } = e;        
+        const { client: t } = e;
+        if (e.channel.type == "DM" && e.author.id != t.user.id) {
+            dmmessage(e, t);
+            return;
+        }
         if (e.author.bot || !e.guild) return;
         let guildDB = await e.guild.fetchDB();        
         if (e.content.startsWith(guildDB.prefix) || e.content.startsWith("komu ") || e.content.startsWith(`<@!${e.client.user.id}>`)) {

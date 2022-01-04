@@ -12,7 +12,11 @@ const fs = require("fs"),
             Intents.FLAGS.DIRECT_MESSAGES,
             Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
         ],
-        partials: ['USER', 'REACTION', 'MESSAGE']
+        partials: ['USER', 
+            'REACTION', 
+            'MESSAGE', 
+            'CHANNEL',
+        ]
     }),
     util = require("util"),
     { Player } = require("discord-player"),
