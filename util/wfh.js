@@ -44,6 +44,11 @@ const wfh = async (interaction, client) => {
                 return;
             }
 
+            if (wfhdata.complain) {
+                interaction.reply({ content: "You have already complained.", ephemeral: true });
+                return;
+            }
+
             // send message to PM
             const userdb = await userData.findOne({ id: labelImageId }).catch(console.error);
             if (!userdb) {
