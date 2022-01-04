@@ -18,10 +18,12 @@ const wfh = async (interaction, client) => {
 
     if (arrIds.length > 2 && 
         (arrIds[0] == "komu_wfh_complain" || 
-            arrIds[0] == "komu_wfh_accept" || 
-            arrIds[0] == "komu_wfh_accept_but") && 
+            arrIds[0] == "komu_wfh_accept") && 
         //labelImageId == interaction.user.id && 
         interaction.message.author.id == client.user.id) {
+        
+        console.log("wfh complain from", interaction.user.id);
+            
         const wfhid = arrIds[2];    
         if (arrIds[0] == "komu_wfh_accept" || arrIds[0] == "komu_wfh_accept_but") {
             await wfhData.updateOne(
@@ -54,7 +56,10 @@ const wfh = async (interaction, client) => {
                 interaction.reply({ content: `Error while looking up for **${userdb.email}**.`, ephemeral: true }).catch(console.error);
                 return { data: "There was an error!" };
             });
-            if (data == null || data == undefined || data.length == 0 || data.result == null || data.result == undefined || data.result.length == 0) {
+            if (data == null || data == undefined || data.length == 0 || 
+                data.result == null || data.result == undefined || 
+                data.result.length == 0 || data.result.projectDtos == undefined ||
+                data.result.projectDtos.length == 0) {
                 const msg = `There is no PM to confirm for **${userdb.email}**. Please contact to your PM`;
                 console.log(msg);
                 interaction.reply({ content: msg, ephemeral: true }).catch(console.error);
