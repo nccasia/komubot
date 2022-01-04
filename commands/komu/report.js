@@ -125,7 +125,7 @@ module.exports = {
           return message.channel.send(mess).catch(console.error);
         } else {
           for (let i = 0; i <= Math.ceil(userNotDaily.length / 50); i += 1) {
-            if (userNotDaily.slice(i * 50, (i + 1) * 50).length === 0) return;
+            if (userNotDaily.slice(i * 50, (i + 1) * 50).length === 0) break;
             mess =
               "```" +
               "những người chưa daily hôm nay" +
