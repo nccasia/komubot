@@ -25,18 +25,6 @@ module.exports = {
                                 .map((e) => `\`${e.name}\``)
                                 .join(", "),
                         }, {
-                            name: `• Filters (6)`,
-                            value: t
-                                .filter((e) => "filters" === e.cat)
-                                .map((e) => `\`${e.name}\``)
-                                .join(", "),
-                        }, {
-                            name: "• Configuration (" + t.filter((e) => "configuration" === e.cat).size + ") ",
-                            value: t
-                                .filter((e) => "configuration" === e.cat)
-                                .map((e) => `\`${e.name}\``)
-                                .join(", "),
-                        }, {
                             name: `• ${E[3]}  (${t.filter((e) => "utilities" === e.cat).size})`,
                             value: t
                                 .filter((e) => "utilities" === e.cat)
