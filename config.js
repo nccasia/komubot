@@ -68,8 +68,12 @@ module.exports = {
         admin_user_id: "840420960162152470",
         pmid: "921333966731091978",
     },
+    wfh: {
+        api_url: "http://timesheetapi.nccsoft.vn/api/services/app/HRM/GetUserWorkFromHome",
+        api_key_secret: "",
+    },
     wiki: {
-        api_url: "http://project-api.dev.nccsoft.vn/api/services/app/User/GetEmployeeInformation?email=",
+        api_url: "http://project-api.nccsoft.vn/api/services/app/User/GetEmployeeInformation?email=",
         api_key_secret: "",
         options: [
             'all',

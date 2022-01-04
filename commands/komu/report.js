@@ -29,10 +29,10 @@ module.exports = {
     try {
       const wfhGetApi = await axios
         .get(
-          `http://timesheetapi.nccsoft.vn/api/services/app/HRM/GetUserWorkFromHome`,
+          client.config.wfh.api_url,
           {
             headers: {
-              securitycode: "Xnsks4@llslhl%hjsksCCHHA145",
+              securitycode: client.config.wfh.api_key_secret,
             },
           }
         )
