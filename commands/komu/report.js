@@ -112,6 +112,11 @@ module.exports = {
           console.log(error);
         }
 
+        for (let i = 0; i < userNotDaily.length; i++) {
+          if (userNotDaily[i] === null) {
+            userNotDaily[i] = notDaily[i];
+          }
+        }
         let mess;
         if (!userNotDaily) {
           return;
@@ -127,13 +132,16 @@ module.exports = {
               "```" +
               userNotDaily
                 .slice(i * 50, (i + 1) * 50)
-                .map(
-                  (user, index) =>
-                    `<@${user.id}> (${findCountNotDaily(
+                .map((user, index) => {
+                  if (user.id) {
+                    return `<@${user.id}> (${findCountNotDaily(
                       notDaily,
                       user.username
-                    )})`
-                )
+                    )})`;
+                  } else {
+                    return `${user.email} (${user.countnotdaily})`;
+                  }
+                })
                 .join("\n");
             await message.channel.send(mess).catch(console.error);
           }
