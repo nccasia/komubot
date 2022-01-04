@@ -31,12 +31,6 @@ module.exports = {
                                 .map((e) => `\`${e.name}\``)
                                 .join(", "),
                         }, {
-                            name: `• ${E[1]} (${t.filter((e) => "music" === e.cat).size})`,
-                            value: t
-                                .filter((e) => "music" === e.cat)
-                                .map((e) => `\`${e.name}\``)
-                                .join(", "),
-                        }, {
                             name: "• Configuration (" + t.filter((e) => "configuration" === e.cat).size + ") ",
                             value: t
                                 .filter((e) => "configuration" === e.cat)

@@ -55,7 +55,7 @@ module.exports = {
       }
 
       const daily = await dailyData.find({
-        createdAt: { $lte: getDateDay[1], $gte: getDateDay[0] },
+        createdAt: { $lte: getDateDay()[1], $gte: getDateDay()[0] },
       });
 
       const dailyUserId = daily.map((item) => item.email);
@@ -63,7 +63,7 @@ module.exports = {
       let notDaily = [];
 
       for (let wfhData of wfhUserName) {
-        if (!dailyUserId.includes(wfhData)) {
+        if (!dailyUserId.includes(wfhData) && wfhData !== undefined) {
           notDaily.push(wfhData);
         }
       }
@@ -78,7 +78,7 @@ module.exports = {
         "```" +
         userNotDaily.map((user, index) => `<@${user.id}>`).join("\n");
 
-      return message.channel.send(mess);
+      return message.channel.send(mess).catch(console.error);
     } catch (error) {
       console.log(error);
     }

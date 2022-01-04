@@ -21,6 +21,7 @@ module.exports = {
             supportTypes = supportTypes.concat(client.config.wiki.options);
             supportTypes = [ ...new Set(supportTypes)];
             topic = topic.replace(/!/g, '');
+            console.log('wiki', topic);
             if (topic == "help" || (topic.substring(0,2) != "<@" && topic.substring(20) != ">" && !supportTypes.includes(topic))) {
                 message.reply({ content: "Available commands: \n" + '\`@user\` ' + supportTypes.map(x => `\`${x}\``).join(' '), ephemeral: true })
                 .catch(console.error);
