@@ -303,9 +303,13 @@ sendMessageToMachLeo = async(client, req, res) => {
     complain: false,
     pmconfirm: false,
     status: "ACTIVE",
-  }).save().catch(console.error);
-  req.body.wfhid = data._id;
+  }).save().catch(err => {
+    console.log("Error: ", err);
+    res.status(400).send({ message: err });
+    return;
+  });
 
+  req.body.wfhid = data._id.toString();
   await sendMessageToChannel(client, req, res);
 }
 
