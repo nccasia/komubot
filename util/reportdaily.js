@@ -128,8 +128,8 @@ async function reportDaily(date, message, args, client, guildDB) {
   let mess;
   let dateString = (date && date.toDateString()) || "";
   let dailyString = date
-    ? "Những Người Chưa Daily Hôm Nay"
-    : "Những Người Chưa Daily";
+    ? "Những Người Chưa Daily"
+    : "Những Người Chưa Daily Hôm Nay";
   if (!userNotDaily) {
     return;
   } else if (Array.isArray(userNotDaily) && userNotDaily.length === 0) {
