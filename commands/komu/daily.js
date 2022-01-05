@@ -12,7 +12,7 @@ module.exports = {
       }
       const data = await new dailyData({
           userid: message.author.id,
-          email: message.author.username,
+          email: (message.member != null || message.member != undefined?message.member.displayName:message.author.username),
           daily: daily,
           createdAt: new Date(),
           channelid: message.channel.id
