@@ -30,7 +30,7 @@ getUserIdByUsername = async(client, req, res) => {
   res.status(200).send({ username: req.body.username, userid: userdb.id });
 }
 
-sendMessageKomuToUser = async(client, msg, username) => {
+module.exports.sendMessageKomuToUser = sendMessageKomuToUser = async(client, msg, username) => {
   try {
     const userdb = await userData.findOne({$or: [
       {email: username},

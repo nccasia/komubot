@@ -37,6 +37,10 @@ module.exports = {
     }, 30000);
 
     //run schedule
-    scheduler.run(client);
+    try {
+      scheduler.run(client);
+    } catch (error) {
+      console.log(error);
+    }
   },
 };
