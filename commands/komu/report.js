@@ -1,6 +1,7 @@
 const axios = require("axios");
 const dailyData = require("../../models/dailyData");
 const userData = require("../../models/userData");
+const { reportWfh, reportCompalinWfh } = require("../../util/reportWfh");
 
 function getDateDay() {
   const date = new Date();
@@ -146,6 +147,10 @@ module.exports = {
             await message.channel.send(mess).catch(console.error);
           }
         }
+      } else if (args[0] === "wfh" && args[1] === "complain") {
+        await reportCompalinWfh(message, args, client, guildDB);
+      } else if (args[0] === "wfh") {
+        await reportWfh(message, args, client, guildDB);
       } else {
         return message.channel
           .send("```" + "*report daily" + "```")
