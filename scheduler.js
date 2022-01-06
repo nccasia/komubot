@@ -98,7 +98,7 @@ async function showDaily(client) {
     // send message komu to user
     await Promise.all(
       userNotDaily.map((user, index) =>
-        sendMessageKomuUser(client, "bạn chưa daily ngày hôm nay", user)
+        sendMessageKomuUser(client, "Hôm nay bạn daily chưa? Nếu chưa thì *daily nhé.", user)
       )
     );
   } catch (error) {
