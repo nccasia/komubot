@@ -38,9 +38,34 @@ module.exports = {
         await reportCompalinWfh(message, args, client, guildDB);
       } else if (args[0] === "wfh") {
         await reportWfh(message, args, client, guildDB);
+      } else if (args[0] === "help") {
+        return message.channel
+          .send(
+            "```" +
+              "*report options" +
+              "\n" +
+              "options  " +
+              "\n" +
+              [
+                { name: "daily", des: "show daily today" },
+                { name: "weekly", des: "show daily weekly" },
+                {
+                  name: "wfh ",
+                  des: "show user don't reply to bot ",
+                },
+                {
+                  name: "wfh complain",
+                  des: "show user don't reply to bot & pm confirm",
+                },
+              ]
+                .map((item) => `- ${item.name} : ${item.des}`)
+                .join("\n") +
+              "```"
+          )
+          .catch(console.error);
       } else {
         return message.channel
-          .send("```" + "*report daily" + "```")
+          .send("```" + "*report help" + "```")
           .catch(console.error);
       }
     } catch (error) {

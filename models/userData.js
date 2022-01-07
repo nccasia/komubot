@@ -17,5 +17,7 @@ const userdb = new mongoose.Schema({
      flags: { type: Number, required: false },
      premium_type: { type: Number, required: false },
      public_flags: { type: Number, required: false },
+     last_message_id: { type: String, required: false },
+     last_mentioned_message_id: { type: String, required: false },
 })
 const userData = module.exports = mongoose.model('komu_user', userdb)

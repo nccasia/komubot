@@ -11,11 +11,11 @@ function getDateDay(time) {
   return {
     morning: {
       fisttime: new Date(setTime(date, 7, 0, 0, 0)).getTime(),
-      lastime: new Date(setTime(date, 10, 0, 0, 0)).getTime(),
+      lastime: new Date(setTime(date, 9, 30, 0, 0)).getTime(),
     },
     afternoon: {
       fisttime: new Date(setTime(date, 12, 0, 0, 0)).getTime(),
-      lastime: new Date(setTime(date, 15, 0, 0, 0)).getTime(),
+      lastime: new Date(setTime(date, 14, 0, 0, 0)).getTime(),
     },
   };
 }
