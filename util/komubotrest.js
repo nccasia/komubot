@@ -251,11 +251,12 @@ sendMessageToChannel = async(client, req, res) => {
   }
 
   try {
-    await client.channels.cache.get(channelid).send(message).catch(err => {
-      res.status(400).send({ message: err });
-    });
+    channel = await client.channels.fetch(channelid);
+    await channel.send(message);
+    res.status(200).send({ message: "Successfully!" });
   } catch (error) {
     console.log('error', error);
+    res.status(400).send({ message: error });
   }
 }
 
