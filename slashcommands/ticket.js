@@ -17,20 +17,21 @@ module.exports = {
         .setDescription("assignee email (example: a.nguyenvan)")
         .setRequired(true)
     )
-    .addStringOption((option) =>
-      option
-        .setName("task")
-        .setDescription("task title (example: Add Login UI)")
-        .setRequired(true)
+    .addStringOption(
+      (option) =>
+        option
+          .setName("task")
+          .setDescription("task title (example: Add Login UI)")
+      // .setRequired(true)
     ),
   async execute(message, client) {
     const topic = message.options.get("query").value;
     const topicAssignee = message.options.get("assignee").value;
-    const topicTask = message.options.get("task").value;
 
     try {
       if (topic === "add") {
-        const data = await axios
+        const topicTask = message.options.get("task").value;
+        const { data } = await axios
           .post(
             `${client.config.ticket.api_url_create}`,
 
@@ -48,9 +49,56 @@ module.exports = {
             }
           )
           .catch((err) => {
-            console.log("Error ", err);
+            console.log("Email address not found", err);
+            message
+              .reply({ content: "Email address not found", ephemeral: true })
+              .catch(console.error);
             return { data: "There was an error!" };
           });
+        message.reply({ content: `\`✅\` Ticket saved.`, ephemeral: true });
+      } else if (topic === "list") {
+        const { data } = await axios
+          .get(
+            `${client.config.ticket.api_url_get}?email=${topicAssignee}@ncc.asia`,
+            {
+              headers: {
+                "X-Secret-Key": client.config.ticket.api_key_secret,
+              },
+            }
+          )
+          .catch((err) => {
+            console.log("Error ", err);
+            message
+              .reply({
+                content: `Error while looking up for **${topicAssignee}**.`,
+                ephemeral: true,
+              })
+              .catch(console.error);
+            return { data: "There was an error!" };
+          });
+        if(!data || !data.result) return
+        const dataJobs = data.result.map(item =>( [item.jobId, item.jobName, item.creatorEmail, item.creatorUsername, item.status]))
+        let mess = ""
+        dataJobs.forEach(data => {
+          mess = mess + `jobId:${data[0]}` +"\n" + `jobName:${data[1]}` +"\n" + `creatorEmail:${data[2]}` +"\n" + `creatorUsername:${data[3]}` +"\n" + `status:${data[4]}` +"\n"  +"\n"
+        })
+        message.reply({ content: mess, ephemeral: true });
+
+        if (
+          data == null ||
+          data == undefined ||
+          data.length == 0 ||
+          data.result == null ||
+          data.result == undefined ||
+          data.result.length == 0
+        ) {
+          return message
+            .reply({
+              content: `No data for **${topicAssignee}**.`,
+              ephemeral: true,
+            })
+            .catch(console.error);
+        }
       } else {
         return message.chanel
           .send("```" + "*No query ticket" + "```")
@@ -58,6 +106,8 @@ module.exports = {
       }
     } catch (error) {
       console.log(error);
+      message.reply({ content: "Error " + error, ephemeral: true });
+      return;
     }
   },
 };
