@@ -116,7 +116,7 @@ async function pingWfh(client) {
       arrayMessUser.map((user, index) =>
         sendMessageKomuToUser(
           client,
-          "Bạn đang online đấy chứ ? Hãy trả lời tin nhắn nhé!",
+          "Bạn đang online đấy chứ? Hãy trả lời tin nhắn nhé!",
           user.username
         )
       )

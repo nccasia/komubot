@@ -1,6 +1,23 @@
 const axios = require("axios");
 const wfhData = require("../models/wfhData");
 
+function withoutTime(dateTime) {
+  var date = new Date(dateTime);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function getTimeToDay() {
+  const today = new Date();
+  const tomorrows = new Date();
+  const tomorrowsDate = tomorrows.setDate(tomorrows.getDate() + 1);
+
+  return {
+    firstDay: new Date(withoutTime(today)).getTime(),
+    lastDay: new Date(withoutTime(tomorrowsDate)).getTime(),
+  };
+}
+
 async function reportWfh(message, args, client, guildDB) {
   let wfhGetApi;
   try {
@@ -18,7 +35,17 @@ async function reportWfh(message, args, client, guildDB) {
   }
 
   const wfhFullday = await wfhData.find({
-    $or: [{ status: "ACCEPT" }, { status: "ACTIVE" }],
+    $and: [
+      {
+        $or: [{ status: "ACCEPT" }, { status: "ACTIVE" }],
+      },
+      {
+        createdAt: {
+          $gte: getTimeToDay().firstDay,
+          $lte: getTimeToDay().lastDay,
+        },
+      },
+    ],
   });
 
   let mess;
@@ -62,6 +89,10 @@ async function reportCompalinWfh(message, args, client, guildDB) {
   const wfhFullday = await wfhData.find({
     status: "APPROVED",
     complain: true,
+    createdAt: {
+      $gte: getTimeToDay().firstDay,
+      $lte: getTimeToDay().lastDay,
+    },
   });
 
   let mess;
