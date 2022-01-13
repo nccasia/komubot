@@ -40,8 +40,8 @@ module.exports = {
             if (args[0] == "draw") {
                 var now = new Date();
                 var startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                const starttime = startOfDay.getTime();
-                const endtime = starttime + 24 * 3600000;
+                const starttime = startOfDay.getTime() + 8 * 3600000;
+	            const endtime = starttime + 12 * 3600000;
                 const aggregatorOpts = [
                     { 
                         "$match": {
@@ -94,7 +94,7 @@ module.exports = {
                 const rndNumber = Math.floor(Math.random() * data.length);
                 const tx8Number = data[rndNumber].tx8number;
                 
-                await tx8Data.updateOne({ _id: data[rndNumber]._id }, { status: "done" });
+                await tx8Data.updateMany({ userId: data[rndNumber].userId }, { status: "done" });
                 message.reply({ content: `\`🎉\` Lucky number is \`${tx8Number}\` by \`${data[rndNumber].user[0].email}\``, ephemeral: false });
             }
         } catch (err) {
