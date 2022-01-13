@@ -12,4 +12,4 @@ COPY . /usr/src/komubot
 EXPOSE 3000
 
 # Start the bot.
-CMD ["node", "shader.js"]
+CMD ["node", "sharder.js"]
