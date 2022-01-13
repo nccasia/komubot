@@ -2,7 +2,7 @@ module.exports = {
     //IMPORTANT: If you need help with the installation of KOMU, you can join our support server here: https://komu.vn/discord
     prefix: "*",
     // Your discord bot token. https://discord.com/developpers/bots
-    token: "",
+    token: "OTIyMDAzMjM5ODg3NTgxMjA1.Yb7Ibg.TWT_YeWASo9OeRkqlyKdndnMzaE",
     // Your ID
     // Your name/tag
     owners: ["KOMU#0139"],
@@ -59,7 +59,7 @@ module.exports = {
     komubotrest: {
         http_port: 3000,
         http_ip: "0.0.0.0",
-        komu_bot_secret_key: "",
+        komu_bot_secret_key: "6kkCZQja9Gn27kTiv",
         machleo_channel_id: "921339190090797106", 
         thongbao_channel_id: "921239248991055885",
         finance_channel_id: "922344796218093619",
@@ -70,11 +70,11 @@ module.exports = {
     },
     wfh: {
         api_url: "http://timesheetapi.nccsoft.vn/api/services/app/HRM/GetUserWorkFromHome",
-        api_key_secret: "",
+        api_key_secret: "Xnsks4@llslhl%hjsksCCHHA145",
     },
     wiki: {
         api_url: "http://project-api.nccsoft.vn/api/services/app/User/GetEmployeeInformation?email=",
-        api_key_secret: "",
+        api_key_secret: "Uqhfwwg%fyef@HUSAA744fiegyeR",
         options: [
             'all',
             'note',

@@ -16,7 +16,7 @@ module.exports = {
             if (args.length == 1 && args[0] != "draw") {
                 const tx8Number = args[0];                
 
-                if (isNaN(tx8Number)) {
+                if (isNaN(tx8Number) || (tx8Number >>> 0 !== parseFloat(tx8Number)) || tx8Number < 100 || tx8Number > 999) {
                     message.reply({ content: "Please enter a number between 100 and 999", ephemeral: true });
                     return;
                 }
@@ -32,7 +32,7 @@ module.exports = {
                 return;
             }
 
-            if (userId != "869928527607246858" && userId != "871713984670216273" && args[0] == "draw") {
+            if (userId != "694732284116598797" && userId != "871713984670216273" && args[0] == "draw") {
                 message.reply({ content: "```You are not allowed to use this command.```", ephemeral: true }).catch(console.error);
                 return;    
             }
@@ -42,25 +42,64 @@ module.exports = {
                 var startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 const starttime = startOfDay.getTime();
                 const endtime = starttime + 24 * 3600000;
-
-                const data = await tx8Data.find({ status: "pending", createdTimestamp: {
-                    $gte: starttime,
-                    $lt: endtime
-                } }).sort({ createdTimestamp: -1 });
+                const aggregatorOpts = [
+                    { 
+                        "$match": {
+                            status: "pending",
+                            createdTimestamp: {
+                                $gte: starttime,
+                                $lt: endtime
+                            },
+                            tx8number: {
+                                $gte: 99,
+                                $lt: 1000
+                            }
+                        } 
+                    },
+                    {
+                        "$group": {
+                            "_id": "$userId",
+                            "lastId": { $last: '$_id' },
+                            "tx8number": { $last: '$tx8number' },
+                            "createdTimestamp" : { $last: '$createdTimestamp' }
+                        }
+                    },
+                    {
+                        $project: {
+                          _id: '$lastId',
+                          userId: '$_id',
+                          tx8number: 1,
+                          createdTimestamp: 1
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "komu_users",
+                            localField: "userId",
+                            foreignField: "id",
+                            as: "user",
+                        },
+                    },
+                    {
+                        $sort: {
+                            createdTimestamp: -1
+                        }
+                    }
+                ];
+                const data = await tx8Data.aggregate(aggregatorOpts).exec();
                 if (data.length == 0) {
                     message.reply({ content: "```No lucky number found```", ephemeral: true });
                     return;
                 }
                 const rndNumber = Math.floor(Math.random() * data.length);
                 const tx8Number = data[rndNumber].tx8number;
-                const user = await userData.findOne({ id: data[rndNumber].userId });
                 
                 await tx8Data.updateOne({ _id: data[rndNumber]._id }, { status: "done" });
-                message.reply({ content: `\`🎉\` Lucky number is \`${tx8Number}\` by \`${user.email}\``, ephemeral: false });
+                message.reply({ content: `\`🎉\` Lucky number is \`${tx8Number}\` by \`${data[rndNumber].user[0].email}\``, ephemeral: false });
             }
         } catch (err) {
             console.log(err);
             message.reply({ content: "```Error```", ephemeral: true });
-        }     
+        }  
     },
 };
