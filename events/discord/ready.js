@@ -38,7 +38,7 @@ module.exports = {
 
     //run schedule
     try {
-      //scheduler.run(client);
+      scheduler.run(client);
     } catch (error) {
       console.log(error);
     }

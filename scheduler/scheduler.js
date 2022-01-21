@@ -102,7 +102,7 @@ async function pingWfh(client) {
         },
       },
     ]);
-    const arrayMessUser = result.filter(
+    let arrayMessUser = result.filter(
       (user) => Date.now() - user.last_message_time >= 1800000
     );
     
@@ -112,6 +112,7 @@ async function pingWfh(client) {
     ) {
       return;
     }
+    arrayMessUser = [...new Set(arrayMessUser.map(user => user.username))];
     await Promise.all(
       arrayMessUser.map((user, index) =>
         sendMessageKomuToUser(
@@ -129,14 +130,14 @@ async function pingWfh(client) {
 exports.scheduler = {
   async run(client) {
     new cron.CronJob(
-      "00 00 8 * * 1-5",
+      "00 00 9 * * 1-5",
       async () => await showDaily(client),
       null,
       false,
       "Asia/Ho_Chi_Minh"
     ).start();
     new cron.CronJob(
-      "*/30 8-17 * * 1-5",
+      "*/30 9-17 * * 1-5",
       async () => await pingWfh(client),
       null,
       false,
