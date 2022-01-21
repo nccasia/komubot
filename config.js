@@ -2,7 +2,7 @@ module.exports = {
   //IMPORTANT: If you need help with the installation of KOMU, you can join our support server here: https://komu.vn/discord
   prefix: "*",
   // Your discord bot token. https://discord.com/developpers/bots
-  token: "OTMxMzc3MDEwNjE2NDUxMTIy.YeDibw.BPfIYvwPrFHqOuQOZj6lfnjjAnw",
+  token: "",
   // Your ID
   // Your name/tag
   owners: ["KOMU#0139"],
@@ -82,7 +82,7 @@ module.exports = {
     CHECK_IN_URL: "http://172.16.100.153:8000",
     admin_user_id: "840420960162152470",
     pmid: "921333966731091978",
-    nhacuachung_channel_id: "925707563629150238",
+    nhacuachung_channel_id: "921239541388554240",
   },
   wfh: {
     api_url:
@@ -95,11 +95,6 @@ module.exports = {
     api_url_get:
       "https://info-api.dev.nccsoft.vn/api/services/app/KomuJobService/GetJobs",
     api_key_secret: "Xnsks4@llslhl%hjsksCCHHA145",
-  },
-  birthday: {
-    api_url_getUser:
-      "http://project-api.dev.nccsoft.vn/api/services/app/User/GetEmployeeInformation",
-    api_key_secret: "Uqhfwwg%fyef@HUSAA744fiegyeR",
   },
   wiki: {
     api_url:

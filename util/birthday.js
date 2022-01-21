@@ -6,10 +6,10 @@ async function getBirthdayUser(email, client) {
   try {
     const { data } = await axios
       .get(
-        `${client.config.birthday.api_url_getUser}?email=${email}@ncc.asia`,
+        `${client.config.wiki.api_url}${email}@ncc.asia`,
         {
           headers: {
-            "X-Secret-Key": client.config.birthday.api_key_secret,
+            "X-Secret-Key": client.config.wiki.api_key_secret,
           },
         }
       )
@@ -20,7 +20,6 @@ async function getBirthdayUser(email, client) {
     if (!data || !data.result) return;
     const dobUser = {
       birthday: data.result.dob,
-      // birthday: "01-21",
       name: data.result.employeeName,
       email: data.result.emailAddress.slice(0, -9),
     };
@@ -42,7 +41,6 @@ async function birthdayUser(client) {
   let emailArray = getAllUser.map((item) => item.email);
   const resultBirthday = await birthdayData.find();
   const items = resultBirthday.map((item) => item.title);
-  // for (let email of ["tai.cumanhtuan", "thanh.levan"]) {
     for (let email of emailArray) {
     let emailBirthday = await getBirthdayUser(email, client);
 
