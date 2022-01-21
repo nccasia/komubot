@@ -162,7 +162,7 @@ exports.scheduler = {
       "Asia/Ho_Chi_Minh"
     ).start();
     new cron.CronJob(
-      "48 16 * * 0-6",
+      "00 09 * * 0-6",
       async () => await happyBirthday(client),
       null,
       false,
