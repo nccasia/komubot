@@ -114,11 +114,11 @@ async function pingWfh(client) {
     }
     arrayMessUser = [...new Set(arrayMessUser.map(user => user.username))];
     await Promise.all(
-      arrayMessUser.map((user, index) =>
+      arrayMessUser.map((username, index) =>
         sendMessageKomuToUser(
           client,
           "Bạn đang online đấy chứ? Hãy trả lời tin nhắn nhé!",
-          user.username
+          username
         )
       )
     );
