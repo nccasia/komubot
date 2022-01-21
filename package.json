@@ -16,6 +16,7 @@
     "emoji-api": "^1.0.2",
     "express": "^4.17.2",
     "ffmpeg-static": "^4.2.8",
+    "googleapis": "^92.0.0",
     "image-downloader": "^4.0.3",
     "is-url": "^1.2.4",
     "moment": "^2.29.1",
