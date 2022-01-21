@@ -7,6 +7,7 @@ const checkIsNumber = (number) => {
   return !isNaN(parseFloat(number)) && !isNaN(number - 0) && parseInt(number);
 };
 const transAmmount = (ammout) => {
+  ammout = ammout.toLowerCase();
   const lastString = ammout.slice(ammout.length - 1, ammout.length);
   const startString = ammout.slice(0, ammout.length - 1);
 
