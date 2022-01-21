@@ -8,7 +8,6 @@ const {
   sendMessageToNhaCuaChung,
 } = require("../util/komubotrest");
 const birthdayUser = require("../util/birthday");
-const birthdayData = require("../models/birthdayData");
 
 async function showDaily(client) {
   console.log("[Scheduler] Run");
@@ -134,13 +133,10 @@ async function pingWfh(client) {
 async function happyBirthday(client) {
   const result = await birthdayUser(client);
 
-  const resultBirthday = await birthdayData.find();
-  const items = resultBirthday.map((item) => item.title);
-  const birthdayWishes = items[Math.floor(Math.random() * items.length)];
   try {
     await Promise.all(
       await result.map((item, index) =>
-        sendMessageToNhaCuaChung(client, `${birthdayWishes} <@${item.id}>`)
+        sendMessageToNhaCuaChung(client, `${item.wish} <@${item.user.id}> +1 trà sữa nhé anh zai`)
       )
     );
   } catch (error) {
@@ -166,7 +162,7 @@ exports.scheduler = {
       "Asia/Ho_Chi_Minh"
     ).start();
     new cron.CronJob(
-      "00 09 * * 0-6",
+      "48 16 * * 0-6",
       async () => await happyBirthday(client),
       null,
       false,

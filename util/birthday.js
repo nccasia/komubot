@@ -1,5 +1,6 @@
 const axios = require("axios");
 const userData = require("../models/userData");
+const birthdayData = require("../models/birthdayData");
 
 async function getBirthdayUser(email, client) {
   try {
@@ -19,14 +20,14 @@ async function getBirthdayUser(email, client) {
     if (!data || !data.result) return;
     const dobUser = {
       birthday: data.result.dob,
-      // birthday: "01-20",
+      // birthday: "01-21",
       name: data.result.employeeName,
       email: data.result.emailAddress.slice(0, -9),
     };
     const today = new Date();
     const currentDate = today.toISOString().substring(5, 10);
     if (dobUser.birthday !== null) {
-      if (dobUser.birthday.slice(5, 10) === currentDate) {
+      if (dobUser.birthday === currentDate) {
         return dobUser.email;
       }
     }
@@ -39,15 +40,19 @@ async function birthdayUser(client) {
   let result = [];
   const getAllUser = await userData.find();
   let emailArray = getAllUser.map((item) => item.email);
+  const resultBirthday = await birthdayData.find();
+  const items = resultBirthday.map((item) => item.title);
   // for (let email of ["tai.cumanhtuan", "thanh.levan"]) {
-  for (let email of emailArray) {
+    for (let email of emailArray) {
     let emailBirthday = await getBirthdayUser(email, client);
 
+    const birthdayWishes = items[Math.floor(Math.random() * items.length)];
+    items.splice(birthdayWishes, 1);
     if (!emailBirthday) continue;
     const birthday = await userData.findOne({
       email: emailBirthday,
     });
-    result.push(birthday);
+    result.push({ user: birthday, wish: birthdayWishes });
   }
   return result;
 }
