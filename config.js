@@ -2,7 +2,7 @@ module.exports = {
   //IMPORTANT: If you need help with the installation of KOMU, you can join our support server here: https://komu.vn/discord
   prefix: "*",
   // Your discord bot token. https://discord.com/developpers/bots
-  token: "",
+  token: "OTMxMzc3MDEwNjE2NDUxMTIy.YeDibw.BPfIYvwPrFHqOuQOZj6lfnjjAnw",
   // Your ID
   // Your name/tag
   owners: ["KOMU#0139"],
