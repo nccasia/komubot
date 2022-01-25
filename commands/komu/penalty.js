@@ -138,7 +138,7 @@ module.exports = {
           .setColor("#0099ff")
           .setTitle("PENALTY")
           .setDescription(
-            `Bạn vừa bị ${message.author.username} phạt ${ammount} vì lý do ${reason}`
+            `You have been fined by ${message.author.username} ${ammount} for: ${reason}`
           );
         const row = new MessageActionRow().addComponents(
           new MessageButton()
@@ -169,8 +169,8 @@ module.exports = {
         } catch (error) {}
 
         if (interaction) {
-          message.channel.send(`<@!${user.id}> từ chối nạp phạt`);
-          await interaction.reply(`Đã gửi từ chối!!!`);
+          message.channel.send(`<@!${user.id}> reject penalty`);
+          await interaction.reply(`Rejection sent!!!`);
           await penatlyData.updateOne(
             { _id: newPenatlyData._id },
             {
