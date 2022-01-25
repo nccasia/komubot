@@ -30,7 +30,14 @@ const transArgs = (userArgs) => {
     return { username: userArgs };
   }
 };
-
+const messHelp =
+  "```" +
+  "*penalty @username ammount<50k> reason" +
+  "\n" +
+  "*penalty summary" +
+  "\n" +
+  "*penalty detail @username" +
+  "```";
 module.exports = {
   name: "penalty",
   description: "penalty",
@@ -38,15 +45,7 @@ module.exports = {
   async execute(message, args, client, guildDB) {
     try {
       if (args[0] === "help") {
-        return message.channel.send(
-          "```" +
-            "*penalty @username ammount<50k> reason" +
-            "\n" +
-            "*penalty summary" +
-            "\n" +
-            "*penalty detail username" +
-            "```"
-        );
+        return message.channel.send(messHelp);
       } else if (args[0] === "summary") {
         const aggregatorOpts = [
           {
@@ -84,28 +83,35 @@ module.exports = {
           .catch(console.error);
       } else if (args[0] === "detail") {
         //detail
-        const username = args[1];
-        if (!username)
-          return message.channel.send("```" + "*penalty help" + "```");
-        const dataPen = await penatlyData.find({ username });
+        const user = transArgs(args[1]);
+
+        if (!user) return message.channel.send(messHelp);
+        let dataPen;
+        if (user.id) {
+          dataPen = await penatlyData.find({ user_id: user.id });
+        } else {
+          dataPen = await penatlyData.find({ username: user.username });
+        }
 
         if (!dataPen || (Array.isArray(dataPen) && dataPen.length === 0))
           return message.channel.send("```" + "no result" + "```");
         let mess = dataPen
-          .map((item, index) => `${index + 1} - ${item.reason}`)
+          .map(
+            (item, index) => `${index + 1} - ${item.reason} (${item.ammount})`
+          )
           .join("\n");
         return message.channel.send(
-          "```" + `Lý do ${username} bị phạt` + "\n" + mess + "```"
+          "```" + `Lý do ${dataPen[0].username} bị phạt` + "\n" + mess + "```"
         );
       } else {
         const channel_id = message.channel.id;
-        if (!args[0] || !args[1]) {
-          return message.channel.send("```" + "*penalty help" + "```");
+        if (!args[0] || !args[1] || !args[2]) {
+          return message.channel.send(messHelp);
         }
         const userArgs = transArgs(args[0]);
         const ammount = transAmmount(args[1]);
-        if (!transAmmount || !userArgs) {
-          return message.channel.send("```" + "no result" + "```");
+        if (!ammount || !userArgs) {
+          return message.channel.send(messHelp);
         }
         const reason = args.slice(2, args.length).join(" ");
 
@@ -127,12 +133,12 @@ module.exports = {
           channel_id,
         });
         const newPenatlyData = await newPenatly.save();
-
+        message.reply({ content: `\`✅\` Penalty saved.`, ephemeral: true });
         const embed = new MessageEmbed()
           .setColor("#0099ff")
           .setTitle("PENALTY")
           .setDescription(
-            `Bạn vừa bị ${message.author.username} phạt ${ammount} vì lý do ${reason}`
+            `You have been fined by ${message.author.username} ${ammount} for: ${reason}`
           );
         const row = new MessageActionRow().addComponents(
           new MessageButton()
@@ -152,12 +158,19 @@ module.exports = {
         const filter = (interaction) =>
           interaction.customId === `rejectpenalty${newPenatlyData._id}`;
 
-        const interaction = await userSend.dmChannel.awaitMessageComponent({
-          filter,
-        });
+        let interaction;
+        try {
+          interaction = await userSend.dmChannel.awaitMessageComponent({
+            filter,
+            max: 1,
+            time: 86400000,
+            errors: ["time"],
+          });
+        } catch (error) {}
+
         if (interaction) {
-          message.channel.send(`<@!${user.id}> từ chối nạp phạt`);
-          await interaction.reply(`Đã gửi từ chối!!!`);
+          message.channel.send(`<@!${user.id}> reject penalty`);
+          await interaction.reply(`Rejection sent!!!`);
           await penatlyData.updateOne(
             { _id: newPenatlyData._id },
             {

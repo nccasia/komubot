@@ -4,6 +4,30 @@ const userData = require("../models/userData");
 const axios = require("axios");
 const getUserNotDaily = require("../util/getUserNotDaily");
 const { sendMessageKomuToUser } = require("../util/komubotrest");
+const testQuiz = require("../testquiz");
+
+function setTime(date, hours, minute, second, msValue) {
+  return date.setHours(hours, minute, second, msValue);
+}
+
+function checkTime(time) {
+  if (!time) return false;
+  let result = false;
+  const curDate = new Date();
+
+  const fFistTime = new Date(setTime(curDate, 13, 0, 0, 0)).getTime();
+  const lFistTime = new Date(setTime(curDate, 13, 30, 0, 0)).getTime();
+
+  const lLastTime = new Date(setTime(curDate, 17, 25, 0, 0)).getTime();
+
+  if (
+    (time.getTime() >= fFistTime && time.getTime() < lFistTime) ||
+    time.getTime() >= lLastTime
+  )
+    result = true;
+
+  return result;
+}
 
 async function showDaily(client) {
   console.log("[Scheduler] Run");
@@ -20,7 +44,7 @@ async function showDaily(client) {
       notDailyMorning.map((email, index) =>
         sendMessageKomuToUser(
           client,
-          "Hôm nay bạn daily chưa? Nếu chưa thì *daily nhé.",
+          "Don't forget to daily, dude! Don't be mad at me, we are friends I mean we are best friends.",
           email
         )
       )
@@ -37,6 +61,7 @@ function getUserNameByEmail(string) {
 }
 async function pingWfh(client) {
   try {
+    if (checkTime(new Date())) return;
     let wfhGetApi;
     try {
       wfhGetApi = await axios.get(client.config.wfh.api_url, {
@@ -105,20 +130,20 @@ async function pingWfh(client) {
     let arrayMessUser = result.filter(
       (user) => Date.now() - user.last_message_time >= 1800000
     );
-    
+
     if (
       (Array.isArray(arrayMessUser) && arrayMessUser.length === 0) ||
       !arrayMessUser
     ) {
       return;
     }
-    arrayMessUser = [...new Set(arrayMessUser.map(user => user.username))];
+    arrayMessUser = [...new Set(arrayMessUser.map((user) => user.username))];
     await Promise.all(
       arrayMessUser.map((username, index) =>
         sendMessageKomuToUser(
           client,
-          "Bạn đang online đấy chứ? Hãy trả lời tin nhắn nhé!",
-          username
+          "Are you there? Please say something to me. I'm sad because they are so serious. I'm just an adorable bot, work for the money!!!",
+          user.username
         )
       )
     );
@@ -137,7 +162,7 @@ exports.scheduler = {
       "Asia/Ho_Chi_Minh"
     ).start();
     new cron.CronJob(
-      "*/30 9-17 * * 1-5",
+      "*/5 9-11,13-17 * * 1-5",
       async () => await pingWfh(client),
       null,
       false,
