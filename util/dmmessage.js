@@ -34,7 +34,8 @@ const dmmessage = async (message, client) => {
 
         if (res && res.data && res.data.generated_text) {
             message.channel.send(res.data.generated_text).catch(console.log);
-        }
+        }  else return
+
         if (data) {
             await conversationData.updateOne({_id: data._id}, {
                 past_user_inputs: res.data.conversation.past_user_inputs,
