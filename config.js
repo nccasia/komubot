@@ -67,6 +67,7 @@ module.exports = {
         CHECK_IN_URL: "http://172.16.100.153:8000",
         admin_user_id: "840420960162152470",
         pmid: "921333966731091978",
+        nhacuachung_channel_id: "921239541388554240",
     },
     wfh: {
         api_url: "http://timesheetapi.nccsoft.vn/api/services/app/HRM/GetUserWorkFromHome",

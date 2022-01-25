@@ -3,7 +3,8 @@ const dailyData = require("../models/dailyData");
 const userData = require("../models/userData");
 const axios = require("axios");
 const getUserNotDaily = require("../util/getUserNotDaily");
-const { sendMessageKomuToUser } = require("../util/komubotrest");
+const { sendMessageKomuToUser, sendMessageToNhaCuaChung } = require("../util/komubotrest");
+const birthdayUser = require("../util/birthday");
 // const testQuiz = require("../testquiz");
 
 function setTime(date, hours, minute, second, msValue) {
@@ -156,6 +157,20 @@ async function pingWfh(client) {
   }
 }
 
+async function happyBirthday(client) {
+  const result = await birthdayUser(client);
+
+  try {
+    await Promise.all(
+      await result.map((item, index) =>
+        sendMessageToNhaCuaChung(client, `${item.wish} <@${item.user.id}> +1 trà sữa nhé anh zai`)
+      )
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 exports.scheduler = {
   async run(client) {
     new cron.CronJob(
@@ -168,6 +183,14 @@ exports.scheduler = {
     new cron.CronJob(
       "*/5 9-11,13-17 * * 1-5",
       async () => await pingWfh(client),
+
+      null,
+      false,
+      "Asia/Ho_Chi_Minh"
+    ).start();
+    new cron.CronJob(
+      "00 09 * * 0-6",
+      async () => await happyBirthday(client),
       null,
       false,
       "Asia/Ho_Chi_Minh"
