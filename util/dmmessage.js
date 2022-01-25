@@ -54,11 +54,15 @@ const dmmessage = async (message, client) => {
         }, 
         { headers: {"Authorization": `Bearer ${API_TOKEN}`} }).catch(() => {
             message.channel.send("Very busy, too much work today. I'm so tired. BRB.")
+            return 
         });
 
         if (res && res.data && res.data.generated_text) {
             message.channel.send(res.data.generated_text).catch(console.log);
-        }  else return
+        }  else {
+            message.channel.send("Very busy, too much work today. I'm so tired. BRB.")
+            return 
+        }
 
         if (data) {
             await conversationData.updateOne({_id: data._id}, {
