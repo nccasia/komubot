@@ -1,6 +1,7 @@
 const conversationData = require("../models/conversationData.js");
 const axios = require("axios");
-
+const userData = require("../models/userData")
+const msgData = require("../models/msgData")
 API_TOKEN = "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"
 API_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-large"
 
@@ -16,6 +17,27 @@ const dmmessage = async (message, client) => {
 
         var generated_responses = []
         var past_user_inputs = []
+        
+        if(!authorId || !content) return
+        const newMsg = new msgData({
+            channelId: message.channelId,
+            guildId: message.guildId,
+            id: message.id,
+            createdTimestamp: message.createdTimestamp,
+            type: message.type,
+            system: message.system,
+            content: message.content,
+            author: message.author.id,
+            pinned: message.pinned,
+            tts: message.tts,
+            nonce: message.nonce,
+            webhookId: message.webhookId,
+            applicationId: message.applicationId,
+            flags: message.flags,
+        })
+        const newMsgAfter = await newMsg.save()
+       
+        await userData.updateOne({id : authorId}, {last_message_id : newMsgAfter.id})
 
         if (data) {
             generated_responses = data.generated_responses;
@@ -30,7 +52,9 @@ const dmmessage = async (message, client) => {
             "generated_responses": generated_responses,
             "text": `${content}`,
         }, 
-        { headers: {"Authorization": `Bearer ${API_TOKEN}`} }).catch(console.log);
+        { headers: {"Authorization": `Bearer ${API_TOKEN}`} }).catch(() => {
+            message.channel.send("Very busy, too much work today. I'm so tired. BRB.")
+        });
 
         if (res && res.data && res.data.generated_text) {
             message.channel.send(res.data.generated_text).catch(console.log);
