@@ -4,7 +4,7 @@ const userData = require("../models/userData");
 const axios = require("axios");
 const getUserNotDaily = require("../util/getUserNotDaily");
 const { sendMessageKomuToUser } = require("../util/komubotrest");
-const testQuiz = require("../testquiz");
+// const testQuiz = require("../testquiz");
 
 function setTime(date, hours, minute, second, msValue) {
   return date.setHours(hours, minute, second, msValue);
@@ -143,7 +143,7 @@ async function pingWfh(client) {
         sendMessageKomuToUser(
           client,
           "Are you there? Please say something to me. I'm sad because they are so serious. I'm just an adorable bot, work for the money!!!",
-          user.username
+          username
         )
       )
     );
