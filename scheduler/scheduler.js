@@ -14,11 +14,15 @@ function checkTime(time) {
   if (!time) return false;
   let result = false;
   const curDate = new Date();
+  const timezone = curDate.getTimezoneOffset() / -60;
+  const fFistTime = new Date(setTime(curDate, 6 + timezone, 0, 0, 0)).getTime();
+  const lFistTime = new Date(
+    setTime(curDate, 6 + timezone, 30, 0, 0)
+  ).getTime();
 
-  const fFistTime = new Date(setTime(curDate, 13, 0, 0, 0)).getTime();
-  const lFistTime = new Date(setTime(curDate, 13, 30, 0, 0)).getTime();
-
-  const lLastTime = new Date(setTime(curDate, 17, 25, 0, 0)).getTime();
+  const lLastTime = new Date(
+    setTime(curDate, 10 + timezone, 25, 0, 0)
+  ).getTime();
 
   if (
     (time.getTime() >= fFistTime && time.getTime() < lFistTime) ||
