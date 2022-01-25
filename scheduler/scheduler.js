@@ -127,7 +127,7 @@ async function pingWfh(client) {
         },
       },
     ]);
-    const arrayMessUser = result.filter(
+    let arrayMessUser = result.filter(
       (user) => Date.now() - user.last_message_time >= 1800000
     );
 
@@ -137,8 +137,9 @@ async function pingWfh(client) {
     ) {
       return;
     }
+    arrayMessUser = [...new Set(arrayMessUser.map((user) => user.username))];
     await Promise.all(
-      arrayMessUser.map((user, index) =>
+      arrayMessUser.map((username, index) =>
         sendMessageKomuToUser(
           client,
           "Are you there? Please say something to me. I'm sad because they are so serious. I'm just an adorable bot, work for the money!!!",
@@ -154,7 +155,7 @@ async function pingWfh(client) {
 exports.scheduler = {
   async run(client) {
     new cron.CronJob(
-      "00 00 8 * * 1-5",
+      "00 00 9 * * 1-5",
       async () => await showDaily(client),
       null,
       false,
