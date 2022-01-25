@@ -3,19 +3,21 @@ const dailyData = require("../models/dailyData");
 const userData = require("../models/userData");
 function getDateDay(time) {
   let date;
+
   if (!time) {
     date = new Date();
   } else {
     date = new Date(time);
   }
+  const timezone = date.getTimezoneOffset() / -60;
   return {
     morning: {
-      fisttime: new Date(setTime(date, 7, 0, 0, 0)).getTime(),
-      lastime: new Date(setTime(date, 9, 31, 0, 0)).getTime(),
+      fisttime: new Date(setTime(date, 0 + timezone, 0, 0, 0)).getTime(),
+      lastime: new Date(setTime(date, 2 + timezone, 31, 0, 0)).getTime(),
     },
     afternoon: {
-      fisttime: new Date(setTime(date, 12, 0, 0, 0)).getTime(),
-      lastime: new Date(setTime(date, 14, 1, 0, 0)).getTime(),
+      fisttime: new Date(setTime(date, 5 + timezone, 0, 0, 0)).getTime(),
+      lastime: new Date(setTime(date, 7 + timezone, 1, 0, 0)).getTime(),
     },
   };
 }
