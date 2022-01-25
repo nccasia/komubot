@@ -1,6 +1,7 @@
 const reportDaily = require("../../util/reportdaily");
 const { reportWfh, reportCompalinWfh } = require("../../util/reportWfh");
-
+const reportMessageCount = require("../../util/reportMsgCount");
+const reportScore = require("../../util/reportScore");
 function getTimeWeekMondayToFriday(dayNow) {
   let curr = new Date();
   // current date of week
@@ -38,6 +39,10 @@ module.exports = {
         await reportCompalinWfh(message, args, client, guildDB);
       } else if (args[0] === "wfh") {
         await reportWfh(message, args, client, guildDB);
+      } else if (args[0] === "msgcount") {
+        await reportMessageCount(message, args, client, guildDB);
+      } else if (args[0] === "quiz") {
+        await reportScore(message, args, client, guildDB);
       } else if (args[0] === "help") {
         return message.channel
           .send(
@@ -56,6 +61,14 @@ module.exports = {
                 {
                   name: "wfh complain",
                   des: "show user don't reply to bot & pm confirm",
+                },
+                {
+                  name: "msgcount",
+                  des: "show top 20 count message",
+                },
+                {
+                  name: "quiz",
+                  des: "show top 10 quiz",
                 },
               ]
                 .map((item) => `- ${item.name} : ${item.des}`)
