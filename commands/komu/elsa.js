@@ -108,6 +108,7 @@ module.exports = {
         await elsaReport(message, args, client, guildDB);
       } else if (args[0] === "daily") {
         let links = [];
+        
         message.attachments.forEach(attachment => {
           try {
               const imageLink = attachment.proxyURL;
