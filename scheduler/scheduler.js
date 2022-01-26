@@ -66,6 +66,7 @@ function getUserNameByEmail(string) {
 }
 async function pingWfh(client) {
   try {
+    console.log("[Scheduler run]");
     if (checkTime(new Date())) return;
     let wfhGetApi;
     try {
@@ -102,6 +103,7 @@ async function pingWfh(client) {
           // last_mentioned_message_id: 1,
         },
       },
+      { $match: { last_message_id: { $exists: true } } },
       {
         $lookup: {
           from: "komu_msgs",
