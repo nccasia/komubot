@@ -3,14 +3,13 @@ const dailyData = require("../models/dailyData");
 const userData = require("../models/userData");
 const axios = require("axios");
 const getUserNotDaily = require("../util/getUserNotDaily");
-<<<<<<< HEAD
-const { sendMessageKomuToUser } = require("../util/komubotrest");
 const sendQuizToSingleUser = require("../util/sendQuizToSingleUser");
-=======
-const { sendMessageKomuToUser, sendMessageToNhaCuaChung } = require("../util/komubotrest");
+const {
+  sendMessageKomuToUser,
+  sendMessageToNhaCuaChung,
+} = require("../util/komubotrest");
 const birthdayUser = require("../util/birthday");
 // const testQuiz = require("../testquiz");
->>>>>>> main
 
 function setTime(date, hours, minute, second, msValue) {
   return date.setHours(hours, minute, second, msValue);
@@ -179,7 +178,7 @@ async function sendQuiz(client) {
     ]);
     return await Promise.all(
       randomUser.map((user) => sendQuizToSingleUser(client, user))
-      );
+    );
   } catch (error) {
     console.log(error);
   }
@@ -190,7 +189,10 @@ async function happyBirthday(client) {
   try {
     await Promise.all(
       await result.map((item, index) =>
-        sendMessageToNhaCuaChung(client, `${item.wish} <@${item.user.id}> +1 trà sữa full topping nhé b iu`)
+        sendMessageToNhaCuaChung(
+          client,
+          `${item.wish} <@${item.user.id}> +1 trà sữa full topping nhé b iu`
+        )
       )
     );
   } catch (error) {
