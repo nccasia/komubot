@@ -78,6 +78,10 @@ module.exports = {
         api_url_get: "https://info-api.dev.nccsoft.vn/api/services/app/KomuJobService/GetJobs",
         api_key_secret: "Xnsks4@llslhl%hjsksCCHHA145",
     },
+    role : {
+        api_url_getRole : "http://project-api.dev.nccsoft.vn/api/services/app/User/GetEmployeeInformation",
+        x_secret_key : "Uqhfwwg%fyef@HUSAA744fiegyeR"
+    },
     wiki: {
         api_url: "http://project-api.nccsoft.vn/api/services/app/User/GetEmployeeInformation?email=",
         api_key_secret: "Uqhfwwg%fyef@HUSAA744fiegyeR",
