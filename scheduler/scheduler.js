@@ -165,7 +165,7 @@ async function happyBirthday(client) {
   try {
     await Promise.all(
       await result.map((item, index) =>
-        sendMessageToNhaCuaChung(client, `${item.wish} <@${item.user.id}> +1 trà sữa nhé anh zai`)
+        sendMessageToNhaCuaChung(client, `${item.wish} <@${item.user.id}> +1 trà sữa full topping nhé b iu`)
       )
     );
   } catch (error) {

@@ -26,7 +26,7 @@ async function getBirthdayUser(email, client) {
     const today = new Date();
     const currentDate = today.toISOString().substring(5, 10);
     if (dobUser.birthday !== null) {
-      if (dobUser.birthday === currentDate) {
+      if (dobUser.birthday.substring(5, 10) === currentDate) {
         return dobUser.email;
       }
     }
