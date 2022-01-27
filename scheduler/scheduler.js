@@ -4,7 +4,7 @@ const userData = require("../models/userData");
 const axios = require("axios");
 const getUserNotDaily = require("../util/getUserNotDaily");
 const { sendMessageKomuToUser } = require("../util/komubotrest");
-// const testQuiz = require("../testquiz");
+const sendQuizToSingleUser = require("../util/sendQuizToSingleUser");
 
 function setTime(date, hours, minute, second, msValue) {
   return date.setHours(hours, minute, second, msValue);
@@ -158,6 +158,30 @@ async function pingWfh(client) {
   }
 }
 
+async function sendQuiz(client) {
+  try {
+    console.log("Send quiz run ");
+    // const randomUser = await userData.aggregate([
+    //   {
+    //     $project: {
+    //       _id: 0,
+    //       id: 1,
+    //       username: 1,
+    //       roles: 1,
+    //     },
+    //   },
+    // ]);
+    const randomUser = [
+      { username: "anh.leduc1", id: "921591643755397132", roles: ["DEV"] },
+    ];
+    return await Promise.all(
+      randomUser.map((user) => sendQuizToSingleUser(client, user))
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 exports.scheduler = {
   async run(client) {
     new cron.CronJob(
@@ -174,5 +198,12 @@ exports.scheduler = {
       false,
       "Asia/Ho_Chi_Minh"
     ).start();
+    // new cron.CronJob(
+    //   "*/10 * 8-17 * * 1-5",
+    //   async () => await sendQuiz(client),
+    //   null,
+    //   false,
+    //   "Asia/Ho_Chi_Minh"
+    // ).start();
   },
 };

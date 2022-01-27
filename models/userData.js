@@ -19,6 +19,7 @@ const userdb = new mongoose.Schema({
      public_flags: { type: Number, required: false },
      last_message_id: { type: String, required: false },
      last_mentioned_message_id: { type: String, required: false },
-     scores_quiz : {type : Number, default : 0}
+     scores_quiz : {type : Number, default : 0},
+     roles : {type : Array, default : []}
 })
 const userData = module.exports = mongoose.model('komu_user', userdb)
