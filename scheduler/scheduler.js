@@ -3,7 +3,11 @@ const dailyData = require("../models/dailyData");
 const userData = require("../models/userData");
 const axios = require("axios");
 const getUserNotDaily = require("../util/getUserNotDaily");
-const { sendMessageKomuToUser, sendMessageToNhaCuaChung } = require("../util/komubotrest");
+const sendQuizToSingleUser = require("../util/sendQuizToSingleUser");
+const {
+  sendMessageKomuToUser,
+  sendMessageToNhaCuaChung,
+} = require("../util/komubotrest");
 const birthdayUser = require("../util/birthday");
 // const testQuiz = require("../testquiz");
 
@@ -159,13 +163,36 @@ async function pingWfh(client) {
   }
 }
 
+async function sendQuiz(client) {
+  try {
+    console.log("Send quiz run ");
+    const randomUser = await userData.aggregate([
+      {
+        $project: {
+          _id: 0,
+          id: 1,
+          username: 1,
+          roles: 1,
+        },
+      },
+    ]);
+    return await Promise.all(
+      randomUser.map((user) => sendQuizToSingleUser(client, user))
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
 async function happyBirthday(client) {
   const result = await birthdayUser(client);
 
   try {
     await Promise.all(
       await result.map((item, index) =>
-        sendMessageToNhaCuaChung(client, `${item.wish} <@${item.user.id}> +1 trà sữa full topping nhé b iu`)
+        sendMessageToNhaCuaChung(
+          client,
+          `${item.wish} <@${item.user.id}> +1 trà sữa full topping nhé b iu`
+        )
       )
     );
   } catch (error) {
@@ -197,5 +224,12 @@ exports.scheduler = {
       false,
       "Asia/Ho_Chi_Minh"
     ).start();
+    // new cron.CronJob(
+    //   "*/10 * 8-17 * * 1-5",
+    //   async () => await sendQuiz(client),
+    //   null,
+    //   false,
+    //   "Asia/Ho_Chi_Minh"
+    // ).start();
   },
 };
