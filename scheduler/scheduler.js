@@ -199,6 +199,15 @@ async function happyBirthday(client) {
     console.log(error);
   }
 }
+async function happyNewYear(client) {
+  const message = 'Happy lunar new year @everyone! Wishing you and your family a happy, healthy, lucky New Year. We have been through a challenging year, due to the covid pandemic. After all, we did it great. Every new year brings with it new opportunities, together we start a new chapter of our story.';
+
+  try {
+    await sendMessageToNhaCuaChung(client, message)
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 exports.scheduler = {
   async run(client) {
@@ -220,6 +229,13 @@ exports.scheduler = {
     new cron.CronJob(
       "00 09 * * 0-6",
       async () => await happyBirthday(client),
+      null,
+      false,
+      "Asia/Ho_Chi_Minh"
+    ).start();
+    new cron.CronJob(
+      "00 00 1 2 *",
+      async () => await happyNewYear(client),
       null,
       false,
       "Asia/Ho_Chi_Minh"
