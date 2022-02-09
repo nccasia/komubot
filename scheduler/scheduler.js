@@ -242,10 +242,7 @@ async function punish(client) {
         client.config.komubotrest.machleo_channel_id
       );
       await channel.send(message);
-      await userData.updateOne(
-        { username: user.username },
-        { last_bot_message_id: '' }
-      );
+      await userData.updateOne({ id: user.id }, { last_bot_message_id: '' });
     }
   });
 }
