@@ -225,7 +225,9 @@ async function punish(client) {
     if (Date.now() - user.createdTimestamp >= 1800000) {
       const content = `<@${user.id}> không trả lời tin nhắn WFH lúc ${moment(
         parseInt(user.createdTimestamp.toString())
-      ).format('YYYY-MM-DD HH:mm:ss')} !\n`;
+      )
+        .utcOffset(420)
+        .format('YYYY-MM-DD HH:mm:ss')} !\n`;
       const data = await new wfhData({
         userid: user.id,
         wfhMsg: content,
