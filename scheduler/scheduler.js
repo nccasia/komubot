@@ -11,6 +11,7 @@ const {
 } = require('../util/komubotrest');
 const birthdayUser = require('../util/birthday');
 const wfhData = require('../models/wfhData');
+const mentionedData = require('../models/mentionedData');
 // const testQuiz = require("../testquiz");
 
 function setTime(date, hours, minute, second, msValue) {
@@ -249,6 +250,53 @@ async function punish(client) {
   });
 }
 
+async function checkMention(client) {
+  if (checkTime(new Date())) return;
+  try {
+    let mentionedUsers = await mentionedData.find({ confirm: false });
+    mentionedUsers = mentionedUsers.filter(
+      (item) => Date.now() - item.createdTimestamp >= 1800000
+    );
+
+    await Promise.all(
+      mentionedUsers.map(async (user) => {
+        let mentionChannel = await client.channels.fetch(user.channelId);
+        if (mentionChannel.type !== 'GUILD_TEXT') {
+          mentionChannel = await client.channels.fetch(mentionChannel.parentId);
+        }
+        const content = `<@${
+          user.mentionUserId
+        }> không trả lời tin nhắn mention của <@${user.authorId}> lúc ${moment(
+          parseInt(user.createdTimestamp.toString())
+        )
+          .utcOffset(420)
+          .format('YYYY-MM-DD HH:mm:ss')} tại channel ${
+          mentionChannel.name
+        }!\n`;
+        const data = await new wfhData({
+          userid: user.mentionUserId,
+          wfhMsg: content,
+          complain: false,
+          pmconfirm: false,
+          status: 'ACTIVE',
+        }).save();
+        const message = getWFHWarninghMessage(
+          content,
+          user.mentionUserId,
+          data._id.toString()
+        );
+        const channel = await client.channels.fetch(
+          client.config.komubotrest.machleo_channel_id
+        );
+        await channel.send(message);
+        await mentionedData.updateOne({ _id: user._id }, { confirm: true });
+      })
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 exports.scheduler = {
   run(client) {
     new cron.CronJob(
@@ -286,5 +334,12 @@ exports.scheduler = {
     //   false,
     //   "Asia/Ho_Chi_Minh"
     // ).start();
+    new cron.CronJob(
+      '*/1 9-11,13-17 * * 1-5',
+      async () => await checkMention(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
   },
 };
