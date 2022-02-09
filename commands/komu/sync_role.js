@@ -1,16 +1,16 @@
-const userData = require("../../models/userData");
-const axios = require("axios");
+const userData = require('../../models/userData');
+const axios = require('axios');
 module.exports = {
-  name: "sync",
-  description: "WFH Daily",
-  cat: "komu",
-  async execute(message, args, client, guildDB) {
+  name: 'sync',
+  description: 'WFH Daily',
+  cat: 'komu',
+  async execute(message, args, client) {
     try {
-      if (args[0] === "role") {
+      if (args[0] === 'role') {
         const userDb = await userData.find({});
         const emailArray = userDb.map((user) => user.email);
 
-        for (let email of emailArray) {
+        for (const email of emailArray) {
           const url = encodeURI(
             `${client.config.role.api_url_getRole}?email=${email}@ncc.asia`
           );
@@ -18,7 +18,7 @@ module.exports = {
           try {
             response = await axios.get(url, {
               headers: {
-                "X-Secret-Key": client.config.role.x_secret_key,
+                'X-Secret-Key': client.config.role.x_secret_key,
               },
             });
           } catch (error) {
@@ -45,7 +45,7 @@ module.exports = {
           await userData.updateOne({ email }, { roles: rolesRemoveDuplicate });
         }
 
-        return message.reply("Update role success!!!");
+        return message.reply('Update role success!!!');
       }
     } catch (err) {
       console.log(err);

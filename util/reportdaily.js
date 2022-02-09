@@ -1,4 +1,4 @@
-const getUserNotDaily = require("../util/getUserNotDaily");
+const getUserNotDaily = require('../util/getUserNotDaily');
 
 function findCountNotDaily(arr, email) {
   return arr.filter((item) => item.email === email)[0].countnotdaily;
@@ -14,28 +14,28 @@ async function reportDaily(date, message, args, client, guildDB) {
     );
 
     let mess;
-    let dateString = (date && date.toDateString()) || "";
-    let dailyString = date
-      ? "Những Người Chưa Daily"
-      : "Những Người Chưa Daily Hôm Nay";
+    const dateString = (date && date.toDateString()) || '';
+    const dailyString = date
+      ? 'Những Người Chưa Daily'
+      : 'Những Người Chưa Daily Hôm Nay';
     if (!userNotDaily) {
       return;
     } else if (Array.isArray(userNotDaily) && userNotDaily.length === 0) {
-      mess = "```" + dateString + "Tất Cả Đều Đã Daily" + "```";
+      mess = '```' + dateString + 'Tất Cả Đều Đã Daily' + '```';
       return message.channel.send(mess).catch(console.error);
     } else {
       for (let i = 0; i <= Math.ceil(userNotDaily.length / 50); i += 1) {
         if (userNotDaily.slice(i * 50, (i + 1) * 50).length === 0) break;
         mess =
-          "```" +
+          '```' +
           dateString +
-          "\n" +
+          '\n' +
           dailyString +
-          "\n" +
-          "```" +
+          '\n' +
+          '```' +
           userNotDaily
             .slice(i * 50, (i + 1) * 50)
-            .map((user, index) => {
+            .map((user) => {
               if (user.id) {
                 return `<@${user.id}> (${findCountNotDaily(
                   notDaily,
@@ -45,7 +45,7 @@ async function reportDaily(date, message, args, client, guildDB) {
                 return `${user.email} (${user.countnotdaily})`;
               }
             })
-            .join("\n");
+            .join('\n');
         await message.channel.send(mess).catch(console.error);
       }
     }

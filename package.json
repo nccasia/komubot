@@ -16,6 +16,7 @@
     "emoji-api": "^1.0.2",
     "express": "^4.17.2",
     "ffmpeg-static": "^4.2.8",
+    "hex-color-regex": "^1.1.0",
     "image-downloader": "^4.0.3",
     "is-url": "^1.2.4",
     "moment": "^2.29.1",
@@ -33,7 +34,10 @@
   },
   "scripts": {
     "start": "node sharder.js ",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --fix",
+    "format": "prettier --write .",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -51,5 +55,12 @@
   "bugs": {
     "url": "https://github.com/KomuBotDeveloppement/komu/issues"
   },
-  "homepage": "https://komu.vn"
+  "homepage": "https://komu.vn",
+  "devDependencies": {
+    "eslint": "^8.8.0",
+    "eslint-config-prettier": "^8.3.0",
+    "husky": "^7.0.0",
+    "prettier": "^2.5.1",
+    "pretty-quick": "^3.1.3"
+  }
 }

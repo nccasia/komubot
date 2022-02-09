@@ -1,8 +1,8 @@
-const axios = require("axios");
-const wfhData = require("../models/wfhData");
+const axios = require('axios');
+const wfhData = require('../models/wfhData');
 
 function withoutTime(dateTime) {
-  var date = new Date(dateTime);
+  const date = new Date(dateTime);
   date.setHours(0, 0, 0, 0);
   return date;
 }
@@ -18,7 +18,7 @@ function getTimeToDay() {
   };
 }
 
-async function reportWfh(message, args, client, guildDB) {
+async function reportWfh(message, args, client) {
   let wfhGetApi;
   try {
     wfhGetApi = await axios.get(client.config.wfh.api_url, {
@@ -37,7 +37,7 @@ async function reportWfh(message, args, client, guildDB) {
   const wfhFullday = await wfhData.find({
     $and: [
       {
-        $or: [{ status: "ACCEPT" }, { status: "ACTIVE" }],
+        $or: [{ status: 'ACCEPT' }, { status: 'ACTIVE' }],
       },
       {
         createdAt: {
@@ -52,25 +52,25 @@ async function reportWfh(message, args, client, guildDB) {
   if (!wfhFullday) {
     return;
   } else if (Array.isArray(wfhFullday) && wfhFullday.length === 0) {
-    mess = "```" + "Không có ai vi phạm trong ngày" + "```";
+    mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
     return message.channel.send(mess).catch(console.error);
   } else {
     for (let i = 0; i <= Math.ceil(wfhFullday.length / 50); i += 1) {
       if (wfhFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
       mess =
-        "```" +
-        "Những người không check bot trong ngày hôm nay" +
-        "```" +
+        '```' +
+        'Những người không check bot trong ngày hôm nay' +
+        '```' +
         wfhFullday
           .slice(i * 50, (i + 1) * 50)
-          .map((wfh, index) => `<@${wfh.userid}> `)
-          .join("\n");
+          .map((wfh) => `<@${wfh.userid}> `)
+          .join('\n');
       return message.channel.send(mess).catch(console.error);
     }
   }
 }
 
-async function reportCompalinWfh(message, args, client, guildDB) {
+async function reportCompalinWfh(message, args, client) {
   let wfhGetApi;
   try {
     wfhGetApi = await axios.get(client.config.wfh.api_url, {
@@ -87,7 +87,7 @@ async function reportCompalinWfh(message, args, client, guildDB) {
   }
 
   const wfhFullday = await wfhData.find({
-    status: "APPROVED",
+    status: 'APPROVED',
     complain: true,
     createdAt: {
       $gte: getTimeToDay().firstDay,
@@ -99,19 +99,19 @@ async function reportCompalinWfh(message, args, client, guildDB) {
   if (!wfhFullday) {
     return;
   } else if (Array.isArray(wfhFullday) && wfhFullday.length === 0) {
-    mess = "```" + "Không có ai được approved trong ngày" + "```";
+    mess = '```' + 'Không có ai được approved trong ngày' + '```';
     return message.channel.send(mess).catch(console.error);
   } else {
     for (let i = 0; i <= Math.ceil(wfhFullday.length / 50); i += 1) {
       if (wfhFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
       mess =
-        "```" +
-        "Những người được approved trong ngày hôm nay" +
-        "```" +
+        '```' +
+        'Những người được approved trong ngày hôm nay' +
+        '```' +
         wfhFullday
           .slice(i * 50, (i + 1) * 50)
-          .map((wfh, index) => `<@${wfh.userid}> `)
-          .join("\n");
+          .map((wfh) => `<@${wfh.userid}> `)
+          .join('\n');
       return message.channel.send(mess).catch(console.error);
     }
   }

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const userquizdb = new mongoose.Schema({
   userid: { type: String, require: true },
@@ -6,7 +6,5 @@ const userquizdb = new mongoose.Schema({
   correct: { type: Boolean, require: true },
   answer: { type: Number },
 });
-const userquizData = (module.exports = mongoose.model(
-  "komu_userquiz",
-  userquizdb
-));
+
+module.exports = mongoose.model('komu_userquiz', userquizdb);

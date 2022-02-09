@@ -1,11 +1,11 @@
-const userData = require("../../models/userData");
-const { sendMessageKomuToUser } = require("../../util/komubotrest");
-const { MessageActionRow, MessageButton, MessageEmbed } = require("discord.js");
-const penatlyData = require("../../models/penatlyData");
+const userData = require('../../models/userData');
+const { sendMessageKomuToUser } = require('../../util/komubotrest');
+const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const penatlyData = require('../../models/penatlyData');
 
-const checkIsNumber = (number) => {
-  return !isNaN(parseFloat(number)) && !isNaN(number - 0) && parseInt(number);
-};
+// const checkIsNumber = (number) => {
+//   return !isNaN(parseFloat(number)) && !isNaN(number - 0) && parseInt(number);
+// };
 const transAmmount = (ammout) => {
   ammout = ammout.toLowerCase();
   const lastString = ammout.slice(ammout.length - 1, ammout.length);
@@ -14,15 +14,14 @@ const transAmmount = (ammout) => {
   const checkNumber = (string) =>
     !isNaN(parseFloat(string)) && !isNaN(string - 0);
 
-  if (lastString == "k" && checkNumber(startString)) {
+  if (lastString == 'k' && checkNumber(startString)) {
     return startString * 1000;
-  } else {
-    if (checkNumber(ammout)) return checkNumber(ammout);
+  } else if (checkNumber(ammout)) {
+    return checkNumber(ammout);
   }
-  return;
 };
 const transArgs = (userArgs) => {
-  if (userArgs.includes("<@!")) {
+  if (userArgs.includes('<@!')) {
     return {
       id: userArgs.slice(3, userArgs.length - 1),
     };
@@ -31,22 +30,22 @@ const transArgs = (userArgs) => {
   }
 };
 const messHelp =
-  "```" +
-  "*penalty @username ammount<50k> reason" +
-  "\n" +
-  "*penalty summary" +
-  "\n" +
-  "*penalty detail @username" +
-  "```";
+  '```' +
+  '*penalty @username ammount<50k> reason' +
+  '\n' +
+  '*penalty summary' +
+  '\n' +
+  '*penalty detail @username' +
+  '```';
 module.exports = {
-  name: "penalty",
-  description: "penalty",
-  cat: "komu",
-  async execute(message, args, client, guildDB) {
+  name: 'penalty',
+  description: 'penalty',
+  cat: 'komu',
+  async execute(message, args, client) {
     try {
-      if (args[0] === "help") {
+      if (args[0] === 'help') {
         return message.channel.send(messHelp);
-      } else if (args[0] === "summary") {
+      } else if (args[0] === 'summary') {
         const aggregatorOpts = [
           {
             $match: {
@@ -56,8 +55,8 @@ module.exports = {
           },
           {
             $group: {
-              _id: "$user_id",
-              amount: { $sum: "$ammount" },
+              _id: '$user_id',
+              amount: { $sum: '$ammount' },
             },
           },
           {
@@ -71,18 +70,18 @@ module.exports = {
 
         let mess;
         if (Array.isArray(result) && result.length === 0) {
-          mess = "```" + "no result" + "```";
+          mess = '```' + 'no result' + '```';
         } else {
           mess = result
             .map((item) => `<@${item._id}> : ${item.amount}`)
-            .join("\n");
+            .join('\n');
         }
 
         return message.channel
-          .send("```" + `Top bị phạt :` + "\n" + "```" + "\n" + mess)
+          .send('```' + 'Top bị phạt :' + '\n' + '```' + '\n' + mess)
           .catch(console.error);
-      } else if (args[0] === "detail") {
-        //detail
+      } else if (args[0] === 'detail') {
+        // detail
         const user = transArgs(args[1]);
 
         if (!user) return message.channel.send(messHelp);
@@ -93,15 +92,16 @@ module.exports = {
           dataPen = await penatlyData.find({ username: user.username });
         }
 
-        if (!dataPen || (Array.isArray(dataPen) && dataPen.length === 0))
-          return message.channel.send("```" + "no result" + "```");
-        let mess = dataPen
+        if (!dataPen || (Array.isArray(dataPen) && dataPen.length === 0)) {
+          return message.channel.send('```' + 'no result' + '```');
+        }
+        const mess = dataPen
           .map(
             (item, index) => `${index + 1} - ${item.reason} (${item.ammount})`
           )
-          .join("\n");
+          .join('\n');
         return message.channel.send(
-          "```" + `Lý do ${dataPen[0].username} bị phạt` + "\n" + mess + "```"
+          '```' + `Lý do ${dataPen[0].username} bị phạt` + '\n' + mess + '```'
         );
       } else {
         const channel_id = message.channel.id;
@@ -113,7 +113,7 @@ module.exports = {
         if (!ammount || !userArgs) {
           return message.channel.send(messHelp);
         }
-        const reason = args.slice(2, args.length).join(" ");
+        const reason = args.slice(2, args.length).join(' ');
 
         let user;
         if (userArgs?.id) {
@@ -121,7 +121,7 @@ module.exports = {
         } else {
           user = await userData.findOne({ username: userArgs.username });
         }
-        if (!user) return message.channel.send("```" + "no result" + "```");
+        if (!user) return message.channel.send('```' + 'no result' + '```');
 
         const newPenatly = new penatlyData({
           user_id: user.id,
@@ -133,18 +133,18 @@ module.exports = {
           channel_id,
         });
         const newPenatlyData = await newPenatly.save();
-        message.reply({ content: `\`✅\` Penalty saved.`, ephemeral: true });
+        message.reply({ content: '`✅` Penalty saved.', ephemeral: true });
         const embed = new MessageEmbed()
-          .setColor("#0099ff")
-          .setTitle("PENALTY")
+          .setColor('#0099ff')
+          .setTitle('PENALTY')
           .setDescription(
             `You have been fined by ${message.author.username} ${ammount} for: ${reason}`
           );
         const row = new MessageActionRow().addComponents(
           new MessageButton()
             .setCustomId(`rejectpenalty${newPenatlyData._id}`)
-            .setLabel("REJECT")
-            .setStyle("DANGER")
+            .setLabel('REJECT')
+            .setStyle('DANGER')
         );
 
         const userSend = await sendMessageKomuToUser(
@@ -164,13 +164,15 @@ module.exports = {
             filter,
             max: 1,
             time: 86400000,
-            errors: ["time"],
+            errors: ['time'],
           });
-        } catch (error) {}
+        } catch (error) {
+          console.log(error);
+        }
 
         if (interaction) {
           message.channel.send(`<@!${user.id}> reject penalty`);
-          await interaction.reply(`Rejection sent!!!`);
+          await interaction.reply('Rejection sent!!!');
           await penatlyData.updateOne(
             { _id: newPenatlyData._id },
             {

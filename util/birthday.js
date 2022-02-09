@@ -1,21 +1,18 @@
-const axios = require("axios");
-const userData = require("../models/userData");
-const birthdayData = require("../models/birthdayData");
+const axios = require('axios');
+const userData = require('../models/userData');
+const birthdayData = require('../models/birthdayData');
 
 async function getBirthdayUser(email, client) {
   try {
     const { data } = await axios
-      .get(
-        `${client.config.wiki.api_url}${email}@ncc.asia`,
-        {
-          headers: {
-            "X-Secret-Key": client.config.wiki.api_key_secret,
-          },
-        }
-      )
+      .get(`${client.config.wiki.api_url}${email}@ncc.asia`, {
+        headers: {
+          'X-Secret-Key': client.config.wiki.api_key_secret,
+        },
+      })
       .catch((err) => {
-        console.log("Error ", err);
-        return { data: "There was an error!" };
+        console.log('Error ', err);
+        return { data: 'There was an error!' };
       });
     if (!data || !data.result) return;
     const dobUser = {
@@ -36,13 +33,13 @@ async function getBirthdayUser(email, client) {
 }
 
 async function birthdayUser(client) {
-  let result = [];
+  const result = [];
   const getAllUser = await userData.find();
-  let emailArray = getAllUser.map((item) => item.email);
+  const emailArray = getAllUser.map((item) => item.email);
   const resultBirthday = await birthdayData.find();
   const items = resultBirthday.map((item) => item.title);
-    for (let email of emailArray) {
-    let emailBirthday = await getBirthdayUser(email, client);
+  for (const email of emailArray) {
+    const emailBirthday = await getBirthdayUser(email, client);
 
     const birthdayWishes = items[Math.floor(Math.random() * items.length)];
     items.splice(birthdayWishes, 1);

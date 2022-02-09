@@ -1,8 +1,7 @@
-const userData = require("../models/userData");
-const msgData = require("../models/msgData");
+const msgData = require('../models/msgData');
 
 function withoutTime(dateTime) {
-  var date = new Date(dateTime);
+  const date = new Date(dateTime);
   date.setHours(0, 0, 0, 0);
   return date;
 }
@@ -18,7 +17,7 @@ function getTimeToDay() {
   };
 }
 
-async function reportMessageCount(message, args, client, guildDB) {
+async function reportMessageCount(message) {
   try {
     const userid = message.author.id;
     const username = message.author.username;
@@ -32,20 +31,20 @@ async function reportMessageCount(message, args, client, guildDB) {
             $lte: getTimeToDay().lastDay,
             $gte: getTimeToDay().firstDay,
           },
-          author: { $nin: ["922003239887581205", "931377010616451122"] }, // remove komu and komudev
+          author: { $nin: ['922003239887581205', '931377010616451122'] },
         },
       },
       {
         $group: {
-          _id: "$author",
-          totalMess: { $addToSet: "$id" },
+          _id: '$author',
+          totalMess: { $addToSet: '$id' },
         },
       },
       {
         $project: {
-          userid: "$id",
+          userid: '$id',
           countMessage: {
-            $size: "$totalMess",
+            $size: '$totalMess',
           },
         },
       },
@@ -60,15 +59,15 @@ async function reportMessageCount(message, args, client, guildDB) {
     ]);
     let mess;
     if (Array.isArray(messageData) && messageData.length === 0) {
-      mess = "```" + "no result" + "```";
+      mess = '```' + 'no result' + '```';
     } else {
       mess = messageData
         .map((item) => `<@${item._id}> : ${item.countMessage}`)
-        .join("\n");
+        .join('\n');
     }
 
     return message.channel
-      .send("```" + "Top 20 message :" + "\n" + "```" + "\n" + mess)
+      .send('```' + 'Top 20 message :' + '\n' + '```' + '\n' + mess)
       .catch(console.error);
   } catch (error) {
     console.log(error);

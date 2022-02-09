@@ -1,5 +1,4 @@
-const userData = require("../../models/userData.js");
-const bwlReactData = require("../../models/bwlReactData.js");
+const bwlReactData = require('../../models/bwlReactData.js');
 
 function getTimeWeek(time) {
   let curr;
@@ -13,10 +12,12 @@ function getTimeWeek(time) {
     curr = new Date();
   }
   // current date of week
-  let currentWeekDay = curr.getDay();
-  let lessDays = currentWeekDay == 0 ? 6 : currentWeekDay - 1;
-  let firstweek = new Date(new Date(curr).setDate(curr.getDate() - lessDays));
-  let lastweek = new Date(new Date(firstweek).setDate(firstweek.getDate() + 7));
+  const currentWeekDay = curr.getDay();
+  const lessDays = currentWeekDay == 0 ? 6 : currentWeekDay - 1;
+  const firstweek = new Date(new Date(curr).setDate(curr.getDate() - lessDays));
+  const lastweek = new Date(
+    new Date(firstweek).setDate(firstweek.getDate() + 7)
+  );
 
   return {
     firstday: {
@@ -31,22 +32,22 @@ function getTimeWeek(time) {
 }
 
 function withoutTime(dateTime) {
-  var date = new Date(dateTime);
+  const date = new Date(dateTime);
   date.setHours(0, 0, 0, 0);
   return date;
 }
 function formatDayMonth(time) {
-  const day = time.split("").slice(0, 2).join("");
-  const month = time.split("").slice(3, 5).join("");
-  const year = time.split("").slice(6, 10).join("");
+  const day = time.split('').slice(0, 2).join('');
+  const month = time.split('').slice(3, 5).join('');
+  const year = time.split('').slice(6, 10).join('');
   return `${month}/${day}/${year}`;
 }
 
 function formatDate(time) {
-  let today = new Date(time);
-  let dd = String(today.getDate()).padStart(2, "0");
-  let mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
-  let yyyy = today.getFullYear();
+  const today = new Date(time);
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const yyyy = today.getFullYear();
   return `${dd}/${mm}/${yyyy}`;
 }
 
@@ -57,18 +58,18 @@ function validateTimeDDMMYYYY(time) {
 }
 
 module.exports = {
-  name: "bwl",
-  description: "BWL leaderboard",
-  cat: "komu",
-  async execute(message, args, client, guildDB) {
+  name: 'bwl',
+  description: 'BWL leaderboard',
+  cat: 'komu',
+  async execute(message, args) {
     try {
-      if (args[0] === "help") {
+      if (args[0] === 'help') {
         return message.channel.send(
-          "```" +
-            "*bwl channel_id top dd/mm/yyyy" +
-            "\n" +
-            "channel_id : right click to the channel & copy" +
-            "```"
+          '```' +
+            '*bwl channel_id top dd/mm/yyyy' +
+            '\n' +
+            'channel_id : right click to the channel & copy' +
+            '```'
         );
       }
 
@@ -81,7 +82,7 @@ module.exports = {
         5;
       const time = args[2];
       if (!channelId || !getTimeWeek(time)) {
-        return message.channel.send("```invalid channel or time```");
+        return message.channel.send('```invalid channel or time```');
       }
 
       const aggregatorOpts = [
@@ -90,62 +91,62 @@ module.exports = {
         },
         {
           $group: {
-            _id: "$messageId",
-            totalReact: { $addToSet: "$authorId" },
+            _id: '$messageId',
+            totalReact: { $addToSet: '$authorId' },
           },
         },
         {
           $project: {
             _id: 0,
-            messageId: "$_id",
+            messageId: '$_id',
             totalReact: {
-              $size: "$totalReact",
+              $size: '$totalReact',
             },
           },
         },
         {
           $lookup: {
-            from: "komu_bwls",
-            localField: "messageId",
-            foreignField: "messageId",
-            as: "author_message",
+            from: 'komu_bwls',
+            localField: 'messageId',
+            foreignField: 'messageId',
+            as: 'author_message',
           },
         },
         {
-          $unwind: "$author_message",
+          $unwind: '$author_message',
         },
         {
           $lookup: {
-            from: "komu_users",
-            localField: "author_message.authorId",
-            foreignField: "id",
-            as: "author",
+            from: 'komu_users',
+            localField: 'author_message.authorId',
+            foreignField: 'id',
+            as: 'author',
           },
         },
         {
-          $unwind: "$author",
+          $unwind: '$author',
         },
         {
           $sort: { totalReact: -1 },
         },
         {
           $group: {
-            _id: "$author.id",
-            author: { $first: "$author" },
-            message: { $first: "$author_message" },
-            totalReact: { $first: "$totalReact" },
+            _id: '$author.id',
+            author: { $first: '$author' },
+            message: { $first: '$author_message' },
+            totalReact: { $first: '$totalReact' },
           },
         },
         {
           $match: {
             $and: [
               {
-                "message.createdTimestamp": {
+                'message.createdTimestamp': {
                   $gte: getTimeWeek(time).firstday.timestamp,
                 },
               },
               {
-                "message.createdTimestamp": {
+                'message.createdTimestamp': {
                   $lte: getTimeWeek(time).lastday.timestamp,
                 },
               },
@@ -171,17 +172,17 @@ module.exports = {
             });
           }
           if (Array.isArray(name) && name.length === 0) {
-            message.channel.send("```no result```");
+            message.channel.send('```no result```');
           } else {
             message.channel
               .send(
-                "```" +
+                '```' +
                   getTimeWeek(time).firstday.date +
-                  " - " +
+                  ' - ' +
                   getTimeWeek(time).lastday.date +
-                  "\n" +
-                  name.join("\n") +
-                  "```"
+                  '\n' +
+                  name.join('\n') +
+                  '```'
               )
               .catch(console.error);
           }

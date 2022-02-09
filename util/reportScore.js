@@ -1,6 +1,6 @@
-const userData = require("../models/userData");
+const userData = require('../models/userData');
 
-async function reportScore(message, args, client, guildDB) {
+async function reportScore(message) {
   try {
     const userid = message.author.id;
     const username = message.author.username;
@@ -26,15 +26,15 @@ async function reportScore(message, args, client, guildDB) {
     ]);
     let mess;
     if (Array.isArray(scoresQuizData) && scoresQuizData.length === 0) {
-      mess = "```" + "no result" + "```";
+      mess = '```' + 'no result' + '```';
     } else {
       mess = scoresQuizData
         .map((item) => `<@${item.id}> - ${item.scores_quiz || 0} score`)
-        .join("\n");
+        .join('\n');
     }
 
     return message.channel
-      .send("```" + "Top 10 quiz score :" + "\n" + "```" + "\n" + mess)
+      .send('```' + 'Top 10 quiz score :' + '\n' + '```' + '\n' + mess)
       .catch(console.error);
   } catch (error) {
     console.log(error);

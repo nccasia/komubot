@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const penatlydb = new mongoose.Schema({
   user_id: { type: String, require: true },
@@ -9,7 +9,5 @@ const penatlydb = new mongoose.Schema({
   is_reject: { type: Boolean },
   channel_id: { type: String, require: true },
 });
-const penatlyData = (module.exports = mongoose.model(
-  "komu_penatly",
-  penatlydb
-));
+
+module.exports = mongoose.model('komu_penatly', penatlydb);

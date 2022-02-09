@@ -1,10 +1,7 @@
-const { MessageEmbed: MessageEmbed, MessageButton } = require("discord.js");
-const questionData = require("../models/quizData");
-const userData = require("../models/userData");
-const userquizData = require("../models/userQuiz");
-const { sendMessageKomuToUser } = require("../util/komubotrest");
-const newEmbed = (message, color) =>
-  new MessageEmbed().setTitle(message).setColor(color);
+const { MessageEmbed: MessageEmbed } = require('discord.js');
+const questionData = require('../models/quizData');
+const userData = require('../models/userData');
+const userquizData = require('../models/userQuiz');
 
 async function randomQuiz(userInput, context, type) {
   // context is message or client
@@ -20,7 +17,7 @@ async function randomQuiz(userInput, context, type) {
       roleRandom =
         roles[Math.floor(Math.random() * roles.length)].toLowerCase();
     } else {
-      roleRandom = "policy";
+      roleRandom = 'policy';
     }
 
     const questionAnswered = await userquizData.find(
@@ -55,8 +52,8 @@ async function randomQuiz(userInput, context, type) {
     ]);
     console.log(questions);
     if (Array.isArray(questions) && questions.length === 0) {
-      let mess = "You have answered all the questions!!!";
-      if (type === "commands") {
+      const mess = 'You have answered all the questions!!!';
+      if (type === 'commands') {
         await context.channel.send(mess);
       } else {
         return;
@@ -73,11 +70,11 @@ function embedQuestion(question) {
   const Embed = new MessageEmbed()
     .setTitle(question.title)
     .setDescription(
-      question.options.map((otp, index) => `${index + 1} - ${otp}`).join("\n")
+      question.options.map((otp, index) => `${index + 1} - ${otp}`).join('\n')
     )
-    .setColor("RANDOM")
+    .setColor('RANDOM')
     .setFooter({
-      text: "Reply to this message with the correct question number! You have 1 minute",
+      text: 'Reply to this message with the correct question number! You have 1 minute',
     });
   return Embed;
 }
@@ -160,10 +157,10 @@ async function saveQuestionInCorrect(userid, questionid, answerkey) {
 //   max: 1,
 //   errors: ["time"],
 // });
-const filterAwaitMessage = (module.exports = {
+module.exports = {
   randomQuiz,
   embedQuestion,
   addScores,
   saveQuestionCorrect,
   saveQuestionInCorrect,
-});
+};

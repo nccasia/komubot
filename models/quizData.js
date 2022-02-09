@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const questiondb = new mongoose.Schema({
   title: String,
@@ -9,7 +9,5 @@ const questiondb = new mongoose.Schema({
   accept: Boolean,
   author_email: String,
 });
-const questionData = (module.exports = mongoose.model(
-  "komu_question",
-  questiondb
-));
+
+module.exports = mongoose.model('komu_question', questiondb);

@@ -1,13 +1,13 @@
-const reportDaily = require("../../util/reportdaily");
-const { reportWfh, reportCompalinWfh } = require("../../util/reportWfh");
-const reportMessageCount = require("../../util/reportMsgCount");
-const reportScore = require("../../util/reportScore");
+const reportDaily = require('../../util/reportdaily');
+const { reportWfh, reportCompalinWfh } = require('../../util/reportWfh');
+const reportMessageCount = require('../../util/reportMsgCount');
+const reportScore = require('../../util/reportScore');
 function getTimeWeekMondayToFriday(dayNow) {
-  let curr = new Date();
+  const curr = new Date();
   // current date of week
-  let currentWeekDay = curr.getDay();
-  let lessDays = currentWeekDay == 0 ? 6 : currentWeekDay - 1;
-  let firstweek = new Date(new Date(curr).setDate(curr.getDate() - lessDays));
+  const currentWeekDay = curr.getDay();
+  const lessDays = currentWeekDay == 0 ? 6 : currentWeekDay - 1;
+  const firstweek = new Date(new Date(curr).setDate(curr.getDate() - lessDays));
   let arrayDay;
   if (dayNow === 0 || dayNow === 6 || dayNow === 5) {
     arrayDay = [2, 3, 4, 5, 6];
@@ -24,61 +24,61 @@ function getTimeWeekMondayToFriday(dayNow) {
 }
 
 module.exports = {
-  name: "report",
-  description: "show no daily",
-  cat: "komu",
+  name: 'report',
+  description: 'show no daily',
+  cat: 'komu',
   async execute(message, args, client, guildDB) {
     try {
-      if (args[0] === "daily") {
+      if (args[0] === 'daily') {
         await reportDaily(null, message, args, client, guildDB);
-      } else if (args[0] === "weekly") {
-        for (day of getTimeWeekMondayToFriday(new Date().getDay())) {
+      } else if (args[0] === 'weekly') {
+        for (const day of getTimeWeekMondayToFriday(new Date().getDay())) {
           await reportDaily(day, message, args, client, guildDB);
         }
-      } else if (args[0] === "wfh" && args[1] === "complain") {
+      } else if (args[0] === 'wfh' && args[1] === 'complain') {
         await reportCompalinWfh(message, args, client, guildDB);
-      } else if (args[0] === "wfh") {
+      } else if (args[0] === 'wfh') {
         await reportWfh(message, args, client, guildDB);
-      } else if (args[0] === "msgcount") {
+      } else if (args[0] === 'msgcount') {
         await reportMessageCount(message, args, client, guildDB);
-      } else if (args[0] === "quiz") {
+      } else if (args[0] === 'quiz') {
         await reportScore(message, args, client, guildDB);
-      } else if (args[0] === "help") {
+      } else if (args[0] === 'help') {
         return message.channel
           .send(
-            "```" +
-              "*report options" +
-              "\n" +
-              "options  " +
-              "\n" +
+            '```' +
+              '*report options' +
+              '\n' +
+              'options  ' +
+              '\n' +
               [
-                { name: "daily", des: "show daily today" },
-                { name: "weekly", des: "show daily weekly" },
+                { name: 'daily', des: 'show daily today' },
+                { name: 'weekly', des: 'show daily weekly' },
                 {
-                  name: "wfh ",
+                  name: 'wfh ',
                   des: "show user don't reply to bot ",
                 },
                 {
-                  name: "wfh complain",
+                  name: 'wfh complain',
                   des: "show user don't reply to bot & pm confirm",
                 },
                 {
-                  name: "msgcount",
-                  des: "show top 20 count message",
+                  name: 'msgcount',
+                  des: 'show top 20 count message',
                 },
                 {
-                  name: "quiz",
-                  des: "show top 10 quiz",
+                  name: 'quiz',
+                  des: 'show top 10 quiz',
                 },
               ]
                 .map((item) => `- ${item.name} : ${item.des}`)
-                .join("\n") +
-              "```"
+                .join('\n') +
+              '```'
           )
           .catch(console.error);
       } else {
         return message.channel
-          .send("```" + "*report help" + "```")
+          .send('```' + '*report help' + '```')
           .catch(console.error);
       }
     } catch (error) {

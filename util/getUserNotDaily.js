@@ -1,6 +1,6 @@
-const axios = require("axios");
-const dailyData = require("../models/dailyData");
-const userData = require("../models/userData");
+const axios = require('axios');
+const dailyData = require('../models/dailyData');
+const userData = require('../models/userData');
 function getDateDay(time) {
   let date;
 
@@ -27,15 +27,15 @@ function setTime(date, hours, minute, second, msValue) {
 }
 
 function getUserNameByEmail(string) {
-  if (string.includes("@ncc.asia")) {
+  if (string.includes('@ncc.asia')) {
     return string.slice(0, string.length - 9);
   }
 }
-async function getUserNotDaily(date, message, args, client, guildDB) {
+async function getUserNotDaily(date, message, args, client) {
   try {
     let wfhGetApi;
     try {
-      let url = date
+      const url = date
         ? `${client.config.wfh.api_url}?date=${date.toDateString()}`
         : client.config.wfh.api_url;
       wfhGetApi = await axios.get(url, {
@@ -55,7 +55,7 @@ async function getUserNotDaily(date, message, args, client, guildDB) {
       getUserNameByEmail(item.emailAddress)
     );
 
-    //if no wfh
+    // if no wfh
     if (
       (Array.isArray(wfhUserEmail) && wfhUserEmail.length === 0) ||
       !wfhUserEmail
@@ -79,25 +79,25 @@ async function getUserNotDaily(date, message, args, client, guildDB) {
 
     const dailyEmailMorning = dailyMorning.map((item) => item.email);
     const dailyEmailAfternoon = dailyAfternoon.map((item) => item.email);
-    let notDailyMorning = [];
-    for (let wfhData of wfhUserEmail) {
+    const notDailyMorning = [];
+    for (const wfhData of wfhUserEmail) {
       if (!dailyEmailMorning.includes(wfhData) && wfhData !== undefined) {
         notDailyMorning.push(wfhData);
       }
     }
-    let notDailyAfternoon = [];
-    for (let wfhData of wfhUserEmail) {
+    const notDailyAfternoon = [];
+    for (const wfhData of wfhUserEmail) {
       if (!dailyEmailAfternoon.includes(wfhData) && wfhData !== undefined) {
         notDailyAfternoon.push(wfhData);
       }
     }
-    let spreadNotDaily = [...notDailyMorning, ...notDailyAfternoon];
+    const spreadNotDaily = [...notDailyMorning, ...notDailyAfternoon];
     // => notDaily : {email : "", countnotdaily : }
     const notDaily = spreadNotDaily.reduce((acc, cur) => {
       if (Array.isArray(acc) && acc.length === 0) {
         acc.push({ email: cur, countnotdaily: 1 });
       } else {
-        let indexExist = acc.findIndex((item) => item.email === cur);
+        const indexExist = acc.findIndex((item) => item.email === cur);
         if (indexExist !== -1) {
           acc[indexExist] = {
             email: acc[indexExist].email,

@@ -1,25 +1,25 @@
-const { MessageActionRow, MessageButton, MessageEmbed } = require("discord.js");
-const { sendMessageKomuToUser } = require("./komubotrest");
+const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const { sendMessageKomuToUser } = require('./komubotrest');
 const {
   randomQuiz,
   embedQuestion,
   addScores,
   saveQuestionCorrect,
   saveQuestionInCorrect,
-} = require("./quiz");
+} = require('./quiz');
 const newEmbed = (message, color) =>
   new MessageEmbed().setTitle(message).setColor(color);
 
 async function sendQuizToSingleUser(client, userInput) {
   try {
-    //random userid
+    // random userid
     if (!userInput) return;
     const userid = userInput.id;
     const username = userInput.username;
 
-    const q = await randomQuiz(userInput, client, "scheduler");
+    const q = await randomQuiz(userInput, client, 'scheduler');
     if (!q) return;
-    console.log("run");
+    console.log('run');
     const Embed = embedQuestion(q);
 
     const row = new MessageActionRow();
@@ -28,7 +28,7 @@ async function sendQuizToSingleUser(client, userInput) {
         new MessageButton()
           .setCustomId(`question_${userid}_key${i + 1}`)
           .setLabel((i + 1).toString())
-          .setStyle("PRIMARY")
+          .setStyle('PRIMARY')
       );
     }
 
@@ -39,18 +39,18 @@ async function sendQuizToSingleUser(client, userInput) {
     );
     // user.dmChannel
     // id
-    const filterAwaitMessage = (interaction) =>
-      interaction.customId === `question_${userid}_key${i}`;
+    const filterAwaitMessage = (reaction) =>
+      reaction.customId.includes(`question_${userid}_key`);
     let interaction;
     try {
       interaction = await user.dmChannel.awaitMessageComponent({
         filterAwaitMessage,
         max: 1,
         time: 86400000,
-        errors: ["time"],
+        errors: ['time'],
       });
     } catch (error) {
-      const EmbedDidNotAnswer = newEmbed("You did not answer!", "YELLOW");
+      const EmbedDidNotAnswer = newEmbed('You did not answer!', 'YELLOW');
       return user.send({ embeds: [EmbedDidNotAnswer] });
     }
     if (interaction) {
@@ -65,13 +65,13 @@ async function sendQuizToSingleUser(client, userInput) {
 
         const EmbedCorrect = newEmbed(
           `Correct!!!, you have ${newUser.scores_quiz} points`,
-          "GREEN"
+          'GREEN'
         );
 
         return interaction.reply({ embeds: [EmbedCorrect] });
       } else {
         await saveQuestionInCorrect(userid, q._id, key);
-        const EmbedInCorrect = newEmbed(`Incorrect!!!`, "RED");
+        const EmbedInCorrect = newEmbed('Incorrect!!!', 'RED');
         return interaction.reply({ embeds: [EmbedInCorrect] });
       }
     }
