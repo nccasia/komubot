@@ -354,7 +354,7 @@ exports.scheduler = {
     // ).start();
     new cron.CronJob(
       '*/1 9-11,13-17 * * 1-5',
-      async () => await checkMention(client),
+      () => checkMention(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
