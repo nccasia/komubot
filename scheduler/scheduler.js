@@ -252,10 +252,25 @@ async function punish(client) {
 
 async function checkMention(client) {
   if (checkTime(new Date())) return;
+  const now = Date.now();
   try {
     let mentionedUsers = await mentionedData.find({ confirm: false });
     mentionedUsers = mentionedUsers.filter(
-      (item) => Date.now() - item.createdTimestamp >= 1800000
+      (item) => now - item.createdTimestamp >= 1800000
+    );
+
+    const notiUser = mentionedUsers.filter(
+      (item) =>
+        now - item.createdTimestamp >= 1500000 &&
+        now - item.createdTimestamp < 1800000 &&
+        !item.noti
+    );
+
+    await Promise.all(
+      notiUser.map(async (user) => {
+        const userDiscord = await client.users.fetch(user.mentionUserId);
+        userDiscord.send(`Hãy trả lời mention của <@${user.authorId}> nhé!`);
+      })
     );
 
     await Promise.all(
@@ -289,7 +304,10 @@ async function checkMention(client) {
           client.config.komubotrest.machleo_channel_id
         );
         await channel.send(message);
-        await mentionedData.updateOne({ _id: user._id }, { confirm: true });
+        await mentionedData.updateOne(
+          { _id: user._id },
+          { confirm: true, punish: true }
+        );
       })
     );
   } catch (error) {
