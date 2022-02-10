@@ -28,10 +28,21 @@ function getTomorrowDate() {
 }
 
 async function reportMention(message) {
-  const mentionFullday = await mentionedData.find({
-    punish: true,
-    createdTimestamp: { $gte: getYesterdayDate(), $lte: getTomorrowDate() },
-  });
+  const mentionFullday = await mentionedData.aggregate([
+    {
+      $match: {
+        punish: true,
+        createdTimestamp: { $gte: getYesterdayDate(), $lte: getTomorrowDate() },
+      },
+    },
+    {
+      $group: {
+        _id: '$mentionUserId',
+        total: { $sum: 1 },
+      },
+    },
+    { $sort: { total: -1 } },
+  ]);
   let mess;
 
   if (!mentionFullday) {
@@ -48,7 +59,7 @@ async function reportMention(message) {
         '```' +
         mentionFullday
           .slice(i * 50, (i + 1) * 50)
-          .map((mention) => `<@${mention.mentionUserId}> `)
+          .map((mention) => `<@${mention._id}> (${mention.total})`)
           .join('\n');
       return message.channel.send(mess).catch(console.error);
     }
