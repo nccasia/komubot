@@ -7,6 +7,7 @@ const mentionedDb = new mongoose.Schema({
   mentionUserId: { type: String, required: false },
   createdTimestamp: { type: mongoose.Decimal128, required: false },
   confirm: { type: Boolean, required: false },
+  punish: { type: Boolean, required: false },
 });
 
 module.exports = mongoose.model('komu_mentioned', mentionedDb);

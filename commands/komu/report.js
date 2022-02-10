@@ -2,6 +2,7 @@ const reportDaily = require('../../util/reportdaily');
 const { reportWfh, reportCompalinWfh } = require('../../util/reportWfh');
 const reportMessageCount = require('../../util/reportMsgCount');
 const reportScore = require('../../util/reportScore');
+const { reportMention } = require('../../util/reportMention');
 function getTimeWeekMondayToFriday(dayNow) {
   const curr = new Date();
   // current date of week
@@ -35,6 +36,8 @@ module.exports = {
         for (const day of getTimeWeekMondayToFriday(new Date().getDay())) {
           await reportDaily(day, message, args, client, guildDB);
         }
+      } else if (args[0] === 'mention') {
+        await reportMention(message, args, client, guildDB);
       } else if (args[0] === 'wfh' && args[1] === 'complain') {
         await reportCompalinWfh(message, args, client, guildDB);
       } else if (args[0] === 'wfh') {

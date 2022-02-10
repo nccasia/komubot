@@ -12,14 +12,14 @@ function withoutLastTime(dateTime) {
   return date;
 }
 
-function getyesterdaydate() {
+function getYesterdayDate() {
   const today = new Date();
   const yesterday = new Date(withoutLastTime(today));
   yesterday.setDate(yesterday.getDate() - 1);
   return yesterday;
 }
 
-function gettomorrowdate() {
+function getTomorrowDate() {
   const today = new Date();
   const yesterday = new Date(withoutFirstTime(today));
   yesterday.setDate(yesterday.getDate() + 1);
@@ -29,7 +29,7 @@ function gettomorrowdate() {
 async function elsaReport(message) {
   const report = await elsaDailyData.find({
     attachment: false,
-    createdAt: { $gte: getyesterdaydate(), $lte: gettomorrowdate() },
+    createdAt: { $gte: getYesterdayDate(), $lte: getTomorrowDate() },
   });
 
   let mess;
