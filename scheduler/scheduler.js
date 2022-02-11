@@ -390,7 +390,7 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '45 08 * * 0-6',
+      '45 08 * * 1-5',
       async () => await topTracker(client),
       null,
       false,
