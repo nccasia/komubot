@@ -255,10 +255,6 @@ async function checkMention(client) {
   const now = Date.now();
   try {
     let mentionedUsers = await mentionedData.find({ confirm: false });
-    mentionedUsers = mentionedUsers.filter(
-      (item) => now - item.createdTimestamp >= 1800000
-    );
-
     const notiUser = mentionedUsers.filter(
       (item) =>
         now - item.createdTimestamp >= 1500000 &&
@@ -266,10 +262,24 @@ async function checkMention(client) {
         !item.noti
     );
 
+    mentionedUsers = mentionedUsers.filter(
+      (item) => now - item.createdTimestamp >= 1800000
+    );
+
     await Promise.all(
       notiUser.map(async (user) => {
+        let mentionChannel = await client.channels.fetch(user.channelId);
+        if (mentionChannel.type !== 'GUILD_TEXT') {
+          mentionChannel = await client.channels.fetch(mentionChannel.parentId);
+        }
+
+        let mentionName = await client.users.fetch(user.authorId);
+
         const userDiscord = await client.users.fetch(user.mentionUserId);
-        userDiscord.send(`Hãy trả lời mention của <@${user.authorId}> nhé!`);
+        userDiscord.send(
+          `Hãy trả lời ${mentionName.username} tại channel ${mentionChannel.name} nhé!`
+        );
+        await mentionedData.updateOne({ _id: user._id }, { noti: true });
       })
     );
 
@@ -315,6 +325,26 @@ async function checkMention(client) {
   }
 }
 
+async function topTracker(client) {
+  const userTracker = [
+    '856211913456877608',
+    '922416220056199198',
+    '921689631110602792',
+    '922297847876034562',
+    '922306295346921552',
+    '921601073939116073',
+    '921261168088190997',
+    '921312679354834984',
+    '665925240404181002',
+  ];
+  await Promise.all(
+    userTracker.map(async (user) => {
+      const userDiscord = await client.users.fetch(user);
+      userDiscord.send(`Nhớ bật top tracker <@${user}> nhé!!!`);
+    })
+  );
+}
+
 exports.scheduler = {
   run(client) {
     new cron.CronJob(
@@ -355,6 +385,13 @@ exports.scheduler = {
     new cron.CronJob(
       '*/1 9-11,13-17 * * 1-5',
       () => checkMention(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '45 08 * * 1-5',
+      async () => await topTracker(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
