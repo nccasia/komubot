@@ -311,7 +311,7 @@ async function checkMention(client) {
           data._id.toString()
         );
         const channel = await client.channels.fetch(
-          client.config.komubotrest.nhacuachung_channel_id
+          client.config.komubotrest.machleo_channel_id
         );
         await channel.send(message);
         await mentionedData.updateOne(
