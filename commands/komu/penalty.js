@@ -36,6 +36,8 @@ const messHelp =
   '*penalty summary' +
   '\n' +
   '*penalty detail @username' +
+  '\n' +
+  '*penalty clear' +
   '```';
 module.exports = {
   name: 'penalty',
@@ -51,6 +53,7 @@ module.exports = {
             $match: {
               is_reject: false,
               channel_id: message.channel.id,
+              delete: !true,
             },
           },
           {
@@ -103,6 +106,16 @@ module.exports = {
         return message.channel.send(
           '```' + `Lý do ${dataPen[0].username} bị phạt` + '\n' + mess + '```'
         );
+      } else if (args[0] === 'clear') {
+        // clear
+        await penatlyData.updateMany(
+          { channel_id: message.channel.id, delete: false },
+          { delete: true }
+        );
+        message.reply({
+          content: 'Clear penatly successfully',
+          ephemeral: true,
+        });
       } else {
         const channel_id = message.channel.id;
         if (!args[0] || !args[1] || !args[2]) {
@@ -131,6 +144,7 @@ module.exports = {
           createdTimestamp: Date.now(),
           is_reject: false,
           channel_id,
+          delete: false,
         });
         const newPenatlyData = await newPenatly.save();
         message.reply({ content: '`✅` Penalty saved.', ephemeral: true });
