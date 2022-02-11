@@ -6,6 +6,7 @@ const mentionedDb = new mongoose.Schema({
   channelId: { type: String, required: false },
   mentionUserId: { type: String, required: false },
   createdTimestamp: { type: mongoose.Decimal128, required: false },
+  noti: { type: Boolean, required: false },
   confirm: { type: Boolean, required: false },
   punish: { type: Boolean, required: false },
 });
