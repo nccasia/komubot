@@ -38,16 +38,18 @@ async function birthdayUser(client) {
   const emailArray = getAllUser.map((item) => item.email);
   const resultBirthday = await birthdayData.find();
   const items = resultBirthday.map((item) => item.title);
+  let wishes = items;
   for (const email of emailArray) {
-    const emailBirthday = await getBirthdayUser(email, client);
-
-    const birthdayWishes = items[Math.floor(Math.random() * items.length)];
-    items.splice(birthdayWishes, 1);
+    const emailBirthday = await getBirthdayUser(encodeURI(email), client);
     if (!emailBirthday) continue;
+    if (!wishes.length) wishes = items;
+    const index = Math.floor(Math.random() * items.length);
+    const birthdayWish = wishes[index];
+    wishes.splice(index, 1);
     const birthday = await userData.findOne({
       email: emailBirthday,
     });
-    result.push({ user: birthday, wish: birthdayWishes });
+    result.push({ user: birthday, wish: birthdayWish });
   }
   return result;
 }
