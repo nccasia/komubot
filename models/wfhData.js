@@ -9,6 +9,7 @@ const wfhdb = new mongoose.Schema({
   pmconfirm: { type: Boolean, required: false },
   status: { type: String, required: false },
   data: { type: String, required: false },
+  type: { type: String, default: 'wfh' },
 });
 
 module.exports = mongoose.model('komu_wfh', wfhdb);

@@ -42,7 +42,6 @@ async function birthdayUser(client) {
     const emailBirthday = await getBirthdayUser(email, client);
 
     const birthdayWishes = items[Math.floor(Math.random() * items.length)];
-    items.splice(birthdayWishes, 1);
     if (!emailBirthday) continue;
     const birthday = await userData.findOne({
       email: emailBirthday,

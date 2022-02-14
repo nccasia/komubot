@@ -304,6 +304,7 @@ async function checkMention(client) {
           complain: false,
           pmconfirm: false,
           status: 'ACTIVE',
+          type: 'mention',
         }).save();
         const message = getWFHWarninghMessage(
           content,

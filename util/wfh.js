@@ -122,7 +122,7 @@ const wfh = async (interaction, client) => {
               pmdb.id
           )
           .setLabel('Reject')
-          .setStyle('PRIMARY'),
+          .setStyle('DANGER'),
         new MessageButton()
           .setCustomId(
             'komu_wfh_complain#' +
@@ -133,7 +133,7 @@ const wfh = async (interaction, client) => {
               pmdb.id
           )
           .setLabel('Confirm')
-          .setStyle('SECONDARY')
+          .setStyle('PRIMARY')
       );
       const embed = new MessageEmbed()
         .setColor('RANDOM')
