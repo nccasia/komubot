@@ -3,7 +3,9 @@ const wfhData = require('../models/wfhData');
 
 function withoutTime(dateTime) {
   const date = new Date(dateTime);
-  date.setHours(0, 0, 0, 0);
+  const curDate = new Date();
+  const timezone = curDate.getTimezoneOffset() / -60;
+  date.setHours(0 + timezone, 0, 0, 0);
   return date;
 }
 
@@ -13,8 +15,8 @@ function getTimeToDay() {
   const tomorrowsDate = tomorrows.setDate(tomorrows.getDate() + 1);
 
   return {
-    firstDay: new Date(withoutTime(today)).getTime(),
-    lastDay: new Date(withoutTime(tomorrowsDate)).getTime(),
+    firstDay: new Date(withoutTime(today)),
+    lastDay: new Date(withoutTime(tomorrowsDate)),
   };
 }
 
@@ -34,19 +36,34 @@ async function reportWfh(message, args, client) {
     return;
   }
 
-  const wfhFullday = await wfhData.find({
-    $and: [
-      {
-        $or: [{ status: 'ACCEPT' }, { status: 'ACTIVE' }],
-      },
-      {
+  const wfhFullday = await wfhData.aggregate([
+    {
+      $match: {
+        type: 'wfh',
         createdAt: {
           $gte: getTimeToDay().firstDay,
           $lte: getTimeToDay().lastDay,
         },
+        $or: [
+          { status: 'ACCEPT' },
+          { status: 'ACTIVE' },
+          {
+            status: 'APPROVED',
+            pmconfirm: false,
+          },
+        ],
       },
-    ],
-  });
+    },
+    {
+      $group: {
+        _id: '$userid',
+        total: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { total: -1 },
+    },
+  ]);
 
   let mess;
   if (!wfhFullday) {
@@ -59,11 +76,11 @@ async function reportWfh(message, args, client) {
       if (wfhFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
       mess =
         '```' +
-        'Những người không check bot trong ngày hôm nay' +
+        'Những người bị phạt vì không trả lời wfh trong ngày hôm nay' +
         '```' +
         wfhFullday
           .slice(i * 50, (i + 1) * 50)
-          .map((wfh) => `<@${wfh.userid}> `)
+          .map((wfh) => `<@${wfh._id}> - (${wfh.total})`)
           .join('\n');
       return message.channel.send(mess).catch(console.error);
     }

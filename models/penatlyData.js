@@ -8,6 +8,7 @@ const penatlydb = new mongoose.Schema({
   createdTimestamp: { type: mongoose.Decimal128, required: true },
   is_reject: { type: Boolean },
   channel_id: { type: String, require: true },
+  delete: { type: Boolean, require: false },
 });
 
 module.exports = mongoose.model('komu_penatly', penatlydb);
