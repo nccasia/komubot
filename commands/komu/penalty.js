@@ -90,9 +90,15 @@ module.exports = {
         if (!user) return message.channel.send(messHelp);
         let dataPen;
         if (user.id) {
-          dataPen = await penatlyData.find({ user_id: user.id });
+          dataPen = await penatlyData.find({
+            user_id: user.id,
+            channel_id: message.channel.id,
+          });
         } else {
-          dataPen = await penatlyData.find({ username: user.username });
+          dataPen = await penatlyData.find({
+            username: user.username,
+            channel_id: message.channel.id,
+          });
         }
 
         if (!dataPen || (Array.isArray(dataPen) && dataPen.length === 0)) {
