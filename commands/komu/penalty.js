@@ -53,7 +53,7 @@ module.exports = {
             $match: {
               is_reject: false,
               channel_id: message.channel.id,
-              delete: !true,
+              delete: { $ne: true },
             },
           },
           {
