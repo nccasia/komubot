@@ -3,8 +3,7 @@ const axios = require('axios');
 const userData = require('../models/userData');
 const msgData = require('../models/msgData');
 const API_TOKEN = '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';
-const API_URL =
-  'https://api-inference.huggingface.co/models/microsoft/DialoGPT-large';
+const API_URL = 'http://172.16.100.111:3000/webhooks/rest/webhook';
 
 const dmmessage = async (message) => {
   try {
@@ -20,9 +19,6 @@ const dmmessage = async (message) => {
         createdTimestamp: { $gte: Date.now() - 20000 },
       })
       .catch(console.log);
-
-    let generated_responses = [];
-    let past_user_inputs = [];
 
     if (!authorId || !content) return;
     const newMsg = new msgData({
@@ -51,20 +47,12 @@ const dmmessage = async (message) => {
       }
     );
 
-    if (data) {
-      generated_responses = data.generated_responses;
-      past_user_inputs = data.past_user_inputs;
-    }
-
-    console.log(generated_responses, past_user_inputs);
-
     const res = await axios
       .post(
         API_URL,
         {
-          past_user_inputs: past_user_inputs,
-          generated_responses: generated_responses,
-          text: `${content}`,
+          sender: message.author.username,
+          message: `${content}`,
         },
         { headers: { Authorization: `Bearer ${API_TOKEN}` } }
       )
@@ -74,8 +62,10 @@ const dmmessage = async (message) => {
         );
       });
 
-    if (res && res.data && res.data.generated_text) {
-      message.channel.send(res.data.generated_text).catch(console.log);
+    if (res && res.data && res.data.length) {
+      res.data.map((item) => {
+        return message.channel.send(item.text).catch(console.log);
+      });
     } else {
       message.channel.send(
         "Very busy, too much work today. I'm so tired. BRB."
@@ -88,8 +78,8 @@ const dmmessage = async (message) => {
         .updateOne(
           { _id: data._id },
           {
-            past_user_inputs: res.data.conversation.past_user_inputs,
-            generated_responses: res.data.conversation.generated_responses,
+            past_user_inputs: [content],
+            generated_responses: res.data.map((item) => item.text),
             updatedTimestamp: createdTimestamp,
           }
         )
@@ -100,8 +90,8 @@ const dmmessage = async (message) => {
         authorId: authorId,
         createdTimestamp: createdTimestamp,
         updatedTimestamp: createdTimestamp,
-        past_user_inputs: res.data.conversation.past_user_inputs,
-        generated_responses: res.data.conversation.generated_responses,
+        past_user_inputs: [content],
+        generated_responses: res.data.map((item) => item.text),
       })
         .save()
         .catch(console.log);
