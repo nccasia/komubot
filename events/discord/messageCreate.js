@@ -7,7 +7,7 @@ const {
   API_TOKEN,
   API_URL,
 } = require('../../util/dmmessage.js');
-const ID_KOMU = '931377010616451122';
+const ID_KOMU = '922003239887581205';
 module.exports = {
   async execute(e) {
     const { client: t } = e;
