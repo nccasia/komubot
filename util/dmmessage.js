@@ -5,6 +5,24 @@ const msgData = require('../models/msgData');
 const API_TOKEN = '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';
 const API_URL = 'http://172.16.100.111:3000/webhooks/rest/webhook';
 
+const getMessageAI = async (url, sender, message, token) => {
+  const response = await axios
+    .post(
+      url,
+      {
+        sender,
+        message,
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+    .catch(() => {
+      message.channel.send(
+        "Very busy, too much work today. I'm so tired. BRB."
+      );
+    });
+  return response;
+};
+
 const dmmessage = async (message) => {
   try {
     const channelId = message.channelId;
@@ -47,20 +65,12 @@ const dmmessage = async (message) => {
       }
     );
 
-    const res = await axios
-      .post(
-        API_URL,
-        {
-          sender: message.author.username,
-          message: `${content}`,
-        },
-        { headers: { Authorization: `Bearer ${API_TOKEN}` } }
-      )
-      .catch(() => {
-        message.channel.send(
-          "Very busy, too much work today. I'm so tired. BRB."
-        );
-      });
+    const res = await getMessageAI(
+      API_URL,
+      message.author.username,
+      `${content}`,
+      API_TOKEN
+    );
 
     if (res && res.data && res.data.length) {
       res.data.map((item) => {
@@ -101,4 +111,4 @@ const dmmessage = async (message) => {
   }
 };
 
-module.exports = dmmessage;
+module.exports = { dmmessage, getMessageAI, API_TOKEN, API_URL };

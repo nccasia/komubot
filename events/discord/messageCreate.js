@@ -1,8 +1,13 @@
 const permes = require('../../util/permissions.json');
 require('../../util/extenders.js');
 const { Permissions } = require('discord.js');
-const dmmessage = require('../../util/dmmessage.js');
-
+const {
+  dmmessage,
+  getMessageAI,
+  API_TOKEN,
+  API_URL,
+} = require('../../util/dmmessage.js');
+const ID_KOMU = '922003239887581205';
 module.exports = {
   async execute(e) {
     const { client: t } = e;
@@ -11,6 +16,36 @@ module.exports = {
       return;
     }
     if (e.author.bot || !e.guild) return;
+
+    // check if mention bot
+    const user_mention = e.author.id;
+    const user_mentioned = e.mentions.users.map((user) => user.id);
+    if (
+      Array.isArray(user_mentioned) &&
+      user_mentioned.length >= 1 &&
+      user_mentioned.includes(ID_KOMU)
+    ) {
+      const content = e.content;
+      let message_include_content;
+      if (content.trim().startsWith('<@!')) {
+        message_include_content = content.slice(22, content.length).trim();
+        const res = await getMessageAI(
+          API_URL,
+          user_mention,
+          message_include_content,
+          API_TOKEN
+        );
+        if (res && res.data && res.data.length) {
+          res.data.map((item) => {
+            return e.reply(item.text).catch(console.log);
+          });
+        } else {
+          e.reply("Very busy, too much work today. I'm so tired. BRB.");
+          return;
+        }
+      }
+    }
+
     const guildDB = await e.guild.fetchDB();
     if (
       e.content.startsWith(guildDB.prefix) ||
