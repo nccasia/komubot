@@ -3,6 +3,7 @@ const { reportWfh, reportCompalinWfh } = require('../../util/reportWfh');
 const reportMessageCount = require('../../util/reportMsgCount');
 const reportScore = require('../../util/reportScore');
 const { reportMention } = require('../../util/reportMention');
+const { reportCheckCamera } = require('../../util/reportCheckCamera');
 function getTimeWeekMondayToFriday(dayNow) {
   const curr = new Date();
   // current date of week
@@ -38,6 +39,8 @@ module.exports = {
         }
       } else if (args[0] === 'mention') {
         await reportMention(message, args, client, guildDB);
+      } else if (args[0] === 'checkcamera') {
+        await reportCheckCamera(message, args, client, guildDB);
       } else if (args[0] === 'wfh' && args[1] === 'complain') {
         await reportCompalinWfh(message, args, client, guildDB);
       } else if (args[0] === 'wfh') {
@@ -57,6 +60,8 @@ module.exports = {
               [
                 { name: 'daily', des: 'show daily today' },
                 { name: 'weekly', des: 'show daily weekly' },
+                { name: 'mention', des: 'show check mention day' },
+                { name: 'checkcamera', des: 'show checkcamera day' },
                 {
                   name: 'wfh ',
                   des: "show user don't reply to bot ",

@@ -1,43 +1,47 @@
 const axios = require('axios');
-const mentionedData = require('../models/mentionedData');
+const wfhData = require('../models/wfhData');
 
-function withoutFirstTime(dateTime) {
+function withoutTime(dateTime) {
   const date = new Date(dateTime);
-  date.setHours(0, 0, 0, 0);
+  const curDate = new Date();
+  const timezone = curDate.getTimezoneOffset() / -60;
+  date.setHours(0 + timezone, 0, 0, 0);
   return date;
 }
 
-function withoutLastTime(dateTime) {
-  const date = new Date(dateTime);
-  date.setHours(23, 59, 59, 999);
-  return date;
-}
-
-function getYesterdayDate() {
+function getTimeToDay() {
   const today = new Date();
-  const yesterday = new Date(withoutLastTime(today));
-  yesterday.setDate(yesterday.getDate() - 1);
-  return new Date(yesterday).valueOf();
-}
+  const tomorrows = new Date();
+  const tomorrowsDate = tomorrows.setDate(tomorrows.getDate() + 1);
 
-function getTomorrowDate() {
-  const today = new Date();
-  const yesterday = new Date(withoutFirstTime(today));
-  yesterday.setDate(yesterday.getDate() + 1);
-  return new Date(yesterday).valueOf();
+  return {
+    firstDay: new Date(withoutTime(today)),
+    lastDay: new Date(withoutTime(tomorrowsDate)),
+  };
 }
 
 async function reportMention(message) {
-  const mentionFullday = await mentionedData.aggregate([
+  const mentionFullday = await wfhData.aggregate([
     {
       $match: {
-        punish: true,
-        createdTimestamp: { $gte: getYesterdayDate(), $lte: getTomorrowDate() },
+        type: 'mention',
+        createdAt: {
+          $gte: getTimeToDay().firstDay,
+          $lte: getTimeToDay().lastDay,
+        },
+        $or: [
+          { status: 'ACCEPT' },
+          { status: 'ACTIVE' },
+          {
+            status: 'APPROVED',
+            pmconfirm: false,
+          },
+        ],
       },
     },
     {
       $group: {
-        _id: '$mentionUserId',
+        _id: '$userid',
         total: { $sum: 1 },
       },
     },
