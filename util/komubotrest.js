@@ -17,7 +17,10 @@ const getUserIdByUsername = async (client, req, res) => {
   }
 
   const userdb = await userData.findOne({
-    $or: [{ email: req.body.username }, { username: req.body.username }],
+    $or: [
+      { email: req.body.username, deactive: { $ne: true } },
+      { username: req.body.username, deactive: { $ne: true } },
+    ],
   });
 
   if (!userdb) {
@@ -36,7 +39,12 @@ const sendMessageKomuToUser = async (
 ) => {
   try {
     const userdb = await userData
-      .findOne({ $or: [{ email: username }, { username: username }] })
+      .findOne({
+        $or: [
+          { email: username, deactive: { $ne: true } },
+          { username: username, deactive: { $ne: true } },
+        ],
+      })
       .catch(console.error);
     if (!userdb) {
       return null;
@@ -296,7 +304,10 @@ const sendMessageToMachLeo = async (client, req, res) => {
   }
 
   const userdb = await userData.findOne({
-    $or: [{ email: req.body.username }, { username: req.body.username }],
+    $or: [
+      { email: req.body.username, deactive: { $ne: true } },
+      { username: req.body.username, deactive: { $ne: true } },
+    ],
   });
   let userid = '';
   req.body.message = ` không trả lời tin nhắn WFH lúc ${req.body.createdate} !\n`;

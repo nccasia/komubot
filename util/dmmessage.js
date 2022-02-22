@@ -58,7 +58,7 @@ const dmmessage = async (message) => {
     const newMsgAfter = await newMsg.save();
 
     await userData.updateOne(
-      { id: authorId },
+      { id: authorId, deactive: { $ne: true } },
       {
         last_message_id: newMsgAfter.id,
         last_bot_message_id: '',

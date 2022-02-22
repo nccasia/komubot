@@ -9,6 +9,11 @@ async function reportScore(message) {
 
     const scoresQuizData = await userData.aggregate([
       {
+        $match: {
+          deactive: { $ne: true },
+        },
+      },
+      {
         $project: {
           _id: 0,
           id: 1,

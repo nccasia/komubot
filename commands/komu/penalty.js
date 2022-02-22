@@ -136,9 +136,15 @@ module.exports = {
 
         let user;
         if (userArgs?.id) {
-          user = await userData.findOne({ id: userArgs.id });
+          user = await userData.findOne({
+            id: userArgs.id,
+            deactive: { $ne: true },
+          });
         } else {
-          user = await userData.findOne({ username: userArgs.username });
+          user = await userData.findOne({
+            username: userArgs.username,
+            deactive: { $ne: true },
+          });
         }
         if (!user) return message.channel.send('```' + 'no result' + '```');
 

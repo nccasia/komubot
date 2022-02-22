@@ -7,7 +7,7 @@ module.exports = {
   async execute(message, args, client) {
     try {
       if (args[0] === 'role') {
-        const userDb = await userData.find({});
+        const userDb = await userData.find({ deactive: { $ne: true } });
         const emailArray = userDb.map((user) => user.email);
 
         for (const email of emailArray) {
@@ -26,7 +26,10 @@ module.exports = {
           }
 
           if (!response || !response.data.result) {
-            await userData.updateOne({ email }, { roles: [] });
+            await userData.updateOne(
+              { email, deactive: { $ne: true } },
+              { roles: [] }
+            );
             continue;
           }
 
@@ -42,7 +45,10 @@ module.exports = {
             roles = [];
           }
           const rolesRemoveDuplicate = [...new Set(roles)];
-          await userData.updateOne({ email }, { roles: rolesRemoveDuplicate });
+          await userData.updateOne(
+            { email, deactive: { $ne: true } },
+            { roles: rolesRemoveDuplicate }
+          );
         }
 
         return message.reply('Update role success!!!');
