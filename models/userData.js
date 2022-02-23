@@ -22,6 +22,7 @@ const userdb = new mongoose.Schema({
   roles: { type: Array, default: [] },
   pending_wfh: { type: Boolean, require: false },
   last_bot_message_id: { type: String, required: false },
+  deactive: { type: Boolean },
 });
 
 module.exports = mongoose.model('komu_user', userdb);

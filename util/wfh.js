@@ -56,7 +56,7 @@ const wfh = async (interaction, client) => {
 
       // send message to PM
       const userdb = await userData
-        .findOne({ id: labelImageId })
+        .findOne({ id: labelImageId, deactive: { $ne: true } })
         .catch(console.error);
       if (!userdb) {
         return interaction
@@ -97,8 +97,14 @@ const wfh = async (interaction, client) => {
       const pmdb = await userData
         .findOne({
           $or: [
-            { username: data.result.projectDtos[0].pmUsername },
-            { email: data.result.projectDtos[0].pmUsername },
+            {
+              username: data.result.projectDtos[0].pmUsername,
+              deactive: { $ne: true },
+            },
+            {
+              email: data.result.projectDtos[0].pmUsername,
+              deactive: { $ne: true },
+            },
           ],
         })
         .catch(console.error);

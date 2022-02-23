@@ -41,6 +41,7 @@ async function reportCheckCamera(message) {
 
   const checkCameraFullday = await userData.find({
     id: { $nin: userCheckCameraId },
+    deactive: { $ne: true },
   });
 
   let mess;

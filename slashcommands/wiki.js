@@ -71,7 +71,11 @@ module.exports = {
       if (topic.substring(0, 2) == '<@' && topic.substring(20) == '>') {
         topic = topic.substring(2, 20);
         const userdb = await userData.findOne({
-          $and: [{ id: topic }, { email: { $ne: null } }],
+          $and: [
+            { id: topic },
+            { email: { $ne: null } },
+            { deactive: { $ne: true } },
+          ],
         });
 
         if (userdb == null) {

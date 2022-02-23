@@ -100,6 +100,7 @@ async function pingWfh(client) {
       {
         $match: {
           email: { $in: wfhUserEmail },
+          deactive: { $ne: true },
           $or: [
             { last_bot_message_id: { $exists: false } },
             { last_bot_message_id: '' },
@@ -163,6 +164,11 @@ async function sendQuiz(client) {
     console.log('Send quiz run ');
     const randomUser = await userData.aggregate([
       {
+        $match: {
+          deactive: { $ne: true },
+        },
+      },
+      {
         $project: {
           _id: 0,
           id: 1,
@@ -200,6 +206,7 @@ async function punish(client) {
   const users = await userData.aggregate([
     {
       $match: {
+        deactive: { $ne: true },
         last_bot_message_id: { $exists: true, $ne: '' },
       },
     },
@@ -245,7 +252,10 @@ async function punish(client) {
         client.config.komubotrest.machleo_channel_id
       );
       await channel.send(message);
-      await userData.updateOne({ id: user.id }, { last_bot_message_id: '' });
+      await userData.updateOne(
+        { id: user.id, deactive: { $ne: true } },
+        { last_bot_message_id: '' }
+      );
     }
   });
 }

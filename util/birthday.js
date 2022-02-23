@@ -34,7 +34,7 @@ async function getBirthdayUser(email, client) {
 
 async function birthdayUser(client) {
   const result = [];
-  const getAllUser = await userData.find();
+  const getAllUser = await userData.find({ deactive: { $ne: true } });
   const emailArray = getAllUser.map((item) => item.email);
   const resultBirthday = await birthdayData.find();
   const items = resultBirthday.map((item) => item.title);
@@ -48,6 +48,7 @@ async function birthdayUser(client) {
     wishes.splice(index, 1);
     const birthday = await userData.findOne({
       email: emailBirthday,
+      deactive: { $ne: true },
     });
     result.push({ user: birthday, wish: birthdayWish });
   }

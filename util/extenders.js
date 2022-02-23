@@ -23,10 +23,16 @@ User.prototype.addDB = async function (displayname = {}) {
     public_flags: this.public_flags,
   });
 
-  let data = await userData.findOne({ username: this.username });
+  let data = await userData.findOne({
+    username: this.username,
+    deactive: { $ne: true },
+  });
   if (!data) await komuUser.save();
 
-  data = await userData.findOne({ email: displayname });
+  data = await userData.findOne({
+    email: displayname,
+    deactive: { $ne: true },
+  });
   if (!data) await komuUser.save();
 };
 /**

@@ -80,7 +80,10 @@ function embedQuestion(question) {
 }
 async function addScores(userid) {
   try {
-    const user = await userData.findOne({ id: userid });
+    const user = await userData.findOne({
+      id: userid,
+      deactive: { $ne: true },
+    });
     let newUser;
     if (user.scores_quiz) {
       user.scores_quiz = user.scores_quiz + 5;
