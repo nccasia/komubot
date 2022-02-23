@@ -12,6 +12,7 @@ const {
 const birthdayUser = require('../util/birthday');
 const wfhData = require('../models/wfhData');
 const mentionedData = require('../models/mentionedData');
+const audioPlayer = require('../util/audioPlayer');
 // const testQuiz = require("../testquiz");
 
 function setTime(date, hours, minute, second, msValue) {
@@ -348,6 +349,13 @@ async function topTracker(client) {
 
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '15 13 * * 5',
+      () => audioPlayer(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     new cron.CronJob(
       '00 00 9 * * 1-5',
       () => showDaily(client),
