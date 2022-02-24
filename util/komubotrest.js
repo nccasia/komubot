@@ -368,8 +368,36 @@ const sendMessageToNhaCuaChung = async (client, msg) => {
 const init = async (client) => {
   const express = require('express');
   const bodyParser = require('body-parser');
+  const multer = require('multer');
+  const uploadFileData = require('../models/uploadFileData');
   const app = express();
   app.use(bodyParser.json());
+
+  var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'uploads');
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now() + '.mp3');
+    },
+  });
+
+  const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'audio/mpeg') {
+      cb(null, true);
+    } else {
+      cb(new Error('You can only upload mp3 file'), false);
+    }
+  };
+
+  const mp3 = multer({
+    storage: storage,
+    limits: {
+      fileSize: 1024 * 1024 * 10,
+    },
+    fileFilter: fileFilter,
+  });
+
   app.post('/getUserIdByUsername', (req, res) => {
     getUserIdByUsername(client, req, res);
   });
@@ -396,6 +424,22 @@ const init = async (client) => {
   });
   app.post('/sendMessageToFinance', (req, res) => {
     sendMessageToFinance(client, req, res);
+  });
+  app.post('/uploadFile', mp3.single('File'), async (req, res, next) => {
+    const file = req.file;
+    if (!file) {
+      const error = new Error('Please upload a file');
+      error.httpStatusCode = 400;
+      return next(error);
+    }
+    const result = await new uploadFileData({
+      filePath: file.path,
+      fileName: `${file.filename}`,
+      createdTimestamp: Date.now(),
+    })
+      .save()
+      .catch((err) => console.log(err));
+    res.send(file);
   });
 
   app.listen(

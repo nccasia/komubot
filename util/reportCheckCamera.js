@@ -64,7 +64,7 @@ async function reportCheckCamera(message) {
           .slice(i * 50, (i + 1) * 50)
           .map((checkCamera) => `<@${checkCamera.id}>`)
           .join('\n');
-      return message.channel.send(mess).catch(console.error);
+      await message.channel.send(mess).catch(console.error);
     }
   }
 }
