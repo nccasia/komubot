@@ -53,17 +53,17 @@ async function reportCheckCamera(message) {
     mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
     return message.channel.send(mess).catch(console.error);
   } else {
-    for (let i = 0; i <= Math.ceil(checkCameraFullday.length / 300); i += 1) {
-      if (checkCameraFullday.slice(i * 300, (i + 1) * 300).length === 0) break;
+    for (let i = 0; i <= Math.ceil(checkCameraFullday.length / 50); i += 1) {
+      if (checkCameraFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
       mess =
         '```' +
         'Những người không bật camera trong ngày hôm nay' +
         '```' +
         checkCameraFullday
-          .slice(i * 300, (i + 1) * 300)
+          .slice(i * 50, (i + 1) * 50)
           .map((checkCamera) => `<@${checkCamera.id}>`)
           .join('\n');
-      return message.channel.send(mess).catch(console.error);
+      await message.channel.send(mess).catch(console.error);
     }
   }
 }
