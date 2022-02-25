@@ -17,7 +17,7 @@ function getLastSaturdayLastWeek() {
   const date = new Date();
   const today = date.getDate();
   const dayOfTheWeek = date.getDay();
-  const newDate = date.setDate(today - (dayOfTheWeek + 1 || 6));
+  const newDate = date.setDate(today - (dayOfTheWeek || 0));
   return new Date(withoutFirstTime(newDate)).valueOf();
 }
 
@@ -25,7 +25,7 @@ function getLastFridayNextWeek() {
   const date = new Date();
   const today = date.getDate();
   const dayOfTheWeek = date.getDay();
-  const newDate = date.setDate(today - (dayOfTheWeek - 5 || 5));
+  const newDate = date.setDate(today - (dayOfTheWeek - 7 || 7));
   return new Date(withoutFirstTime(newDate)).valueOf();
 }
 
