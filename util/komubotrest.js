@@ -395,7 +395,7 @@ const init = async (client) => {
   const mp3 = multer({
     storage: storage,
     limits: {
-      fileSize: 1024 * 1024 * 10,
+      fileSize: 1024 * 1024 * 100,
     },
     fileFilter: fileFilter,
   });
