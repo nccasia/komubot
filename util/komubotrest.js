@@ -369,11 +369,13 @@ const init = async (client) => {
   const express = require('express');
   const bodyParser = require('body-parser');
   const multer = require('multer');
+  const cors = require('cors');
   const uploadFileData = require('../models/uploadFileData');
   const app = express();
+  app.use(cors());
   app.use(bodyParser.json());
 
-  var storage = multer.diskStorage({
+  const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, 'uploads');
     },
@@ -432,7 +434,7 @@ const init = async (client) => {
       error.httpStatusCode = 400;
       return next(error);
     }
-    const result = await new uploadFileData({
+    await new uploadFileData({
       filePath: file.path,
       fileName: `${file.filename}`,
       createdTimestamp: Date.now(),
