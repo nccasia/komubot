@@ -15,6 +15,11 @@ const mentionedData = require('../models/mentionedData');
 const audioPlayer = require('../util/audioPlayer');
 // const testQuiz = require("../testquiz");
 
+// Deepai
+const deepai = require('deepai');
+const API_KEY_DEEPAI = 'quickstart-QUdJIGlzIGNvbWluZy4uLi4K';
+deepai.setApiKey(API_KEY_DEEPAI);
+
 function setTime(date, hours, minute, second, msValue) {
   return date.setHours(hours, minute, second, msValue);
 }
@@ -144,14 +149,24 @@ async function pingWfh(client) {
       return;
     }
     arrayMessUser = [...new Set(arrayMessUser.map((user) => user.username))];
+
+    let deepResponse;
+
+    try {
+      deepResponse = await deepai.callStandardApi('text-generator', {
+        text: 'Are you there?',
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+    let mess =
+      deepResponse.output ||
+      "Are you there? Please say something to me. I'm sad because they are so serious. I'm just an adorable bot, work for the money!!!";
+
     await Promise.all(
       arrayMessUser.map((username) => {
-        return sendMessageKomuToUser(
-          client,
-          "Are you there? Please say something to me. I'm sad because they are so serious. I'm just an adorable bot, work for the money!!!",
-          username,
-          true
-        );
+        return sendMessageKomuToUser(client, mess, username, true);
       })
     );
   } catch (error) {
