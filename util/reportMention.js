@@ -65,7 +65,7 @@ async function reportMention(message) {
           .slice(i * 50, (i + 1) * 50)
           .map((mention) => `<@${mention._id}> (${mention.total})`)
           .join('\n');
-      return message.channel.send(mess).catch(console.error);
+      await message.channel.send(mess).catch(console.error);
     }
   }
 }
