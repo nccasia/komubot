@@ -13,6 +13,7 @@ const birthdayUser = require('../util/birthday');
 const wfhData = require('../models/wfhData');
 const mentionedData = require('../models/mentionedData');
 const audioPlayer = require('../util/audioPlayer');
+const joincallData = require('../models/joincallData');
 // const testQuiz = require("../testquiz");
 
 // Deepai
@@ -77,6 +78,13 @@ async function pingWfh(client) {
   try {
     console.log('[Scheduler run]');
     if (checkTime(new Date())) return;
+
+    // Get user joining now
+    const dataJoining = await joincallData.find({
+      status: 'joining',
+    });
+    const useridJoining = dataJoining.map((item) => item.userid);
+
     let wfhGetApi;
     try {
       wfhGetApi = await axios.get(client.config.wfh.api_url, {
@@ -111,6 +119,7 @@ async function pingWfh(client) {
             { last_bot_message_id: { $exists: false } },
             { last_bot_message_id: '' },
           ],
+          id: { $nin: useridJoining },
         },
       },
       {
