@@ -36,7 +36,7 @@ module.exports = {
           API_TOKEN
         );
         if (res && res.data && res.data.length) {
-          res.data.map((item) => {
+          res.data.forEach((item) => {
             return e.reply(item.text).catch(console.log);
           });
         } else {
