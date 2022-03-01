@@ -357,43 +357,62 @@ async function topTracker(client) {
   );
 }
 
+async function getUserVoiceChanel(client) {
+  const voiceChannel = ['922445995420315702', '945876953460797450'];
+  let usersChannel;
+  await Promise.all(
+    voiceChannel.map(async (voice) => {
+      const userDiscord = await client.channels.fetch(voice);
+      const voiceUsers = userDiscord.members;
+      if (voiceUsers.size < 2) return;
+      console.log(voiceUsers);
+      return voiceUsers;
+      // console.log(voiceUsers);
+      //  usersChannel= voiceUsers.map((item)=>{return item.user.id});
+      //  console.log(usersChannel);
+      //  return usersChannel;
+    })
+  );
+}
+
 exports.scheduler = {
   run(client) {
-    new cron.CronJob(
-      '15 13 * * 5',
-      () => audioPlayer(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '00 00 9 * * 1-5',
-      () => showDaily(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/5 9-11,13-17 * * 1-5',
-      () => pingWfh(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 9-11,13-17 * * 1-5',
-      () => punish(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '00 09 * * 0-6',
-      () => happyBirthday(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
+    getUserVoiceChanel(client);
+    // new cron.CronJob(
+    //   '15 13 * * 5',
+    //   () => audioPlayer(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '00 00 9 * * 1-5',
+    //   () => showDaily(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '*/5 9-11,13-17 * * 1-5',
+    //   () => pingWfh(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '*/1 9-11,13-17 * * 1-5',
+    //   () => punish(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '00 09 * * 0-6',
+    //   () => happyBirthday(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
     // new cron.CronJob(
     //   "*/10 * 8-17 * * 1-5",
     //   async () => await sendQuiz(client),
@@ -401,19 +420,20 @@ exports.scheduler = {
     //   false,
     //   "Asia/Ho_Chi_Minh"
     // ).start();
-    new cron.CronJob(
-      '*/1 9-11,13-17 * * 1-5',
-      () => checkMention(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '45 08 * * 1-5',
-      async () => await topTracker(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
+
+    // new cron.CronJob(
+    //   '*/1 9-11,13-17 * * 1-5',
+    //   () => checkMention(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '45 08 * * 1-5',
+    //   async () => await topTracker(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
   },
 };

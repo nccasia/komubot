@@ -23,6 +23,7 @@
     "mongoose": "^5.12.8",
     "mongoose-unique-validation": "^0.1.0",
     "ms": "^2.1.2",
+    "multer": "^1.4.4",
     "node-cron": "^3.0.0",
     "node-fetch": "^2.6.1",
     "play-dl": "^1.2.2",
