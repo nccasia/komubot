@@ -3,6 +3,8 @@ const userData = require('../models/userData');
 const axios = require('axios');
 const moment = require('moment');
 const getUserNotDaily = require('../util/getUserNotDaily');
+const { MessageEmbed } = require('discord.js');
+
 const sendQuizToSingleUser = require('../util/sendQuizToSingleUser');
 const {
   sendMessageKomuToUser,
@@ -13,6 +15,7 @@ const birthdayUser = require('../util/birthday');
 const wfhData = require('../models/wfhData');
 const mentionedData = require('../models/mentionedData');
 const audioPlayer = require('../util/audioPlayer');
+const joincallData = require('../models/joincallData');
 // const testQuiz = require("../testquiz");
 
 // Deepai
@@ -77,6 +80,13 @@ async function pingWfh(client) {
   try {
     console.log('[Scheduler run]');
     if (checkTime(new Date())) return;
+
+    // Get user joining now
+    const dataJoining = await joincallData.find({
+      status: 'joining',
+    });
+    const useridJoining = dataJoining.map((item) => item.userid);
+
     let wfhGetApi;
     try {
       wfhGetApi = await axios.get(client.config.wfh.api_url, {
@@ -111,6 +121,7 @@ async function pingWfh(client) {
             { last_bot_message_id: { $exists: false } },
             { last_bot_message_id: '' },
           ],
+          id: { $nin: useridJoining },
         },
       },
       {
@@ -372,6 +383,44 @@ async function topTracker(client) {
   );
 }
 
+async function remindWater(client) {
+  const userid = await userData.find({}).select('email -_id');
+  const emails = userid.map((item) => item.email);
+  let message =
+    'Uống nước đầy đủ mang lại các lợi ích tuyệt vời sau:' +
+    '\n' +
+    '- Tăng cường chức năng não bộ' +
+    '\n' +
+    '- Giảm cân' +
+    '\n' +
+    '- Giải độc' +
+    '\n' +
+    '- Tiêu hóa tốt' +
+    '\n' +
+    '- Tốt cho cơ bắp' +
+    '\n' +
+    '- Giữ được làn da trẻ trung' +
+    '\n' +
+    '**Hãy đứng dậy và uống nước đầy đủ nhé!**';
+
+  const embed = new MessageEmbed()
+    .setImage(
+      'https://i.pinimg.com/474x/d8/e4/b1/d8e4b1074f4a9046613a2efaeb2392b1.jpg'
+    )
+    .setDescription(message)
+    .setTitle('Ông cha ta đã có câu : Uống nước nhớ nguồn!');
+
+  for (email of emails) {
+    await sendMessageKomuToUser(
+      client,
+      {
+        embeds: [embed],
+      },
+      email
+    );
+  }
+}
+
 exports.scheduler = {
   run(client) {
     new cron.CronJob(
@@ -426,6 +475,13 @@ exports.scheduler = {
     new cron.CronJob(
       '45 08 * * 1-5',
       async () => await topTracker(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '*/30 9-11,13-17 * * 1-5',
+      async () => await remindWater(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
