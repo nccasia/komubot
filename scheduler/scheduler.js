@@ -20,7 +20,7 @@ const joincallData = require('../models/joincallData');
 
 // Deepai
 const deepai = require('deepai');
-const API_KEY_DEEPAI = 'quickstart-QUdJIGlzIGNvbWluZy4uLi4K';
+const API_KEY_DEEPAI = '9763204a-9c9a-4657-b393-5bbf4010217d';
 deepai.setApiKey(API_KEY_DEEPAI);
 
 function setTime(date, hours, minute, second, msValue) {
@@ -401,7 +401,7 @@ async function remindWater(client) {
     '\n' +
     '- Giữ được làn da trẻ trung' +
     '\n' +
-    '**Hãy đứng dậy và uống nước đầy đủ nhé!**';
+    '**Hãy đứng dậy và uống nước đầy đủ nhé! Bạn không cần phải trả lời tin nhắn này, nếu muốn trò chuyện với mình thì nhắn cũng được (welcome).**';
 
   const embed = new MessageEmbed()
     .setImage(
@@ -480,7 +480,7 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '*/30 9-11,13-17 * * 1-5',
+      '0 9-15 * * 1-5',
       async () => await remindWater(client),
       null,
       false,
