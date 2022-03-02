@@ -31,7 +31,7 @@ module.exports = {
             }
           );
           message.reply({
-            content: 'Disable Account Successfully',
+            content: 'Disable account successfully',
             ephemeral: true,
           });
         } else {
@@ -44,7 +44,7 @@ module.exports = {
             }
           );
           message.reply({
-            content: 'Enable Account Successfully',
+            content: 'Enable account successfully',
             ephemeral: true,
           });
         }
