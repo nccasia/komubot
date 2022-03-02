@@ -4,7 +4,7 @@ const axios = require('axios');
 const moment = require('moment');
 const getUserNotDaily = require('../util/getUserNotDaily');
 const { MessageEmbed } = require('discord.js');
-
+const getUserOffWork = require('../util/getUserOffWork');
 const sendQuizToSingleUser = require('../util/sendQuizToSingleUser');
 const {
   sendMessageKomuToUser,
@@ -384,40 +384,53 @@ async function topTracker(client) {
 }
 
 async function remindWater(client) {
-  const userid = await userData.find({}).select('email -_id');
-  const emails = userid.map((item) => item.email);
-  let message =
-    'Uống nước đầy đủ mang lại các lợi ích tuyệt vời sau:' +
-    '\n' +
-    '- Tăng cường chức năng não bộ' +
-    '\n' +
-    '- Giảm cân' +
-    '\n' +
-    '- Giải độc' +
-    '\n' +
-    '- Tiêu hóa tốt' +
-    '\n' +
-    '- Tốt cho cơ bắp' +
-    '\n' +
-    '- Giữ được làn da trẻ trung' +
-    '\n' +
-    '**Hãy đứng dậy và uống nước đầy đủ nhé! Bạn không cần phải trả lời tin nhắn này, nếu muốn trò chuyện với mình thì nhắn cũng được (welcome).**';
+  try {
+    let notSendUserArray = [];
+    try {
+      const { notSendUser } = await getUserOffWork();
+      notSendUserArray = notSendUser;
+    } catch (error) {
+      console.log(error);
+    }
+    const userid = await userData
+      .find({ email: { $nin: notSendUserArray } })
+      .select('email -_id');
+    const emails = userid.map((item) => item.email);
+    let message =
+      'Uống nước đầy đủ mang lại các lợi ích tuyệt vời sau:' +
+      '\n' +
+      '- Tăng cường chức năng não bộ' +
+      '\n' +
+      '- Giảm cân' +
+      '\n' +
+      '- Giải độc' +
+      '\n' +
+      '- Tiêu hóa tốt' +
+      '\n' +
+      '- Tốt cho cơ bắp' +
+      '\n' +
+      '- Giữ được làn da trẻ trung' +
+      '\n' +
+      '**Hãy đứng dậy và uống nước đầy đủ nhé! Bạn không cần phải trả lời tin nhắn này, nếu muốn trò chuyện với mình thì nhắn cũng được (welcome).**';
 
-  const embed = new MessageEmbed()
-    .setImage(
-      'https://i.pinimg.com/474x/d8/e4/b1/d8e4b1074f4a9046613a2efaeb2392b1.jpg'
-    )
-    .setDescription(message)
-    .setTitle('Ông cha ta đã có câu : Uống nước nhớ nguồn!');
+    const embed = new MessageEmbed()
+      .setImage(
+        'https://i.pinimg.com/474x/d8/e4/b1/d8e4b1074f4a9046613a2efaeb2392b1.jpg'
+      )
+      .setDescription(message)
+      .setTitle('Ông cha ta đã có câu : Uống nước nhớ nguồn!');
 
-  for (email of emails) {
-    await sendMessageKomuToUser(
-      client,
-      {
-        embeds: [embed],
-      },
-      email
-    );
+    for (email of emails) {
+      await sendMessageKomuToUser(
+        client,
+        {
+          embeds: [embed],
+        },
+        email
+      );
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
