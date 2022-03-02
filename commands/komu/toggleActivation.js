@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const userData = require('../../models/userData');
 
 const transArgs = (userArgs) => {
