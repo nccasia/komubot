@@ -112,74 +112,78 @@ async function pingWfh(client) {
     ) {
       return;
     }
-    const result = await userData.aggregate([
-      {
-        $match: {
-          email: { $in: wfhUserEmail },
-          deactive: { $ne: true },
-          $or: [
-            { last_bot_message_id: { $exists: false } },
-            { last_bot_message_id: '' },
-          ],
-          id: { $nin: useridJoining },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          username: 1,
-          last_message_id: 1,
-        },
-      },
-      { $match: { last_message_id: { $exists: true } } },
-      {
-        $lookup: {
-          from: 'komu_msgs',
-          localField: 'last_message_id',
-          foreignField: 'id',
-          as: 'last_message',
-        },
-      },
-      {
-        $project: {
-          username: 1,
-          last_message_time: {
-            $first: '$last_message.createdTimestamp',
+    const filterFindUser = (filterEmail) => {
+      return [
+        {
+          $match: {
+            email: filterEmail,
+            deactive: { $ne: true },
+            $or: [
+              { last_bot_message_id: { $exists: false } },
+              { last_bot_message_id: '' },
+            ],
+            id: { $nin: useridJoining },
           },
         },
-      },
-    ]);
-    let arrayMessUser = result.filter(
+        {
+          $project: {
+            _id: 0,
+            username: 1,
+            last_message_id: 1,
+            id: 1,
+            roles: 1,
+          },
+        },
+        { $match: { last_message_id: { $exists: true } } },
+        {
+          $lookup: {
+            from: 'komu_msgs',
+            localField: 'last_message_id',
+            foreignField: 'id',
+            as: 'last_message',
+          },
+        },
+        {
+          $project: {
+            username: 1,
+            last_message_time: {
+              $first: '$last_message.createdTimestamp',
+            },
+            id: 1,
+            roles: 1,
+          },
+        },
+      ];
+    };
+    const userWfhWithSomeCodition = await userData.aggregate(
+      filterFindUser({ $in: wfhUserEmail })
+    );
+
+    let arrayMessUserWfh = userWfhWithSomeCodition.filter(
       (user) => Date.now() - user.last_message_time >= 1800000
     );
 
-    if (
-      (Array.isArray(arrayMessUser) && arrayMessUser.length === 0) ||
-      !arrayMessUser
-    ) {
-      return;
-    }
-    arrayMessUser = [...new Set(arrayMessUser.map((user) => user.username))];
+    arrayMessUserWfh = [
+      ...new Set(arrayMessUserWfh.map((user) => user.username)),
+    ];
 
-    let deepResponse;
-
-    try {
-      deepResponse = await deepai.callStandardApi('text-generator', {
-        text: 'Are you there?',
-      });
-    } catch (error) {
-      console.log(error);
-    }
-
-    let mess =
-      deepResponse.output ||
-      "Are you there? Please say something to me. I'm sad because they are so serious. I'm just an adorable bot, work for the money!!!";
-
-    await Promise.all(
-      arrayMessUser.map((username) => {
-        return sendMessageKomuToUser(client, mess, username, true);
-      })
+    const userDiffrentWfhWithSomeCodition = await userData.aggregate(
+      filterFindUser({ $nin: wfhUserEmail })
     );
+    let arrayMessUserDiffWfh = userDiffrentWfhWithSomeCodition.filter(
+      (user) => Date.now() - user.last_message_time >= 1800000
+    );
+
+    arrayMessUserDiffWfh = [
+      ...new Set(arrayMessUserDiffWfh.map((user) => user.username)),
+    ];
+
+    for (let userWfh of arrayMessUserWfh) {
+      await sendQuizToSingleUser(client, userWfh, true);
+    }
+    for (let userDiffWfh of arrayMessUserDiffWfh) {
+      await sendQuizToSingleUser(client, userWfh);
+    }
   } catch (error) {
     console.log(error);
   }
