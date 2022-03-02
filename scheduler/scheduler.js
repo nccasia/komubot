@@ -480,7 +480,7 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '0 9-15 * * 1-5',
+      '0 9-15/2 * * 1-5',
       async () => await remindWater(client),
       null,
       false,
