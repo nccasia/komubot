@@ -18,17 +18,37 @@ module.exports = {
   async execute(message, args) {
     try {
       const user = transArgs(args[0]);
-      const dataActive = await userData.updateOne(
-        {
-          id: user.id,
-        },
-        {
-          deactive: true,
+      const findUserId = await userData.find({
+        id: user.id,
+      });
+      findUserId.map(async (item) => {
+        if (item.deactive !== true) {
+          const disableUser = await userData.updateOne(
+            {
+              id: item.id,
+            },
+            {
+              deactive: true,
+            }
+          );
+          message.reply({
+            content: 'Disable Account Successfully',
+            ephemeral: true,
+          });
+        } else {
+          const enableUser = await userData.updateOne(
+            {
+              id: item.id,
+            },
+            {
+              deactive: false,
+            }
+          );
+          message.reply({
+            content: 'Enable Account Successfully',
+            ephemeral: true,
+          });
         }
-      );
-      message.reply({
-        content: 'Toggle Activation Successfully',
-        ephemeral: true,
       });
     } catch (err) {
       console.log(err);
