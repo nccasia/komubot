@@ -449,13 +449,12 @@ async function remindWater(client) {
 async function tagMeeting(client) {
   let guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
-    (guild) => guild.type === 'GUILD_VOICE'
+    (guild) =>
+      guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
   );
   const repeatMeet = await meetingData.find();
 
-  const voiceChannel = getAllVoice
-    .filter((item) => item.parentId === '921239248991055884')
-    .map((item) => item.id);
+  const voiceChannel = getAllVoice.map((item) => item.id);
 
   const timeNow = new Date(Date.now()).toLocaleTimeString('en-US', {
     hour: '2-digit',
@@ -585,6 +584,7 @@ async function sendSubmitTimesheet(client) {
 
 exports.scheduler = {
   run(client) {
+    tagMeeting(client);
     new cron.CronJob(
       '*/1 9-11,13-17 * * 1-5',
       () => tagMeeting(client),
