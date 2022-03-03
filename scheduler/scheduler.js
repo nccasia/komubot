@@ -537,7 +537,7 @@ async function tagMeeting(client) {
 exports.scheduler = {
   run(client) {
     new cron.CronJob(
-      '*/1 9-11,13-19 * * 1-5',
+      '*/1 9-11,13-17 * * 1-5',
       () => tagMeeting(client),
       null,
       false,
