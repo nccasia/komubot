@@ -182,7 +182,7 @@ async function pingWfh(client) {
       await sendQuizToSingleUser(client, userWfh, true);
     }
     for (let userDiffWfh of arrayMessUserDiffWfh) {
-      await sendQuizToSingleUser(client, userWfh);
+      await sendQuizToSingleUser(client, userDiffWfh);
     }
   } catch (error) {
     console.log(error);
