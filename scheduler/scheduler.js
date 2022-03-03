@@ -101,7 +101,6 @@ async function pingWfh(client) {
     if (!wfhGetApi || wfhGetApi.data == undefined) {
       return;
     }
-
     const wfhUserEmail = wfhGetApi.data.result.map((item) =>
       getUserNameByEmail(item.emailAddress)
     );
@@ -123,6 +122,10 @@ async function pingWfh(client) {
               { last_bot_message_id: '' },
             ],
             id: { $nin: useridJoining },
+            $or: [
+              { roles_discord: { $all: ['INTERN'] } },
+              { roles_discord: { $all: ['STAFF'] } },
+            ],
           },
         },
         {
@@ -158,14 +161,9 @@ async function pingWfh(client) {
     const userWfhWithSomeCodition = await userData.aggregate(
       filterFindUser({ $in: wfhUserEmail })
     );
-
     let arrayMessUserWfh = userWfhWithSomeCodition.filter(
       (user) => Date.now() - user.last_message_time >= 1800000
     );
-
-    arrayMessUserWfh = [
-      ...new Set(arrayMessUserWfh.map((user) => user.username)),
-    ];
 
     const userDiffrentWfhWithSomeCodition = await userData.aggregate(
       filterFindUser({ $nin: wfhUserEmail })
@@ -174,25 +172,24 @@ async function pingWfh(client) {
       (user) => Date.now() - user.last_message_time >= 1800000
     );
 
-    arrayMessUserDiffWfh = [
-      ...new Set(arrayMessUserDiffWfh.map((user) => user.username)),
-    ];
-
-    for (let userWfh of arrayMessUserWfh) {
-      try {
-        await sendQuizToSingleUser(client, userWfh, true);
-      } catch (error) {
-        console.log(error);
-        continue;
-      }
+    try {
+      await Promise.all(
+        arrayMessUserWfh.map((userWfh) =>
+          sendQuizToSingleUser(client, userWfh, true)
+        )
+      );
+    } catch (error) {
+      console.log(error);
     }
-    for (let userDiffWfh of arrayMessUserDiffWfh) {
-      try {
-        await sendQuizToSingleUser(client, userDiffWfh);
-      } catch (error) {
-        console.log(error);
-        continue;
-      }
+
+    try {
+      await Promise.all(
+        arrayMessUserDiffWfh.map((userDiffWfh) =>
+          sendQuizToSingleUser(client, userDiffWfh)
+        )
+      );
+    } catch (error) {
+      console.log(error);
     }
   } catch (error) {
     console.log(error);
