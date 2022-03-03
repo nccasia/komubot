@@ -16,6 +16,7 @@ const wfhData = require('../models/wfhData');
 const mentionedData = require('../models/mentionedData');
 const audioPlayer = require('../util/audioPlayer');
 const joincallData = require('../models/joincallData');
+const meetingData = require('../models/meetingData');
 // const testQuiz = require("../testquiz");
 
 // Deepai
@@ -421,8 +422,127 @@ async function remindWater(client) {
   }
 }
 
+async function tagMeeting(client) {
+  const repeatMeet = await meetingData.find();
+
+  const voiceChannel = [
+    '922445995420315702',
+    '945876953460797450',
+    '945877181878370304',
+  ];
+  const timeNow = new Date(Date.now()).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  const dateNow = new Date(Date.now()).toLocaleDateString('en-US');
+
+  let countVoice = 0;
+  let roomVoice = [];
+  const newList = voiceChannel.map(async (voice, index) => {
+    const userDiscord = await client.channels.fetch(voice);
+
+    if (userDiscord.members.size > 0) {
+      countVoice++;
+    }
+    if (userDiscord.members.size === 0) {
+      roomVoice.push(userDiscord.id);
+    }
+    if (index === voiceChannel.length - 1) {
+      const timeCheck = repeatMeet.map(async (item) => {
+        const timeCreatedTimestamp = new Date(
+          +item.createdTimestamp.toString()
+        ).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+        const dateCreatedTimestamp = new Date(
+          +item.createdTimestamp.toString()
+        ).toLocaleDateString('en-US');
+        if (
+          countVoice === voiceChannel.length &&
+          timeCreatedTimestamp === timeNow &&
+          dateCreatedTimestamp === dateNow
+        ) {
+          timeCreatedTimestamp === timeNow && dateCreatedTimestamp === dateNow;
+          {
+            const fetchChannelFull = await client.channels.fetch(
+              item.channelId
+            );
+            fetchChannelFull.send(`@here voice channel full`);
+          }
+        } else {
+          if (item.repeat === 'once') {
+            if (userDiscord.members.size === 0) {
+              if (
+                timeCreatedTimestamp === timeNow &&
+                dateCreatedTimestamp === dateNow
+              ) {
+                const onceFetchChannel = await client.channels.fetch(
+                  item.channelId
+                );
+                if (roomVoice.length !== 0) {
+                  onceFetchChannel.send(
+                    `@here our meeting room is <#${roomVoice[0]}>`
+                  );
+                  roomVoice.shift(roomVoice[0]);
+                } else onceFetchChannel.send(`@here voice channel full`);
+              }
+            }
+          } else if (item.repeat === 'daily') {
+            if (userDiscord.members.size === 0) {
+              if (timeCreatedTimestamp === timeNow) {
+                const dailyFetchChannel = await client.channels.fetch(
+                  item.channelId
+                );
+                if (roomVoice.length !== 0) {
+                  dailyFetchChannel.send(
+                    `@here our meeting room is <#${roomVoice[0]}>`
+                  );
+                  roomVoice.shift(roomVoice[0]);
+                } else dailyFetchChannel.send(`@here voice channel full`);
+              }
+            }
+          } else if (item.repeat === 'weekly') {
+            const today = new Date(+item.createdTimestamp.toString());
+            const dateTimeWeekly = new Date(today);
+            dateTimeWeekly.setDate(dateTimeWeekly.getDate() + 7);
+            const weeklyCreatedTimestamp = new Date(dateTimeWeekly).valueOf();
+            if (userDiscord.members.size === 0) {
+              if (
+                timeCreatedTimestamp === timeNow &&
+                dateCreatedTimestamp === dateNow
+              ) {
+                const weeklyFetchChannel = await client.channels.fetch(
+                  item.channelId
+                );
+                if (roomVoice.length !== 0) {
+                  weeklyFetchChannel.send(
+                    `@here our meeting room is <#${roomVoice[0]}>`
+                  );
+                  roomVoice.shift(roomVoice[0]);
+                } else weeklyFetchChannel.send(`@here voice channel full`);
+                await meetingData.updateOne(
+                  { _id: item._id },
+                  { createdTimestamp: weeklyCreatedTimestamp }
+                );
+              }
+            }
+          }
+        }
+      });
+    }
+  });
+}
+
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '*/1 9-11,13-19 * * 1-5',
+      () => tagMeeting(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     new cron.CronJob(
       '15 13 * * 5',
       () => audioPlayer(client),
