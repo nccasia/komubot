@@ -74,7 +74,7 @@ function embedQuestion(question) {
     )
     .setColor('RANDOM')
     .setFooter({
-      text: 'Reply to this message with the correct question number! You have 1 minute',
+      text: 'Reply to this message with the correct question number!',
     });
   return Embed;
 }

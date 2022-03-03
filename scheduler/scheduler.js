@@ -4,7 +4,7 @@ const axios = require('axios');
 const moment = require('moment');
 const getUserNotDaily = require('../util/getUserNotDaily');
 const { MessageEmbed } = require('discord.js');
-
+const getUserOffWork = require('../util/getUserOffWork');
 const sendQuizToSingleUser = require('../util/sendQuizToSingleUser');
 const {
   sendMessageKomuToUser,
@@ -112,74 +112,78 @@ async function pingWfh(client) {
     ) {
       return;
     }
-    const result = await userData.aggregate([
-      {
-        $match: {
-          email: { $in: wfhUserEmail },
-          deactive: { $ne: true },
-          $or: [
-            { last_bot_message_id: { $exists: false } },
-            { last_bot_message_id: '' },
-          ],
-          id: { $nin: useridJoining },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          username: 1,
-          last_message_id: 1,
-        },
-      },
-      { $match: { last_message_id: { $exists: true } } },
-      {
-        $lookup: {
-          from: 'komu_msgs',
-          localField: 'last_message_id',
-          foreignField: 'id',
-          as: 'last_message',
-        },
-      },
-      {
-        $project: {
-          username: 1,
-          last_message_time: {
-            $first: '$last_message.createdTimestamp',
+    const filterFindUser = (filterEmail) => {
+      return [
+        {
+          $match: {
+            email: filterEmail,
+            deactive: { $ne: true },
+            $or: [
+              { last_bot_message_id: { $exists: false } },
+              { last_bot_message_id: '' },
+            ],
+            id: { $nin: useridJoining },
           },
         },
-      },
-    ]);
-    let arrayMessUser = result.filter(
+        {
+          $project: {
+            _id: 0,
+            username: 1,
+            last_message_id: 1,
+            id: 1,
+            roles: 1,
+          },
+        },
+        { $match: { last_message_id: { $exists: true } } },
+        {
+          $lookup: {
+            from: 'komu_msgs',
+            localField: 'last_message_id',
+            foreignField: 'id',
+            as: 'last_message',
+          },
+        },
+        {
+          $project: {
+            username: 1,
+            last_message_time: {
+              $first: '$last_message.createdTimestamp',
+            },
+            id: 1,
+            roles: 1,
+          },
+        },
+      ];
+    };
+    const userWfhWithSomeCodition = await userData.aggregate(
+      filterFindUser({ $in: wfhUserEmail })
+    );
+
+    let arrayMessUserWfh = userWfhWithSomeCodition.filter(
       (user) => Date.now() - user.last_message_time >= 1800000
     );
 
-    if (
-      (Array.isArray(arrayMessUser) && arrayMessUser.length === 0) ||
-      !arrayMessUser
-    ) {
-      return;
-    }
-    arrayMessUser = [...new Set(arrayMessUser.map((user) => user.username))];
+    arrayMessUserWfh = [
+      ...new Set(arrayMessUserWfh.map((user) => user.username)),
+    ];
 
-    let deepResponse;
-
-    try {
-      deepResponse = await deepai.callStandardApi('text-generator', {
-        text: 'Are you there?',
-      });
-    } catch (error) {
-      console.log(error);
-    }
-
-    let mess =
-      deepResponse.output ||
-      "Are you there? Please say something to me. I'm sad because they are so serious. I'm just an adorable bot, work for the money!!!";
-
-    await Promise.all(
-      arrayMessUser.map((username) => {
-        return sendMessageKomuToUser(client, mess, username, true);
-      })
+    const userDiffrentWfhWithSomeCodition = await userData.aggregate(
+      filterFindUser({ $nin: wfhUserEmail })
     );
+    let arrayMessUserDiffWfh = userDiffrentWfhWithSomeCodition.filter(
+      (user) => Date.now() - user.last_message_time >= 1800000
+    );
+
+    arrayMessUserDiffWfh = [
+      ...new Set(arrayMessUserDiffWfh.map((user) => user.username)),
+    ];
+
+    for (let userWfh of arrayMessUserWfh) {
+      await sendQuizToSingleUser(client, userWfh, true);
+    }
+    for (let userDiffWfh of arrayMessUserDiffWfh) {
+      await sendQuizToSingleUser(client, userWfh);
+    }
   } catch (error) {
     console.log(error);
   }
@@ -384,44 +388,53 @@ async function topTracker(client) {
 }
 
 async function remindWater(client) {
-  const userid = await userData
-    .find({
-      deactive: { $ne: true },
-    })
-    .select('email -_id');
-  const emails = userid.map((item) => item.email);
-  let message =
-    'Uống nước đầy đủ mang lại các lợi ích tuyệt vời sau:' +
-    '\n' +
-    '- Tăng cường chức năng não bộ' +
-    '\n' +
-    '- Giảm cân' +
-    '\n' +
-    '- Giải độc' +
-    '\n' +
-    '- Tiêu hóa tốt' +
-    '\n' +
-    '- Tốt cho cơ bắp' +
-    '\n' +
-    '- Giữ được làn da trẻ trung' +
-    '\n' +
-    '**Hãy đứng dậy và uống nước đầy đủ nhé! Bạn không cần phải trả lời tin nhắn này, nếu muốn trò chuyện với mình thì nhắn cũng được (welcome).**';
+  try {
+    let notSendUserArray = [];
+    try {
+      const { notSendUser } = await getUserOffWork();
+      notSendUserArray = notSendUser;
+    } catch (error) {
+      console.log(error);
+    }
+    const userid = await userData
+      .find({ email: { $nin: notSendUserArray }, deactive: { $ne: true } })
+      .select('email -_id');
+    const emails = userid.map((item) => item.email);
+    let message =
+      'Uống nước đầy đủ mang lại các lợi ích tuyệt vời sau:' +
+      '\n' +
+      '- Tăng cường chức năng não bộ' +
+      '\n' +
+      '- Giảm cân' +
+      '\n' +
+      '- Giải độc' +
+      '\n' +
+      '- Tiêu hóa tốt' +
+      '\n' +
+      '- Tốt cho cơ bắp' +
+      '\n' +
+      '- Giữ được làn da trẻ trung' +
+      '\n' +
+      '**Hãy đứng dậy và uống nước đầy đủ nhé! Bạn không cần phải trả lời tin nhắn này, nếu muốn trò chuyện với mình thì nhắn cũng được (welcome).**';
 
-  const embed = new MessageEmbed()
-    .setImage(
-      'https://i.pinimg.com/474x/d8/e4/b1/d8e4b1074f4a9046613a2efaeb2392b1.jpg'
-    )
-    .setDescription(message)
-    .setTitle('Ông cha ta đã có câu : Uống nước nhớ nguồn!');
+    const embed = new MessageEmbed()
+      .setImage(
+        'https://i.pinimg.com/474x/d8/e4/b1/d8e4b1074f4a9046613a2efaeb2392b1.jpg'
+      )
+      .setDescription(message)
+      .setTitle('Ông cha ta đã có câu : Uống nước nhớ nguồn!');
 
-  for (email of emails) {
-    await sendMessageKomuToUser(
-      client,
-      {
-        embeds: [embed],
-      },
-      email
-    );
+    for (email of emails) {
+      await sendMessageKomuToUser(
+        client,
+        {
+          embeds: [embed],
+        },
+        email
+      );
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
