@@ -384,7 +384,11 @@ async function topTracker(client) {
 }
 
 async function remindWater(client) {
-  const userid = await userData.find({}).select('email -_id');
+  const userid = await userData
+    .find({
+      deactive: { $ne: true },
+    })
+    .select('email -_id');
   const emails = userid.map((item) => item.email);
   let message =
     'Uống nước đầy đủ mang lại các lợi ích tuyệt vời sau:' +
