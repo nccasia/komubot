@@ -397,7 +397,7 @@ async function remindWater(client) {
       console.log(error);
     }
     const userid = await userData
-      .find({ email: { $nin: notSendUserArray } })
+      .find({ email: { $nin: notSendUserArray }, deactive: { $ne: true } })
       .select('email -_id');
     const emails = userid.map((item) => item.email);
     let message =
