@@ -179,10 +179,20 @@ async function pingWfh(client) {
     ];
 
     for (let userWfh of arrayMessUserWfh) {
-      await sendQuizToSingleUser(client, userWfh, true);
+      try {
+        await sendQuizToSingleUser(client, userWfh, true);
+      } catch (error) {
+        console.log(error);
+        continue;
+      }
     }
     for (let userDiffWfh of arrayMessUserDiffWfh) {
-      await sendQuizToSingleUser(client, userWfh);
+      try {
+        await sendQuizToSingleUser(client, userDiffWfh);
+      } catch (error) {
+        console.log(error);
+        continue;
+      }
     }
   } catch (error) {
     console.log(error);
