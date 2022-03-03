@@ -12,19 +12,18 @@ module.exports = {
 
         for (const email of emailArray) {
           const url = encodeURI(
-            `${client.config.role.api_url_getRole}?email=${email}@ncc.asia`
+            `${client.config.wiki.api_url}${email}@ncc.asia`
           );
           let response;
           try {
             response = await axios.get(url, {
               headers: {
-                'X-Secret-Key': client.config.role.x_secret_key,
+                'X-Secret-Key': client.config.wiki.api_key_secret,
               },
             });
           } catch (error) {
             continue;
           }
-
           if (!response || !response.data.result) {
             await userData.updateOne(
               { email, deactive: { $ne: true } },
