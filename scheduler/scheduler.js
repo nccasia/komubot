@@ -456,11 +456,14 @@ async function tagMeeting(client) {
 
   const voiceChannel = getAllVoice.map((item) => item.id);
 
-  const timeNow = new Date(Date.now()).toLocaleTimeString('en-US', {
+  const now = new Date();
+  now.setHours(now.getHours() + 7);
+
+  const timeNow = now.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
   });
-  const dateNow = new Date(Date.now()).toLocaleDateString('en-US');
+  const dateNow = now.toLocaleDateString('en-US');
 
   let countVoice = 0;
   let roomVoice = [];
