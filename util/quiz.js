@@ -50,7 +50,6 @@ async function randomQuiz(userInput, context, type) {
         $sample: { size: 1 },
       },
     ]);
-    console.log(questions);
     if (Array.isArray(questions) && questions.length === 0) {
       const mess = 'You have answered all the questions!!!';
       if (type === 'commands') {
