@@ -447,13 +447,15 @@ async function remindWater(client) {
 }
 
 async function tagMeeting(client) {
+  let guild = client.guilds.fetch('921239248991055882');
+  const getAllVoice = client.channels.cache.filter(
+    (guild) =>
+      guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
+  );
   const repeatMeet = await meetingData.find();
 
-  const voiceChannel = [
-    '922445995420315702',
-    '945876953460797450',
-    '945877181878370304',
-  ];
+  const voiceChannel = getAllVoice.map((item) => item.id);
+
   const timeNow = new Date(Date.now()).toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit',
@@ -558,8 +560,31 @@ async function tagMeeting(client) {
   });
 }
 
+async function sendMessTurnOffPc(client) {
+  const staffRoleId = '921328149927690251';
+  const channel = await client.channels.fetch('921239541388554240');
+  const roles = await channel.guild.roles.fetch(staffRoleId);
+  const membersName = roles.members.map(async (member) => {
+    const userid = await userData.find({ username: member.displayName });
+    await Promise.all(
+      userid.map(async (user) => {
+        const userDiscord = await client.users.fetch(user.id);
+        userDiscord.send(
+          `Nhớ tắt máy trước khi ra về nếu không dùng nữa nhé!!!`
+        );
+      })
+    );
+  });
+}
+
+async function sendSubmitTimesheet(client) {
+  const sendMessage = await client.channels.fetch('921239541388554240');
+  sendMessage.send(`@here nhớ submit timesheet cuối tuần nhé mọi người`);
+}
+
 exports.scheduler = {
   run(client) {
+    tagMeeting(client);
     new cron.CronJob(
       '*/1 9-11,13-17 * * 1-5',
       () => tagMeeting(client),
@@ -630,5 +655,19 @@ exports.scheduler = {
       false,
       'Asia/Ho_Chi_Minh'
     ).start();
+    new cron.CronJob(
+      '30 17 * * 1-5',
+      () => sendMessTurnOffPc(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    // new cron.CronJob(
+    //   '00 12 * * 0',
+    //   () => sendSubmitTimesheet(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
   },
 };
