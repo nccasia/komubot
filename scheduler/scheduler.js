@@ -445,7 +445,6 @@ async function remindWater(client) {
     console.log(error);
   }
 }
-s;
 async function tagMeeting(client) {
   let guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
