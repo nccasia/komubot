@@ -13,7 +13,7 @@ async function randomQuiz(userInput, context, type) {
     let roles;
     let roleRandom;
     if (userInput.roles && userInput.roles.length > 0) {
-      roles = userInput.roles;
+      roles = [...userInput.roles, 'policy'];
       roleRandom =
         roles[Math.floor(Math.random() * roles.length)].toLowerCase();
     } else {

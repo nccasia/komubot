@@ -34,12 +34,12 @@ async function reportScore(message) {
       mess = '```' + 'no result' + '```';
     } else {
       mess = scoresQuizData
-        .map((item) => `<@${item.id}> - ${item.scores_quiz || 0} score`)
+        .map((item) => `<@${item.id}> - ${item.scores_quiz || 0} points`)
         .join('\n');
     }
 
     return message.channel
-      .send('```' + 'Top 10 quiz score :' + '\n' + '```' + '\n' + mess)
+      .send('```' + 'Top 10 quiz points :' + '\n' + '```' + '\n' + mess)
       .catch(console.error);
   } catch (error) {
     console.log(error);
