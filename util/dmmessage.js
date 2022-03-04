@@ -6,21 +6,19 @@ const API_TOKEN = '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';
 const API_URL = 'http://172.16.100.111:3000/webhooks/rest/webhook';
 
 const getMessageAI = async (url, sender, message, token) => {
-  const response = await axios
-    .post(
+  try {
+    const response = await axios.post(
       url,
       {
         sender,
         message,
       },
       { headers: { Authorization: `Bearer ${token}` } }
-    )
-    .catch(() => {
-      message.channel.send(
-        "Very busy, too much work today. I'm so tired. BRB."
-      );
-    });
-  return response;
+    );
+    return response;
+  } catch (e) {
+    return null;
+  }
 };
 
 const dmmessage = async (message) => {
