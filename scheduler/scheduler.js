@@ -586,7 +586,7 @@ exports.scheduler = {
   run(client) {
     tagMeeting(client);
     new cron.CronJob(
-      '*/1 9-11,13-17 * * 1-5',
+      '*/1 * * * *',
       () => tagMeeting(client),
       null,
       false,
