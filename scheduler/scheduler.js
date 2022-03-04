@@ -445,14 +445,13 @@ async function remindWater(client) {
     console.log(error);
   }
 }
-
 async function tagMeeting(client) {
   let guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
       guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
   );
-  const repeatMeet = await meetingData.find();
+  const repeatMeet = await meetingData.find({ cancel: { $ne: true } });
 
   const voiceChannel = getAllVoice.map((item) => item.id);
 
