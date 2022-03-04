@@ -43,7 +43,7 @@ module.exports = {
         } else {
           await saveQuestionInCorrect(userid, id, key);
           const EmbedInCorrect = newEmbed(
-            `Incorrect!!!, The Correct Answer Is ${correct}`,
+            `Incorrect!!!, The correct answer is ${correct}`,
             'RED'
           );
           await interaction.reply({ embeds: [EmbedInCorrect] });
