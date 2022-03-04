@@ -22,7 +22,7 @@ module.exports = {
       }
       if (args[0] === 'now') {
         if (
-          message.member.voice.channel ||
+          message.member.voice.channel &&
           message.member.voice.channel.type === 'GUILD_VOICE'
         ) {
           const voiceCheck = message.member.voice.channel;
