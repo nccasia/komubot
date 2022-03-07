@@ -13,7 +13,7 @@ function withoutFirstTime(dateTime) {
   return date;
 }
 
-function getLastSaturdayLastWeek() {
+function getLastSundayLastWeek() {
   const date = new Date();
   const today = date.getDate();
   const dayOfTheWeek = date.getDay();
@@ -21,7 +21,7 @@ function getLastSaturdayLastWeek() {
   return new Date(withoutFirstTime(newDate)).valueOf();
 }
 
-function getLastFridayNextWeek() {
+function getLastSundayNextWeek() {
   const date = new Date();
   const today = date.getDate();
   const dayOfTheWeek = date.getDay();
@@ -45,8 +45,8 @@ async function audioPlayer(client) {
     const dataMp3 = await uploadFileData
       .find({
         createdTimestamp: {
-          $gte: getLastSaturdayLastWeek(),
-          $lte: getLastFridayNextWeek(),
+          $gte: getLastSundayLastWeek(),
+          $lte: getLastSundayNextWeek(),
         },
       })
       .sort({ _id: -1 })
