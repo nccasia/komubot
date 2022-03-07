@@ -31,6 +31,7 @@ module.exports = {
           channelId: calendarChannel,
           cancel: { $ne: true },
         });
+
         let mess;
         if (!list) {
           return;
