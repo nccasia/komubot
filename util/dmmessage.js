@@ -33,23 +33,17 @@ const dmmessage = async (message, client) => {
     const args = message.content.split(' ').splice(1);
     switch (checkArgs) {
       case '*userstatus':
-        userStatus.execute(message, args, client);
-        return;
+        return userStatus.execute(message, args, client);
       case '*toggleactivation':
-        toggleActivation.execute(message, args);
-        return;
+        return toggleActivation.execute(message, args);
       case '*sync':
-        syncRole.execute(message, args, client);
-        return;
+        return syncRole.execute(message, args, client);
       // case '/tick':
-      //   const slashTicket = ticket.execute(message, client);
-      //   return;
+      //   return const slashTicket = ticket.execute(message, client);
       // case '/keep':
-      //   const keep = ticket.execute(message, client);
-      //   return;
+      //   return const keep = ticket.execute(message, client);
       // case '/wiki':
-      //   const wiki = ticket.execute(message, client);
-      //   return;
+      //   return const wiki = ticket.execute(message, client);
       default:
         break;
     }
