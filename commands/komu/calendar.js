@@ -31,13 +31,15 @@ module.exports = {
           channelId: calendarChannel,
           cancel: { $ne: true },
         });
-        let mess;
 
+        let mess;
         if (!list) {
           return;
         } else if (Array.isArray(list) && list.length === 0) {
-          mess = '```' + 'No Calendar' + '```';
-          return message.channel.send(mess).catch(console.error);
+          return message.reply({
+            content: '`✅` No scheduled meeting.',
+            ephemeral: true,
+          });
         } else {
           for (let i = 0; i <= Math.ceil(list.length / 50); i += 1) {
             if (list.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -48,12 +50,21 @@ module.exports = {
               list
                 .slice(i * 50, (i + 1) * 50)
                 .map((item) => {
-                  const d = formatDate(new Date(Number(item.createdTimestamp)));
-                  return `- ${item.task} ${d} (ID: ${item._id}) ${item.repeat}`;
+                  const dateTime = formatDate(
+                    new Date(Number(item.createdTimestamp))
+                  );
+                  if (item.repeatTime === null) {
+                    return `- ${item.task} ${dateTime} (ID: ${item._id}) ${item.repeat}`;
+                  } else {
+                    return `- ${item.task} ${dateTime} (ID: ${item._id}) ${item.repeat} ${item.repeatTime}`;
+                  }
                 })
                 .join('\n') +
               '```';
-            await message.channel.send(mess).catch(console.error);
+            await message.reply({
+              content: mess,
+              ephemeral: true,
+            });
           }
         }
       } else if (args[0] === 'cancel') {
@@ -66,11 +77,13 @@ module.exports = {
           { _id: id },
           { cancel: true }
         );
-
         if (!findId) {
           return;
         } else {
-          return message.channel.send('reply').catch(console.error);
+          return message.reply({
+            content: '`✅` Cancel successfully.',
+            ephemeral: true,
+          });
         }
       } else if (args[0] === 'help') {
         return message.channel
