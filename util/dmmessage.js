@@ -6,7 +6,7 @@ const API_TOKEN = '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';
 const API_URL = 'http://172.16.100.111:3000/webhooks/rest/webhook';
 const userStatus = require('../commands/komu/user_status');
 const toggleActivation = require('../commands/komu/toggleActivation');
-const sync_role = require('../commands/komu/sync_role');
+const syncRole = require('../commands/komu/sync_role');
 const ticket = require('../slashcommands/ticket');
 const keep = require('../slashcommands/keep');
 const wiki = require('../slashcommands/wiki');
@@ -39,7 +39,7 @@ const dmmessage = async (message, client) => {
         const toggle = toggleActivation.execute(message, args);
         break;
       case '*sync':
-        const sync = sync_role.execute(message, args, client);
+        const sync = syncRole.execute(message, args, client);
         break;
       // case '/tick':
       //   const slashTicket = ticket.execute(message, client);
