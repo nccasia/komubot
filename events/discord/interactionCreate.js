@@ -30,6 +30,7 @@ module.exports = {
           await interaction.reply('You have answered this question before!');
           return;
         }
+
         if (key == correct) {
           const newUser = await addScores(userid);
           if (!newUser) return;
@@ -48,6 +49,11 @@ module.exports = {
           );
           await interaction.reply({ embeds: [EmbedInCorrect] });
         }
+
+        await interaction.message.edit({
+          components: [],
+        });
+
         await userData.updateOne(
           { id: userid },
           {
