@@ -32,7 +32,7 @@ module.exports = {
             `Everyone please join the voice channel <#${voiceCheck.id}>`
           );
         } else {
-          let guild = client.guilds.fetch('921239248991055882');
+          let guild = await client.guilds.fetch('921239248991055882');
           const getAllVoice = client.channels.cache.filter(
             (guild) =>
               guild.type === 'GUILD_VOICE' &&
@@ -92,7 +92,7 @@ module.exports = {
         }
 
         if (repeat === '') repeat = 'once';
-        const list = ['once', 'daily', 'weekly'];
+        const list = ['once', 'daily', 'weekly', 'repeat'];
         if (list.includes(repeat) === false)
           return message.channel.send(messHelp);
 
