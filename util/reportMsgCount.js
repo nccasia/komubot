@@ -66,8 +66,8 @@ async function reportMessageCount(message) {
         .join('\n');
     }
 
-    return message.channel
-      .send('```' + 'Top 20 message :' + '\n' + '```' + '\n' + mess)
+    return message
+      .reply('```' + 'Top 20 message :' + '\n' + '```' + '\n' + mess)
       .catch(console.error);
   } catch (error) {
     console.log(error);

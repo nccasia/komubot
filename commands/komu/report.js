@@ -50,8 +50,8 @@ module.exports = {
       } else if (args[0] === 'quiz') {
         await reportScore(message, args, client, guildDB);
       } else if (args[0] === 'help') {
-        return message.channel
-          .send(
+        return message
+          .reply(
             '```' +
               '*report options' +
               '\n' +
@@ -85,8 +85,8 @@ module.exports = {
           )
           .catch(console.error);
       } else {
-        return message.channel
-          .send('```' + '*report help' + '```')
+        return message
+          .reply('```' + '*report help' + '```')
           .catch(console.error);
       }
     } catch (error) {
