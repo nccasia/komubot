@@ -22,7 +22,7 @@ module.exports = {
       }
       if (args[0] === 'now') {
         if (
-          message.member.voice.channel ||
+          message.member.voice.channel &&
           message.member.voice.channel.type === 'GUILD_VOICE'
         ) {
           const voiceCheck = message.member.voice.channel;
@@ -58,17 +58,15 @@ module.exports = {
                   fetchChannelFull.send(`Voice channel full`);
                 }
               } else {
-                if (userDiscord.members.size === 0) {
-                  const nowFetchChannel = await client.channels.fetch(
-                    message.channelId
+                const nowFetchChannel = await client.channels.fetch(
+                  message.channelId
+                );
+                if (roomVoice.length !== 0) {
+                  nowFetchChannel.send(
+                    `Our meeting room is <#${roomVoice[0]}>`
                   );
-                  if (roomVoice.length !== 0) {
-                    nowFetchChannel.send(
-                      `Our meeting room is <#${roomVoice[0]}>`
-                    );
-                    roomVoice.shift(roomVoice[0]);
-                  } else nowFetchChannel.send(`Voice channel full`);
-                }
+                  roomVoice.shift(roomVoice[0]);
+                } else nowFetchChannel.send(`Voice channel full`);
               }
             }
           });
