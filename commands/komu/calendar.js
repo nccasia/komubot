@@ -32,11 +32,10 @@ module.exports = {
           cancel: { $ne: true },
         });
         let mess;
-
         if (!list) {
           return;
         } else if (Array.isArray(list) && list.length === 0) {
-          mess = '```' + 'No Calendar' + '```';
+          mess = '```' + 'No scheduled meeting' + '```';
           return message.channel.send(mess).catch(console.error);
         } else {
           for (let i = 0; i <= Math.ceil(list.length / 50); i += 1) {
@@ -70,7 +69,8 @@ module.exports = {
         if (!findId) {
           return;
         } else {
-          return message.channel.send('reply').catch(console.error);
+          mess = '```' + 'cancel successfully' + '```';
+          return message.channel.send(mess).catch(console.error);
         }
       } else if (args[0] === 'help') {
         return message.channel
