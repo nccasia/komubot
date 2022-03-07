@@ -604,7 +604,6 @@ async function sendSubmitTimesheet(client) {
 
 exports.scheduler = {
   run(client) {
-    tagMeeting(client);
     new cron.CronJob(
       '*/1 * * * *',
       () => tagMeeting(client),
