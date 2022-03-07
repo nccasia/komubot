@@ -4,6 +4,12 @@ const userData = require('../models/userData');
 const msgData = require('../models/msgData');
 const API_TOKEN = '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';
 const API_URL = 'http://172.16.100.111:3000/webhooks/rest/webhook';
+const userStatus = require('../commands/komu/user_status');
+const toggleActivation = require('../commands/komu/toggleActivation');
+const syncRole = require('../commands/komu/sync_role');
+const ticket = require('../slashcommands/ticket');
+const keep = require('../slashcommands/keep');
+const wiki = require('../slashcommands/wiki');
 
 const getMessageAI = async (url, sender, message, token) => {
   try {
@@ -21,8 +27,26 @@ const getMessageAI = async (url, sender, message, token) => {
   }
 };
 
-const dmmessage = async (message) => {
+const dmmessage = async (message, client) => {
   try {
+    const checkArgs = message.content.split(' ').shift();
+    const args = message.content.split(' ').splice(1);
+    switch (checkArgs) {
+      case '*userstatus':
+        return userStatus.execute(message, args, client);
+      case '*toggleactivation':
+        return toggleActivation.execute(message, args);
+      case '*sync':
+        return syncRole.execute(message, args, client);
+      // case '/tick':
+      //   return const slashTicket = ticket.execute(message, client);
+      // case '/keep':
+      //   return const keep = ticket.execute(message, client);
+      // case '/wiki':
+      //   return const wiki = ticket.execute(message, client);
+      default:
+        break;
+    }
     const channelId = message.channelId;
     const createdTimestamp = message.createdTimestamp;
     const authorId = message.author.id;

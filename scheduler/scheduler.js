@@ -445,6 +445,7 @@ async function remindWater(client) {
     console.log(error);
   }
 }
+
 async function tagMeeting(client) {
   let guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
@@ -457,6 +458,7 @@ async function tagMeeting(client) {
 
   const now = new Date();
   now.setHours(now.getHours() + 7);
+  let day = now.getDay();
 
   const timeNow = now.toLocaleTimeString('en-US', {
     hour: '2-digit',
@@ -500,60 +502,76 @@ async function tagMeeting(client) {
           }
         } else {
           if (item.repeat === 'once') {
-            if (userDiscord.members.size === 0) {
-              if (
-                timeCreatedTimestamp === timeNow &&
-                dateCreatedTimestamp === dateNow
-              ) {
-                const onceFetchChannel = await client.channels.fetch(
-                  item.channelId
+            if (
+              timeCreatedTimestamp === timeNow &&
+              dateCreatedTimestamp === dateNow
+            ) {
+              const onceFetchChannel = await client.channels.fetch(
+                item.channelId
+              );
+              if (roomVoice.length !== 0) {
+                onceFetchChannel.send(
+                  `@here our meeting room is <#${roomVoice[0]}>`
                 );
-                if (roomVoice.length !== 0) {
-                  onceFetchChannel.send(
-                    `@here our meeting room is <#${roomVoice[0]}>`
-                  );
-                  roomVoice.shift(roomVoice[0]);
-                } else onceFetchChannel.send(`@here voice channel full`);
-              }
+                roomVoice.shift(roomVoice[0]);
+              } else onceFetchChannel.send(`@here voice channel full`);
             }
           } else if (item.repeat === 'daily') {
-            if (userDiscord.members.size === 0) {
-              if (timeCreatedTimestamp === timeNow) {
-                const dailyFetchChannel = await client.channels.fetch(
-                  item.channelId
+            if (day === 0 || day === 6) return;
+            if (timeCreatedTimestamp === timeNow) {
+              const dailyFetchChannel = await client.channels.fetch(
+                item.channelId
+              );
+              if (roomVoice.length !== 0) {
+                dailyFetchChannel.send(
+                  `@here our meeting room is <#${roomVoice[0]}>`
                 );
-                if (roomVoice.length !== 0) {
-                  dailyFetchChannel.send(
-                    `@here our meeting room is <#${roomVoice[0]}>`
-                  );
-                  roomVoice.shift(roomVoice[0]);
-                } else dailyFetchChannel.send(`@here voice channel full`);
-              }
+                roomVoice.shift(roomVoice[0]);
+              } else dailyFetchChannel.send(`@here voice channel full`);
             }
           } else if (item.repeat === 'weekly') {
-            const today = new Date(+item.createdTimestamp.toString());
-            const dateTimeWeekly = new Date(today);
+            const dateTimeWeekly = new Date(+item.createdTimestamp.toString());
             dateTimeWeekly.setDate(dateTimeWeekly.getDate() + 7);
             const weeklyCreatedTimestamp = new Date(dateTimeWeekly).valueOf();
-            if (userDiscord.members.size === 0) {
-              if (
-                timeCreatedTimestamp === timeNow &&
-                dateCreatedTimestamp === dateNow
-              ) {
-                const weeklyFetchChannel = await client.channels.fetch(
-                  item.channelId
+            if (
+              timeCreatedTimestamp === timeNow &&
+              dateCreatedTimestamp === dateNow
+            ) {
+              const weeklyFetchChannel = await client.channels.fetch(
+                item.channelId
+              );
+              if (roomVoice.length !== 0) {
+                weeklyFetchChannel.send(
+                  `@here our meeting room is <#${roomVoice[0]}>`
                 );
-                if (roomVoice.length !== 0) {
-                  weeklyFetchChannel.send(
-                    `@here our meeting room is <#${roomVoice[0]}>`
-                  );
-                  roomVoice.shift(roomVoice[0]);
-                } else weeklyFetchChannel.send(`@here voice channel full`);
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  { createdTimestamp: weeklyCreatedTimestamp }
+                roomVoice.shift(roomVoice[0]);
+              } else weeklyFetchChannel.send(`@here voice channel full`);
+              await meetingData.updateOne(
+                { _id: item._id },
+                { createdTimestamp: weeklyCreatedTimestamp }
+              );
+            }
+          } else if (item.repeat === 'repeat') {
+            const dateTimeRepeat = new Date(+item.createdTimestamp.toString());
+            dateTimeRepeat.setDate(dateTimeRepeat.getDate() + item.repeatTime);
+            const repeatCreatedTimestamp = new Date(dateTimeRepeat).valueOf();
+            if (
+              timeCreatedTimestamp === timeNow &&
+              dateCreatedTimestamp === dateNow
+            ) {
+              const repeatFetchChannel = await client.channels.fetch(
+                item.channelId
+              );
+              if (roomVoice.length !== 0) {
+                repeatFetchChannel.send(
+                  `@here our meeting room is <#${roomVoice[0]}>`
                 );
-              }
+                roomVoice.shift(roomVoice[0]);
+              } else repeatFetchChannel.send(`@here voice channel full`);
+              await meetingData.updateOne(
+                { _id: item._id },
+                { createdTimestamp: repeatCreatedTimestamp }
+              );
             }
           }
         }
