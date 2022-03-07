@@ -458,6 +458,7 @@ async function tagMeeting(client) {
 
   const now = new Date();
   now.setHours(now.getHours() + 7);
+  let day = now.getDay();
 
   const timeNow = now.toLocaleTimeString('en-US', {
     hour: '2-digit',
@@ -516,6 +517,7 @@ async function tagMeeting(client) {
               } else onceFetchChannel.send(`@here voice channel full`);
             }
           } else if (item.repeat === 'daily') {
+            if (day === 0 || day === 6) return;
             if (timeCreatedTimestamp === timeNow) {
               const dailyFetchChannel = await client.channels.fetch(
                 item.channelId
@@ -602,6 +604,7 @@ async function sendSubmitTimesheet(client) {
 
 exports.scheduler = {
   run(client) {
+    tagMeeting(client);
     new cron.CronJob(
       '*/1 * * * *',
       () => tagMeeting(client),
