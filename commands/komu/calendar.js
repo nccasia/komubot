@@ -53,10 +53,10 @@ module.exports = {
                   const dateTime = formatDate(
                     new Date(Number(item.createdTimestamp))
                   );
-                  if (item.repeatTime === null) {
-                    return `- ${item.task} ${dateTime} (ID: ${item._id}) ${item.repeat}`;
-                  } else {
+                  if (item.repeatTime) {
                     return `- ${item.task} ${dateTime} (ID: ${item._id}) ${item.repeat} ${item.repeatTime}`;
+                  } else {
+                    return `- ${item.task} ${dateTime} (ID: ${item._id}) ${item.repeat}`;
                   }
                 })
                 .join('\n') +
@@ -78,7 +78,10 @@ module.exports = {
           { cancel: true }
         );
         if (!findId) {
-          return;
+          return message.reply({
+            content: 'Not found.',
+            ephemeral: true,
+          });
         } else {
           return message.reply({
             content: '`✅` Cancel successfully.',
