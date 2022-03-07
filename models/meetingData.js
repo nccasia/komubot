@@ -5,6 +5,7 @@ const meetingdb = new mongoose.Schema({
   createdTimestamp: { type: mongoose.Decimal128, required: false },
   task: { type: String, required: false },
   repeat: { type: String, required: false },
+  repeatTime: { type: Number, required: false },
   cancel: { type: Boolean, default: false },
 });
 
