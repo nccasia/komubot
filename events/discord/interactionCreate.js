@@ -7,6 +7,7 @@ const {
 } = require('../../util/quiz');
 const userData = require('../../models/userData');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const userQuizData = require('../../models/userQuiz');
 const newEmbed = (message, color) =>
   new MessageEmbed().setTitle(message).setColor(color);
 module.exports = {
@@ -21,6 +22,14 @@ module.exports = {
         const { id, key, correct, userid } = queryString.parse(
           interaction.customId
         );
+        const userquiz = await userQuizData.findOne({
+          userid,
+          quizid: id,
+        });
+        if (userquiz) {
+          await interaction.reply('You have answered this question before!');
+          return;
+        }
         if (key == correct) {
           const newUser = await addScores(userid);
           if (!newUser) return;
@@ -33,7 +42,10 @@ module.exports = {
           await interaction.reply({ embeds: [EmbedCorrect] });
         } else {
           await saveQuestionInCorrect(userid, id, key);
-          const EmbedInCorrect = newEmbed('Incorrect!!!', 'RED');
+          const EmbedInCorrect = newEmbed(
+            `Incorrect!!!, The correct answer is ${correct}`,
+            'RED'
+          );
           await interaction.reply({ embeds: [EmbedInCorrect] });
         }
         await userData.updateOne(

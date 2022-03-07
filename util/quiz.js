@@ -13,7 +13,7 @@ async function randomQuiz(userInput, context, type) {
     let roles;
     let roleRandom;
     if (userInput.roles && userInput.roles.length > 0) {
-      roles = userInput.roles;
+      roles = [...userInput.roles, 'policy'];
       roleRandom =
         roles[Math.floor(Math.random() * roles.length)].toLowerCase();
     } else {
@@ -50,7 +50,6 @@ async function randomQuiz(userInput, context, type) {
         $sample: { size: 1 },
       },
     ]);
-    console.log(questions);
     if (Array.isArray(questions) && questions.length === 0) {
       const mess = 'You have answered all the questions!!!';
       if (type === 'commands') {

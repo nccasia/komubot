@@ -5,6 +5,7 @@ const userquizdb = new mongoose.Schema({
   quizid: { type: mongoose.Types.ObjectId, require: true },
   correct: { type: Boolean, require: true },
   answer: { type: Number },
+  createAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model('komu_userquiz', userquizdb);

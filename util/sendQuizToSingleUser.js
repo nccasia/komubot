@@ -19,7 +19,6 @@ async function sendQuizToSingleUser(client, userInput, botPing = false) {
 
     const q = await randomQuiz(userInput, client, 'scheduler');
     if (!q) return;
-    console.log('run');
     const Embed = embedQuestion(q);
 
     const row = new MessageActionRow();
