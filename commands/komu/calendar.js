@@ -69,8 +69,10 @@ module.exports = {
         if (!findId) {
           return;
         } else {
-          mess = '```' + 'Cancel successfully' + '```';
-          return message.channel.send(mess).catch(console.error);
+          return message.reply({
+            content: '`✅` Cancel successfully.',
+            ephemeral: true,
+          });
         }
       } else if (args[0] === 'help') {
         return message.channel
