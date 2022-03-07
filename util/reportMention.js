@@ -53,7 +53,7 @@ async function reportMention(message) {
     return;
   } else if (Array.isArray(mentionFullday) && mentionFullday.length === 0) {
     mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
-    return message.channel.send(mess).catch(console.error);
+    return message.reply(mess).catch(console.error);
   } else {
     for (let i = 0; i <= Math.ceil(mentionFullday.length / 50); i += 1) {
       if (mentionFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -65,7 +65,7 @@ async function reportMention(message) {
           .slice(i * 50, (i + 1) * 50)
           .map((mention) => `<@${mention._id}> (${mention.total})`)
           .join('\n');
-      await message.channel.send(mess).catch(console.error);
+      await message.reply(mess).catch(console.error);
     }
   }
 }

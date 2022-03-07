@@ -57,7 +57,7 @@ async function reportCheckCamera(message) {
     checkCameraFullday.length === 0
   ) {
     mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
-    return message.channel.send(mess).catch(console.error);
+    return message.reply(mess).catch(console.error);
   } else {
     for (let i = 0; i <= Math.ceil(checkCameraFullday.length / 50); i += 1) {
       if (checkCameraFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -69,7 +69,7 @@ async function reportCheckCamera(message) {
           .slice(i * 50, (i + 1) * 50)
           .map((checkCamera) => `<@${checkCamera.id}>`)
           .join('\n');
-      await message.channel.send(mess).catch(console.error);
+      await message.reply(mess).catch(console.error);
     }
   }
 }

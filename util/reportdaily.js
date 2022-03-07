@@ -22,7 +22,7 @@ async function reportDaily(date, message, args, client, guildDB) {
       return;
     } else if (Array.isArray(userNotDaily) && userNotDaily.length === 0) {
       mess = '```' + dateString + 'Tất Cả Đều Đã Daily' + '```';
-      return message.channel.send(mess).catch(console.error);
+      return message.reply(mess).catch(console.error);
     } else {
       for (let i = 0; i <= Math.ceil(userNotDaily.length / 50); i += 1) {
         if (userNotDaily.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -46,7 +46,7 @@ async function reportDaily(date, message, args, client, guildDB) {
               }
             })
             .join('\n');
-        await message.channel.send(mess).catch(console.error);
+        await message.reply(mess).catch(console.error);
       }
     }
   } catch (error) {
