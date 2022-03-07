@@ -3,6 +3,8 @@ const messHelp =
   '```' +
   '*meeting now' +
   '\n' +
+  '*meeting task dd/mm/yyyy 00:00 repeat timerepeat' +
+  '\n' +
   '*meeting task dd/mm/yyyy 00:00 once' +
   '\n' +
   '*meeting task dd/mm/yyyy 00:00 daily' +
@@ -30,11 +32,11 @@ module.exports = {
             `Everyone please join the voice channel <#${voiceCheck.id}>`
           );
         } else {
-          let guild = client.guilds.fetch('921239248991055882');
+          let guild = client.guilds.fetch('922445994929586208');
           const getAllVoice = client.channels.cache.filter(
             (guild) =>
               guild.type === 'GUILD_VOICE' &&
-              guild.parentId === '921239248991055884'
+              guild.parentId === '922445995420315700'
           );
           const voiceChannel = getAllVoice.map((item) => item.id);
 
