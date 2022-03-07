@@ -52,7 +52,11 @@ module.exports = {
                   const dateTime = formatDate(
                     new Date(Number(item.createdTimestamp))
                   );
-                  return `- ${item.task} ${dateTime} (ID: ${item._id}) ${item.repeat}`;
+                  if (item.repeatTime === null) {
+                    return `- ${item.task} ${dateTime} (ID: ${item._id}) ${item.repeat}`;
+                  } else {
+                    return `- ${item.task} ${dateTime} (ID: ${item._id}) ${item.repeat} ${item.repeatTime}`;
+                  }
                 })
                 .join('\n') +
               '```';
