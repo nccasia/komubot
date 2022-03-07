@@ -29,9 +29,9 @@ const getMessageAI = async (url, sender, message, token) => {
 
 const dmmessage = async (message, client) => {
   try {
-    const checkArgs = message.content.split(' ').splice(0, 1);
-    const args = message.content.split(' ').splice(1, 2);
-    switch (checkArgs[0]) {
+    const checkArgs = message.content.split(' ').shift();
+    const args = message.content.split(' ').splice(1);
+    switch (checkArgs) {
       case '*userstatus':
         const status = userStatus.execute(message, args, client);
         break;
