@@ -69,7 +69,7 @@ module.exports = {
         if (!findId) {
           return;
         } else {
-          mess = '```' + 'cancel successfully' + '```';
+          mess = '```' + 'Cancel successfully' + '```';
           return message.channel.send(mess).catch(console.error);
         }
       } else if (args[0] === 'help') {
