@@ -56,7 +56,7 @@ module.exports = {
                 })
                 .join('\n') +
               '```';
-            return message.reply({
+            await message.reply({
               content: mess,
               ephemeral: true,
             });
