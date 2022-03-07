@@ -32,11 +32,11 @@ module.exports = {
             `Everyone please join the voice channel <#${voiceCheck.id}>`
           );
         } else {
-          let guild = client.guilds.fetch('922445994929586208');
+          let guild = client.guilds.fetch('921239248991055882');
           const getAllVoice = client.channels.cache.filter(
             (guild) =>
               guild.type === 'GUILD_VOICE' &&
-              guild.parentId === '922445995420315700'
+              guild.parentId === '921239248991055884'
           );
           const voiceChannel = getAllVoice.map((item) => item.id);
 
@@ -63,11 +63,11 @@ module.exports = {
                 const nowFetchChannel = await client.channels.fetch(
                   message.channelId
                 );
+                const roomRandom = Math.floor(Math.random() * roomVoice.length);
                 if (roomVoice.length !== 0) {
                   nowFetchChannel.send(
-                    `Our meeting room is <#${roomVoice[0]}>`
+                    `Our meeting room is <#${roomVoice[roomRandom]}>`
                   );
-                  roomVoice.shift(roomVoice[0]);
                 } else nowFetchChannel.send(`Voice channel full`);
               }
             }
