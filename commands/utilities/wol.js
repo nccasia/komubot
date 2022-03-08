@@ -8,7 +8,17 @@ function discoverDevice(macOrIp) {
       mac: macOrIp,
     });
   }
-  return find(macOrIp);
+  return find(macOrIp).catch(() => {
+    return discoverDeviceFallback(macOrIp);
+  });
+}
+
+function discoverDeviceFallback(ip) {
+  return find(null).then((devices) => {
+    return devices.find((dev) => {
+      return dev.ip == ip;
+    });
+  });
 }
 
 function wakeDevice(macAddress) {

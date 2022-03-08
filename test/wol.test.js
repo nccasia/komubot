@@ -1,5 +1,8 @@
 const wolCommmand = require('../commands/utilities/wol');
 
-wolCommmand.execute({
+wolCommmand.execute(
+  {
     reply: console.log,
-}, [null]);
+  },
+  ['10.10.30.10']
+);
