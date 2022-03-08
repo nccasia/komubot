@@ -618,9 +618,7 @@ async function sendSubmitTimesheet(client) {
     });
     checkUser.map(async (user) => {
       const userDiscord = await client.users.fetch(user.id);
-      userDiscord.send(
-        `Nhớ submit timesheet cuối tuần tránh bị phạt bạn nhé!!!`
-      );
+      userDiscord.send(`Nhớ submit timesheet cuối tuần tránh bị phạt nhé!!!`);
     });
   });
 }
