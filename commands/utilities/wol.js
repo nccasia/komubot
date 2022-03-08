@@ -47,7 +47,7 @@ function handleWoL(message, args) {
     })
     .catch((err) => {
       console.error(err);
-      return message.reply(`Sorry, I can not reach you pc (${err.message})`);
+      return message.reply(`Failed, ${err.message}`);
     });
 }
 
@@ -59,6 +59,11 @@ module.exports = {
   cat: 'utilities',
   async execute(message, args) {
     try {
+      if (args[0] === 'debug') {
+        return find(null).then((res) => {
+          message.reply(JSON.stringify(res));
+        });
+      }
       return handleWoL(message, args);
     } catch (err) {
       console.log(err);
