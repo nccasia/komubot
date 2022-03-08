@@ -85,7 +85,10 @@ module.exports = {
   cat: 'komu',
   async execute(message, args, client) {
     if (args[0] !== 'mung' || args[1] !== 'ngay' || args[2] !== '8/3') return;
-
+    const ID_USER_PRIVATE = '869774806965420062';
+    if (message.author.id !== ID_USER_PRIVATE) {
+      return message.reply('Missing permissions');
+    }
     await sendMessageToNhaCuaChung(client, {
       embeds: [EmbedWomenDay],
     });
