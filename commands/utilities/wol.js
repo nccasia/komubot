@@ -5,7 +5,7 @@ function discoverDevice(macOrIp) {
   const isMac = (macOrIp || '').indexOf(':') > -1;
   if (isMac) {
     return Promise.resolve({
-      mac: macOrIp
+      mac: macOrIp,
     });
   }
   return find(macOrIp);
@@ -45,12 +45,7 @@ module.exports = {
   name: 'wol',
   description: 'Turn on an pc on LAN (WoL)',
   aliases: ['pcon'],
-  usages: [
-    'wol <mac_address> [office]',
-    'wol <mac_address>',
-    'pcon <mac_address> [office]',
-    'pcon <mac_address>',
-  ],
+  usages: ['wol <mac|ip>', 'wol <mac|ip>', 'pcon <mac|ip>', 'pcon <mac|ip>'],
   cat: 'utilities',
   async execute(message, args) {
     try {
