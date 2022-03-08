@@ -598,8 +598,31 @@ async function sendMessTurnOffPc(client) {
 }
 
 async function sendSubmitTimesheet(client) {
-  const sendMessage = await client.channels.fetch('921239541388554240');
-  sendMessage.send(`@here nhớ submit timesheet cuối tuần nhé mọi người`);
+  let getListUserLogTimesheet;
+  try {
+    getListUserLogTimesheet = await axios.get(
+      client.config.submitTimesheet.api_url_getListUserLogTimesheet
+    );
+  } catch (error) {
+    console.log(error);
+  }
+
+  if (!getListUserLogTimesheet || getListUserLogTimesheet.data == undefined) {
+    return;
+  }
+  const getListUser = getListUserLogTimesheet.data.result.map(async (item) => {
+    const list = getUserNameByEmail(item.emailAddress);
+    const checkUser = await userData.find({
+      email: list,
+      deactive: { $ne: true },
+    });
+    checkUser.map(async (user) => {
+      const userDiscord = await client.users.fetch(user.id);
+      userDiscord.send(
+        `Nhớ submit timesheet cuối tiền tránh bị phạt bạn nhé nhé!!!`
+      );
+    });
+  });
 }
 
 exports.scheduler = {
@@ -681,12 +704,12 @@ exports.scheduler = {
       false,
       'Asia/Ho_Chi_Minh'
     ).start();
-    // new cron.CronJob(
-    //   '00 12 * * 0',
-    //   () => sendSubmitTimesheet(client),
-    //   null,
-    //   false,
-    //   'Asia/Ho_Chi_Minh'
-    // ).start();
+    new cron.CronJob(
+      '00 12 * * 0',
+      () => sendSubmitTimesheet(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
   },
 };
