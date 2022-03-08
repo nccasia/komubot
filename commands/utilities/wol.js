@@ -1,32 +1,60 @@
 const wol = require('wake_on_lan');
+const find = require('local-devices');
 
-function handleWoL(instructions, message, args) {
-  const instructions = args.join(' ');
-  const macAddress = instructions[1];
-  wol.wake(macAddress, function (error) {
-    if (error) {
-      message.reply('Sorry, I can not reach you pc :(');
-    } else {
-      message.reply('Yay, your pc now on : )');
-    }
+function discoverDevice(macOrIp) {
+  const isMac = (macOrIp || '').indexOf(':') > -1;
+  if (isMac) {
+    return Promise.resolve({
+      mac: macOrIp
+    });
+  }
+  return find(macOrIp);
+}
+
+function wakeDevice(macAddress) {
+  return new Promise((resolve, reject) => {
+    wol.wake(macAddress, (error) => {
+      if (error) {
+        return reject(new Error('Cannot send WoL packet.'));
+      }
+      return resolve(macAddress);
+    });
   });
 }
 
+function handleWoL(message, args) {
+  const identity = args[0];
+  return discoverDevice(identity)
+    .then((device) => {
+      if (!device || !device.mac) {
+        console.log(device);
+        throw new Error('error while discovering device.');
+      }
+      return wakeDevice(device.mac);
+    })
+    .then(() => {
+      return message.reply('WoL packet sent!');
+    })
+    .catch((err) => {
+      console.error(err);
+      return message.reply(`Sorry, I can not reach you pc (${err.message})`);
+    });
+}
+
 module.exports = {
-  name: 'wakepc',
+  name: 'wol',
   description: 'Turn on an pc on LAN (WoL)',
-  aliases: ['pcon', 'wol'],
+  aliases: ['pcon'],
   usages: [
     'wol <mac_address> [office]',
     'wol <mac_address>',
-    'wakepc <mac_address> [office]',
-    'wakepc <mac_address>',
+    'pcon <mac_address> [office]',
+    'pcon <mac_address>',
   ],
   cat: 'utilities',
   async execute(message, args) {
     try {
-      const instructions = args.join(' ');
-      return handleWoL(instructions, message, args);
+      return handleWoL(message, args);
     } catch (err) {
       console.log(err);
     }

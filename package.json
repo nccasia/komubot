@@ -21,6 +21,7 @@
     "hex-color-regex": "^1.1.0",
     "image-downloader": "^4.0.3",
     "is-url": "^1.2.4",
+    "local-devices": "^3.2.0",
     "moment": "^2.29.1",
     "mongoose": "^5.12.8",
     "mongoose-unique-validation": "^0.1.0",
