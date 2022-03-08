@@ -4,6 +4,7 @@ const reportMessageCount = require('../../util/reportMsgCount');
 const reportScore = require('../../util/reportScore');
 const { reportMention } = require('../../util/reportMention');
 const { reportCheckCamera } = require('../../util/reportCheckCamera');
+const reportWomenDay = require('../../util/reportWomenDay');
 function getTimeWeekMondayToFriday(dayNow) {
   const curr = new Date();
   // current date of week
@@ -49,9 +50,11 @@ module.exports = {
         await reportMessageCount(message, args, client, guildDB);
       } else if (args[0] === 'quiz') {
         await reportScore(message, args, client, guildDB);
+      } else if (args[0] === 'womenday') {
+        await reportWomenDay(message);
       } else if (args[0] === 'help') {
-        return message.channel
-          .send(
+        return message
+          .reply(
             '```' +
               '*report options' +
               '\n' +
@@ -85,8 +88,8 @@ module.exports = {
           )
           .catch(console.error);
       } else {
-        return message.channel
-          .send('```' + '*report help' + '```')
+        return message
+          .reply('```' + '*report help' + '```')
           .catch(console.error);
       }
     } catch (error) {

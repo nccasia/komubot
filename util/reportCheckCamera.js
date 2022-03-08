@@ -1,6 +1,6 @@
 const checkCameraData = require('../models/checkCameraData');
 const userData = require('../models/userData');
-
+const getUserOffWork = require('../util/getUserOffWork');
 function withoutFirstTime(dateTime) {
   const date = new Date(dateTime);
   date.setHours(0, 0, 0, 0);
@@ -33,16 +33,21 @@ async function reportCheckCamera(message) {
   });
 
   let userCheckCameraId;
+
   if (userCheckCamera) {
     userCheckCameraId = userCheckCamera.map((item) => item.userId);
   } else {
     return;
   }
 
-  const checkCameraFullday = await userData.find({
-    id: { $nin: userCheckCameraId },
-    deactive: { $ne: true },
-  });
+  const { userOffFullday } = await getUserOffWork();
+  const checkCameraFullday = await userData
+    .find({
+      id: { $nin: [...userOffFullday, ...userCheckCameraId] },
+      deactive: { $ne: true },
+      roles_discord: { $nin: ['CLIENT'] },
+    })
+    .select('id -_id');
 
   let mess;
   if (!checkCameraFullday) {
@@ -52,7 +57,7 @@ async function reportCheckCamera(message) {
     checkCameraFullday.length === 0
   ) {
     mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
-    return message.channel.send(mess).catch(console.error);
+    return message.reply(mess).catch(console.error);
   } else {
     for (let i = 0; i <= Math.ceil(checkCameraFullday.length / 50); i += 1) {
       if (checkCameraFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -64,7 +69,7 @@ async function reportCheckCamera(message) {
           .slice(i * 50, (i + 1) * 50)
           .map((checkCamera) => `<@${checkCamera.id}>`)
           .join('\n');
-      await message.channel.send(mess).catch(console.error);
+      await message.reply(mess).catch(console.error);
     }
   }
 }

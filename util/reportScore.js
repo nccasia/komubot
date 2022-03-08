@@ -38,8 +38,8 @@ async function reportScore(message) {
         .join('\n');
     }
 
-    return message.channel
-      .send('```' + 'Top 10 quiz points :' + '\n' + '```' + '\n' + mess)
+    return message
+      .reply('```' + 'Top 10 quiz points :' + '\n' + '```' + '\n' + mess)
       .catch(console.error);
   } catch (error) {
     console.log(error);

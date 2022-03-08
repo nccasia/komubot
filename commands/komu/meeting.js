@@ -3,6 +3,8 @@ const messHelp =
   '```' +
   '*meeting now' +
   '\n' +
+  '*meeting task dd/mm/yyyy 00:00 repeat timerepeat' +
+  '\n' +
   '*meeting task dd/mm/yyyy 00:00 once' +
   '\n' +
   '*meeting task dd/mm/yyyy 00:00 daily' +
@@ -61,11 +63,11 @@ module.exports = {
                 const nowFetchChannel = await client.channels.fetch(
                   message.channelId
                 );
+                const roomRandom = Math.floor(Math.random() * roomVoice.length);
                 if (roomVoice.length !== 0) {
                   nowFetchChannel.send(
-                    `Our meeting room is <#${roomVoice[0]}>`
+                    `Our meeting room is <#${roomVoice[roomRandom]}>`
                   );
-                  roomVoice.shift(roomVoice[0]);
                 } else nowFetchChannel.send(`Voice channel full`);
               }
             }
@@ -90,7 +92,6 @@ module.exports = {
         }
 
         if (repeat === '') repeat = 'once';
-
         const list = ['once', 'daily', 'weekly', 'repeat'];
         if (list.includes(repeat) === false)
           return message.channel.send(messHelp);

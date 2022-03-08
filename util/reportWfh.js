@@ -70,7 +70,7 @@ async function reportWfh(message, args, client) {
     return;
   } else if (Array.isArray(wfhFullday) && wfhFullday.length === 0) {
     mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
-    return message.channel.send(mess).catch(console.error);
+    return message.reply(mess).catch(console.error);
   } else {
     for (let i = 0; i <= Math.ceil(wfhFullday.length / 50); i += 1) {
       if (wfhFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -82,7 +82,7 @@ async function reportWfh(message, args, client) {
           .slice(i * 50, (i + 1) * 50)
           .map((wfh) => `<@${wfh._id}> - (${wfh.total})`)
           .join('\n');
-      return message.channel.send(mess).catch(console.error);
+      return message.reply(mess).catch(console.error);
     }
   }
 }
@@ -117,7 +117,7 @@ async function reportCompalinWfh(message, args, client) {
     return;
   } else if (Array.isArray(wfhFullday) && wfhFullday.length === 0) {
     mess = '```' + 'Không có ai được approved trong ngày' + '```';
-    return message.channel.send(mess).catch(console.error);
+    return message.reply(mess).catch(console.error);
   } else {
     for (let i = 0; i <= Math.ceil(wfhFullday.length / 50); i += 1) {
       if (wfhFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -129,7 +129,7 @@ async function reportCompalinWfh(message, args, client) {
           .slice(i * 50, (i + 1) * 50)
           .map((wfh) => `<@${wfh.userid}> `)
           .join('\n');
-      return message.channel.send(mess).catch(console.error);
+      return message.reply(mess).catch(console.error);
     }
   }
 }
