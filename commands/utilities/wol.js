@@ -2,8 +2,8 @@ const wol = require('wake_on_lan');
 const find = require('local-devices');
 
 function discoverDevice(macOrIp) {
-  const isMac = (macOrIp || '').indexOf(':') > -1;
-  if (isMac) {
+  const isIp = (macOrIp || '').indexOf('.') > -1;
+  if (!isIp) {
     return Promise.resolve({
       mac: macOrIp,
     });
