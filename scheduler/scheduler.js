@@ -607,7 +607,7 @@ async function sendSubmitTimesheet(client) {
     console.log(error);
   }
 
-  if (!getListUserLogTimesheet || getListUserLogTimesheet.data == undefined) {
+  if (!getListUserLogTimesheet) {
     return;
   }
   const getListUser = getListUserLogTimesheet.data.result.map(async (item) => {
@@ -619,7 +619,7 @@ async function sendSubmitTimesheet(client) {
     checkUser.map(async (user) => {
       const userDiscord = await client.users.fetch(user.id);
       userDiscord.send(
-        `Nhớ submit timesheet cuối tiền tránh bị phạt bạn nhé nhé!!!`
+        `Nhớ submit timesheet cuối tuần tránh bị phạt bạn nhé!!!`
       );
     });
   });
