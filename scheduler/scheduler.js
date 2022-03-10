@@ -206,6 +206,7 @@ async function sendQuiz(client) {
       {
         $match: {
           deactive: { $ne: true },
+          roles_discord: { $ne: [], $exists: true },
         },
       },
       {
@@ -247,6 +248,7 @@ async function punish(client) {
     {
       $match: {
         deactive: { $ne: true },
+        roles_discord: { $ne: [], $exists: true },
         last_bot_message_id: { $exists: true, $ne: '' },
       },
     },
@@ -406,7 +408,11 @@ async function remindWater(client) {
       console.log(error);
     }
     const userid = await userData
-      .find({ email: { $nin: notSendUserArray }, deactive: { $ne: true } })
+      .find({
+        email: { $nin: notSendUserArray },
+        deactive: { $ne: true },
+        roles_discord: { $ne: [], $exists: true },
+      })
       .select('email -_id');
     const emails = userid.map((item) => item.email);
     let message =
@@ -694,6 +700,7 @@ async function sendSubmitTimesheet(client) {
     const checkUser = await userData.find({
       email: list,
       deactive: { $ne: true },
+      roles_discord: { $ne: [], $exists: true },
     });
     checkUser.map(async (user) => {
       const userDiscord = await client.users.fetch(user.id);

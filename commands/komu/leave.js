@@ -15,9 +15,9 @@ module.exports = {
         return message.reply('Minute must be a number');
       }
       const reason = args.slice(1, args.length).join(' ');
-
       const newLeave = new leaveData({
-        userid: message.author.id,
+        channelId: message.channel.id,
+        userId: message.author.id,
         minute,
         reason,
       });
