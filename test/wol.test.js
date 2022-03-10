@@ -4,12 +4,6 @@ wolCommmand.execute(
   {
     reply: console.log,
   },
-  ['10.10.30.16']
+  ['34:e8:94:93:e8:69']
 );
 
-wolCommmand.execute(
-  {
-    reply: console.log,
-  },
-  ['debug']
-);
