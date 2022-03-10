@@ -7,6 +7,7 @@ const meetingdb = new mongoose.Schema({
   repeat: { type: String, required: false },
   repeatTime: { type: Number, required: false },
   cancel: { type: Boolean, default: false },
+  reminder: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('komu_meeting', meetingdb);

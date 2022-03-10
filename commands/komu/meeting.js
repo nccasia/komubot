@@ -1,4 +1,5 @@
 const meetingData = require('../../models/meetingData');
+const voiceChannelData = require('../../models/voiceChannelData');
 const messHelp =
   '```' +
   '*meeting now' +
@@ -40,17 +41,23 @@ module.exports = {
           );
           const voiceChannel = getAllVoice.map((item) => item.id);
 
-          let roomVoice = [];
+          let roomMap = [];
           let countVoice = 0;
+          let voiceNow = [];
 
+          const findVoice = await voiceChannelData.find({ status: 'start' });
+          findVoice.map((item) => {
+            voiceNow.push(item.id);
+          });
           const newList = voiceChannel.map(async (voice, index) => {
             const userDiscord = await client.channels.fetch(voice);
             if (userDiscord.members.size > 0) {
               countVoice++;
             }
             if (userDiscord.members.size === 0) {
-              roomVoice.push(userDiscord.id);
+              roomMap.push(userDiscord.id);
             }
+            let roomVoice = roomMap.filter((room) => !voiceNow.includes(room));
             if (index === voiceChannel.length - 1) {
               if (countVoice === voiceChannel.length) {
                 {
