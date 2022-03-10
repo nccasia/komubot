@@ -24,7 +24,7 @@ module.exports = {
 
       await newLeave.save();
 
-      return message.reply('Leave saved');
+      return message.reply('`✅` Leave saved');
     } catch (err) {
       console.log(err);
     }
