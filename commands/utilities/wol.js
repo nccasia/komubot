@@ -39,7 +39,7 @@ function discoverDeviceFallback(ip) {
 
 function wakeDevice(macAddress, netMask, silent) {
   return new Promise((resolve, reject) => {
-    wol.wake(macAddress, { address: netMask }, (error) => {
+    wol.wake(macAddress, { address: netMask, port: 7, num_packets: 5 }, (error) => {
       if (error && !silent) {
         return reject(new Error('Cannot send WoL packet.'));
       }
