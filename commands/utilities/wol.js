@@ -1,5 +1,21 @@
 const wol = require('wake_on_lan');
 const find = require('local-devices');
+const broadcastAddress = require('broadcast-address');
+const os = require('os');
+
+function getAvailableBroadcastAddresses() {
+  const interfacesNames = Object.keys(os.networkInterfaces());
+  const addresses = [];
+  for (const name of interfacesNames) {
+    try {
+      const addr = broadcastAddress(name);
+      addresses.push(addr);
+    } catch (e) {
+      // ingnore
+    }
+  }
+  return addresses;
+}
 
 function discoverDevice(macOrIp) {
   const isIp = (macOrIp || '').indexOf('.') > -1;
@@ -21,15 +37,22 @@ function discoverDeviceFallback(ip) {
   });
 }
 
-function wakeDevice(macAddress) {
+function wakeDevice(macAddress, netMask, silent) {
   return new Promise((resolve, reject) => {
-    wol.wake(macAddress, (error) => {
-      if (error) {
+    wol.wake(macAddress, { address: netMask }, (error) => {
+      if (error && !silent) {
         return reject(new Error('Cannot send WoL packet.'));
       }
       return resolve(macAddress);
     });
   });
+}
+
+function wakeDeviceOnAvailableNetworks(macAddress) {
+  const addresses = getAvailableBroadcastAddresses();
+  return Promise.all(
+    addresses.map((addr) => wakeDevice(macAddress, addr, true))
+  );
 }
 
 function handleWoL(message, args) {
@@ -40,7 +63,7 @@ function handleWoL(message, args) {
         console.log(device);
         throw new Error('error while discovering device.');
       }
-      return wakeDevice(device.mac);
+      return wakeDeviceOnAvailableNetworks(device.mac);
     })
     .then(() => {
       return message.reply('WoL packet sent!');
@@ -55,14 +78,14 @@ module.exports = {
   name: 'wol',
   description: 'Turn on an pc on LAN (WoL)',
   aliases: ['pcon'],
-  usages: ['wol <mac|ip>', 'wol <mac|ip>', 'pcon <mac|ip>', 'pcon <mac|ip>'],
+  usages: ['wol <mac|ip>'],
   cat: 'utilities',
   async execute(message, args) {
     try {
-      if (args[0] === 'debug') {
-        return find(null).then((res) => {
-          message.reply(JSON.stringify(res));
-        });
+      if (args[0] === 'help') {
+        return message.reply(
+          'Using WoL to turn on an pc on LAN using mac address.\n*wol <your mac address>'
+        );
       }
       return handleWoL(message, args);
     } catch (err) {
