@@ -499,7 +499,8 @@ async function tagMeeting(client) {
         if (
           countVoice === voiceChannel.length &&
           hourDateNow === hourTimestamp &&
-          -5 <= checkFiveMinute <= 0 &&
+          -5 <= checkFiveMinute &&
+          checkFiveMinute <= 0 &&
           dateCreatedTimestamp === dateNow
         ) {
           const fetchChannelFull = await client.channels.fetch(item.channelId);
@@ -509,7 +510,8 @@ async function tagMeeting(client) {
             case 'once':
               if (
                 hourDateNow === hourTimestamp &&
-                -5 <= checkFiveMinute <= 0 &&
+                -5 <= checkFiveMinute &&
+                checkFiveMinute <= 0 &&
                 dateCreatedTimestamp === dateNow
               ) {
                 const onceFetchChannel = await client.channels.fetch(
@@ -546,7 +548,11 @@ async function tagMeeting(client) {
               return;
             case 'daily':
               if (day === 0 || day === 6) return;
-              if (hourDateNow === hourTimestamp && -5 <= checkFiveMinute <= 0) {
+              if (
+                hourDateNow === hourTimestamp &&
+                -5 <= checkFiveMinute &&
+                checkFiveMinute <= 0
+              ) {
                 const dailyFetchChannel = await client.channels.fetch(
                   item.channelId
                 );
@@ -586,7 +592,8 @@ async function tagMeeting(client) {
               const weeklyCreatedTimestamp = new Date(dateTimeWeekly).valueOf();
               if (
                 hourDateNow === hourTimestamp &&
-                -5 <= checkFiveMinute <= 0 &&
+                -5 <= checkFiveMinute &&
+                checkFiveMinute <= 0 &&
                 dateCreatedTimestamp === dateNow
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
@@ -630,7 +637,8 @@ async function tagMeeting(client) {
               const repeatCreatedTimestamp = new Date(dateTimeRepeat).valueOf();
               if (
                 hourDateNow === hourTimestamp &&
-                -5 <= checkFiveMinute <= 0 &&
+                -5 <= checkFiveMinute &&
+                checkFiveMinute <= 0 &&
                 dateCreatedTimestamp === dateNow
               ) {
                 const repeatFetchChannel = await client.channels.fetch(
@@ -679,7 +687,7 @@ async function updateReminderMeeting(client) {
   });
 
   const now = new Date();
-  now.setHours(now.getHours());
+  now.setHours(now.getHours() + 7);
   const dateNowTimestamp = now / 1000 / 60;
   const hourDateNow = now.getHours();
   const dateNow = now.toLocaleDateString('en-US');
