@@ -453,22 +453,29 @@ async function tagMeeting(client) {
     (guild) =>
       guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
   );
-  const repeatMeet = await meetingData.find({ cancel: { $ne: true } });
+  const repeatMeet = await meetingData.find({
+    cancel: { $ne: true },
+    reminder: { $ne: true },
+  });
 
   const voiceChannel = getAllVoice.map((item) => item.id);
 
   const now = new Date();
   now.setHours(now.getHours() + 7);
   let day = now.getDay();
-
-  const timeNow = now.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const dateNowTimestamp = now / 1000 / 60;
+  const hourDateNow = now.getHours();
   const dateNow = now.toLocaleDateString('en-US');
 
   let countVoice = 0;
-  let roomVoice = [];
+  let roomMap = [];
+  let voiceNow = [];
+
+  const findVoice = await voiceChannelData.find({ status: 'start' });
+  findVoice.map((item) => {
+    voiceNow.push(item.id);
+  });
+
   const newList = voiceChannel.map(async (voice, index) => {
     const userDiscord = await client.channels.fetch(voice);
 
@@ -476,36 +483,33 @@ async function tagMeeting(client) {
       countVoice++;
     }
     if (userDiscord.members.size === 0) {
-      roomVoice.push(userDiscord.id);
+      roomMap.push(userDiscord.id);
     }
+    let roomVoice = roomMap.filter((room) => !voiceNow.includes(room));
+
     if (index === voiceChannel.length - 1) {
       const timeCheck = repeatMeet.map(async (item) => {
-        const timeCreatedTimestamp = new Date(
-          +item.createdTimestamp.toString()
-        ).toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-        });
+        const hourTimestamp = new Date(+item.createdTimestamp).getHours();
+        const minuteTimestamp = +item.createdTimestamp / 1000 / 60;
+        const checkFiveMinute = dateNowTimestamp - minuteTimestamp;
+
         const dateCreatedTimestamp = new Date(
           +item.createdTimestamp.toString()
         ).toLocaleDateString('en-US');
         if (
           countVoice === voiceChannel.length &&
-          timeCreatedTimestamp === timeNow &&
+          hourDateNow === hourTimestamp &&
+          -5 <= checkFiveMinute <= 0 &&
           dateCreatedTimestamp === dateNow
         ) {
-          timeCreatedTimestamp === timeNow && dateCreatedTimestamp === dateNow;
-          {
-            const fetchChannelFull = await client.channels.fetch(
-              item.channelId
-            );
-            fetchChannelFull.send(`@here voice channel full`);
-          }
+          const fetchChannelFull = await client.channels.fetch(item.channelId);
+          fetchChannelFull.send(`@here voice channel full`);
         } else {
           switch (item.repeat) {
             case 'once':
               if (
-                timeCreatedTimestamp === timeNow &&
+                hourDateNow === hourTimestamp &&
+                -5 <= checkFiveMinute <= 0 &&
                 dateCreatedTimestamp === dateNow
               ) {
                 const onceFetchChannel = await client.channels.fetch(
@@ -534,11 +538,15 @@ async function tagMeeting(client) {
                     .save()
                     .catch((err) => console.log(err));
                 } else onceFetchChannel.send(`@here voice channel full`);
+                await meetingData.updateOne(
+                  { _id: item._id },
+                  { reminder: true }
+                );
               }
               return;
             case 'daily':
               if (day === 0 || day === 6) return;
-              if (timeCreatedTimestamp === timeNow) {
+              if (hourDateNow === hourTimestamp && -5 <= checkFiveMinute <= 0) {
                 const dailyFetchChannel = await client.channels.fetch(
                   item.channelId
                 );
@@ -564,6 +572,10 @@ async function tagMeeting(client) {
                     .save()
                     .catch((err) => console.log(err));
                 } else dailyFetchChannel.send(`@here voice channel full`);
+                await meetingData.updateOne(
+                  { _id: item._id },
+                  { reminder: true }
+                );
               }
               return;
             case 'weekly':
@@ -573,7 +585,8 @@ async function tagMeeting(client) {
               dateTimeWeekly.setDate(dateTimeWeekly.getDate() + 7);
               const weeklyCreatedTimestamp = new Date(dateTimeWeekly).valueOf();
               if (
-                timeCreatedTimestamp === timeNow &&
+                hourDateNow === hourTimestamp &&
+                -5 <= checkFiveMinute <= 0 &&
                 dateCreatedTimestamp === dateNow
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
@@ -603,7 +616,7 @@ async function tagMeeting(client) {
                 } else weeklyFetchChannel.send(`@here voice channel full`);
                 await meetingData.updateOne(
                   { _id: item._id },
-                  { createdTimestamp: weeklyCreatedTimestamp }
+                  { createdTimestamp: weeklyCreatedTimestamp, reminder: true }
                 );
               }
               return;
@@ -616,7 +629,8 @@ async function tagMeeting(client) {
               );
               const repeatCreatedTimestamp = new Date(dateTimeRepeat).valueOf();
               if (
-                timeCreatedTimestamp === timeNow &&
+                hourDateNow === hourTimestamp &&
+                -5 <= checkFiveMinute <= 0 &&
                 dateCreatedTimestamp === dateNow
               ) {
                 const repeatFetchChannel = await client.channels.fetch(
@@ -646,7 +660,7 @@ async function tagMeeting(client) {
                 } else repeatFetchChannel.send(`@here voice channel full`);
                 await meetingData.updateOne(
                   { _id: item._id },
-                  { createdTimestamp: repeatCreatedTimestamp }
+                  { createdTimestamp: repeatCreatedTimestamp, reminder: true }
                 );
               }
               return;
@@ -655,6 +669,36 @@ async function tagMeeting(client) {
           }
         }
       });
+    }
+  });
+}
+
+async function updateReminderMeeting(client) {
+  const repeatMeet = await meetingData.find({
+    reminder: true,
+  });
+
+  const now = new Date();
+  now.setHours(now.getHours());
+  const dateNowTimestamp = now / 1000 / 60;
+  const hourDateNow = now.getHours();
+  const dateNow = now.toLocaleDateString('en-US');
+
+  const timeCheck = repeatMeet.map(async (item) => {
+    const hourTimestamp = new Date(+item.createdTimestamp).getHours();
+    const minuteTimestamp = +item.createdTimestamp / 1000 / 60;
+    const checkFiveMinute = dateNowTimestamp - minuteTimestamp;
+
+    const dateCreatedTimestamp = new Date(
+      +item.createdTimestamp.toString()
+    ).toLocaleDateString('en-US');
+
+    if (
+      hourDateNow === hourTimestamp &&
+      checkFiveMinute >= 5 &&
+      dateCreatedTimestamp === dateNow
+    ) {
+      await meetingData.updateOne({ _id: item._id }, { reminder: false });
     }
   });
 }
@@ -706,6 +750,13 @@ async function sendSubmitTimesheet(client) {
 
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '*/1 * * * *',
+      () => updateReminderMeeting(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     new cron.CronJob(
       '*/1 * * * *',
       () => tagMeeting(client),
