@@ -40,13 +40,13 @@ async function reportCheckCamera(message) {
     return;
   }
 
-  const { userOffFullday } = await getUserOffWork();
+  const { userOffFullday, userOffMorning } = await getUserOffWork();
   const checkCameraFullday = await userData
     .find({
       id: { $nin: userCheckCameraId },
-      email: { $nin: userOffFullday },
+      email: { $nin: [...userOffFullday, ...userOffMorning] },
       deactive: { $ne: true },
-      roles_discord: { $nin: ['CLIENT'], $exists: true },
+      roles_discord: { $nin: ['CLIENT', 'HR', 'ADMIN'], $exists: true },
     })
     .select('id -_id');
 
