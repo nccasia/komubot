@@ -126,10 +126,6 @@ async function pingWfh(client) {
           $match: {
             email: filterEmail,
             deactive: { $ne: true },
-            $or: [
-              { last_bot_message_id: { $exists: false } },
-              { last_bot_message_id: '' },
-            ],
             id: { $nin: useridJoining },
             $or: [
               { roles_discord: { $all: ['INTERN'] } },
@@ -141,16 +137,16 @@ async function pingWfh(client) {
           $project: {
             _id: 0,
             username: 1,
-            last_message_id: 1,
+            last_bot_message_id: 1,
             id: 1,
             roles: 1,
           },
         },
-        { $match: { last_message_id: { $exists: true } } },
+        { $match: { last_bot_message_id: { $exists: true, $ne: '' } } },
         {
           $lookup: {
             from: 'komu_msgs',
-            localField: 'last_message_id',
+            localField: 'last_bot_message_id',
             foreignField: 'id',
             as: 'last_message',
           },
@@ -194,7 +190,7 @@ async function pingWfh(client) {
     try {
       await Promise.all(
         arrayMessUserDiffWfh.map((userDiffWfh) =>
-          sendQuizToSingleUser(client, userDiffWfh)
+          sendQuizToSingleUser(client, userDiffWfh, true)
         )
       );
     } catch (error) {
@@ -224,12 +220,30 @@ async function happyBirthday(client) {
 
 async function punish(client) {
   if (checkTime(new Date())) return;
+  let wfhGetApi;
+  try {
+    wfhGetApi = await axios.get(client.config.wfh.api_url, {
+      headers: {
+        securitycode: client.config.wfh.api_key_secret,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  if (!wfhGetApi || wfhGetApi.data == undefined) {
+    return;
+  }
+  const wfhUserEmail = wfhGetApi.data.result.map((item) =>
+    getUserNameByEmail(item.emailAddress)
+  );
   const users = await userData.aggregate([
     {
       $match: {
         deactive: { $ne: true },
         roles_discord: { $ne: [], $exists: true },
         last_bot_message_id: { $exists: true, $ne: '' },
+        email: { $in: wfhUserEmail },
       },
     },
     {
@@ -388,54 +402,58 @@ async function sendQuiz(client) {
       console.log(error);
     }
 
-    const userDb = await userData
-      .find({
-        deactive: { $ne: true },
-        roles_discord: { $ne: [], $exists: true },
-        email: { $nin: userOff },
-      })
-      .select('id username roles -_id');
-
-    async function sendQuizWithCondition(client, user) {
-      const quizNearest = await userQuizData.aggregate([
+    const filterFindUser = (filterEmail) => {
+      return [
         {
           $match: {
-            userid: user.id,
+            email: filterEmail,
+            deactive: { $ne: true },
+            id: { $nin: useridJoining },
+            $or: [
+              { roles_discord: { $all: ['INTERN'] } },
+              { roles_discord: { $all: ['STAFF'] } },
+            ],
           },
-        },
-        {
-          $sort: { createAt: -1 },
-        },
-        {
-          $limit: 1,
         },
         {
           $project: {
             _id: 0,
-            createAt: 1,
+            username: 1,
+            last_bot_message_id: 1,
+            id: 1,
+            roles: 1,
           },
         },
-      ]);
-      if (quizNearest.length === 0) {
-        await sendQuizToSingleUser(client, user);
-        return;
-      }
-      const checkDate = () => {
-        let result = false;
-        if (
-          Date.now() - new Date(quizNearest[0].createAt).getTime() >=
-          1000 * 60 * 60 * 2
-        ) {
-          result = true;
-        }
-        return result;
-      };
-      if (quizNearest.length > 0 && checkDate()) {
-        await sendQuizToSingleUser(client, user);
-      }
-    }
+        { $match: { last_bot_message_id: { $exists: true, $ne: '' } } },
+        {
+          $lookup: {
+            from: 'komu_msgs',
+            localField: 'last_bot_message_id',
+            foreignField: 'id',
+            as: 'last_message',
+          },
+        },
+        {
+          $project: {
+            username: 1,
+            last_message_time: {
+              $first: '$last_message.createdTimestamp',
+            },
+            id: 1,
+            roles: 1,
+          },
+        },
+      ];
+    };
+    const userSendQuiz = await userData.aggregate(
+      filterFindUser({ $nin: notSendUser })
+    );
+    let arrayUser = userSendQuiz.filter(
+      (user) => Date.now() - user.last_message_time >= 1800000
+    );
+
     await Promise.all(
-      userDb.map((user) => sendQuizWithCondition(client, user))
+      arrayUser.map((user) => sendQuizToSingleUser(client, user, true))
     );
   } catch (error) {
     console.log(error);

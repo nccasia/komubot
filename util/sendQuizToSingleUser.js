@@ -35,17 +35,11 @@ async function sendQuizToSingleUser(client, userInput, botPing = false) {
           .setStyle('PRIMARY')
       );
     }
-    const user = await sendMessageKomuToUser(
+    await sendMessageKomuToUser(
       client,
       { embeds: [Embed], components: [row] },
       username,
       botPing
-    );
-    await userData.updateOne(
-      { id: userid },
-      {
-        last_message_id: user.last_message_id,
-      }
     );
   } catch (error) {
     console.log(error);

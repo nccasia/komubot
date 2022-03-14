@@ -67,7 +67,6 @@ const sendMessageKomuToUser = async (
       userdb.last_bot_message_id = sent.id;
     }
     await userdb.save();
-    user.last_message_id = sent.id;
     return user;
   } catch (error) {
     console.log('error', error);
