@@ -741,8 +741,7 @@ async function checkJoinCall(client) {
     {
       status: 'joining',
       start_time: {
-        $gte: beforeHours,
-        $lte: now,
+        $lte: beforeHours,
       },
     },
     {
