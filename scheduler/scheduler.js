@@ -763,6 +763,12 @@ async function sendSubmitTimesheet(client) {
   });
 }
 
+async function turnOffBot(client) {
+  const fetchVoiceNcc8 = await client.channels.fetch('921323636491710504');
+  const target = await fetchVoiceNcc8.guild.members.fetch('922003239887581205');
+  target.voice.disconnect().catch(console.error);
+}
+
 exports.scheduler = {
   run(client) {
     new cron.CronJob(
@@ -852,6 +858,13 @@ exports.scheduler = {
     new cron.CronJob(
       '00 12 * * 0',
       () => sendSubmitTimesheet(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '15 14 * * 5',
+      () => turnOffBot(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
