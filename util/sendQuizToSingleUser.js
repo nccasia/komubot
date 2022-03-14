@@ -7,6 +7,7 @@ const {
   saveQuestionCorrect,
   saveQuestionInCorrect,
 } = require('./quiz');
+const userData = require('../models/userData');
 const newEmbed = (message, color) =>
   new MessageEmbed().setTitle(message).setColor(color);
 
@@ -34,11 +35,17 @@ async function sendQuizToSingleUser(client, userInput, botPing = false) {
           .setStyle('PRIMARY')
       );
     }
-    await sendMessageKomuToUser(
+    const user = await sendMessageKomuToUser(
       client,
       { embeds: [Embed], components: [row] },
       username,
       botPing
+    );
+    await userData.updateOne(
+      { id: userid },
+      {
+        last_message_id: user.last_message_id,
+      }
     );
   } catch (error) {
     console.log(error);

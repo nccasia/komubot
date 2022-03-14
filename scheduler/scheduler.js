@@ -83,7 +83,13 @@ async function pingWfh(client) {
   try {
     console.log('[Scheduler run]');
     if (checkTime(new Date())) return;
-
+    let userOff = [];
+    try {
+      const { notSendUser } = await getUserOffWork();
+      userOff = notSendUser;
+    } catch (error) {
+      console.log(error);
+    }
     // Get user joining now
     const dataJoining = await joincallData.find({
       status: 'joining',
@@ -169,7 +175,7 @@ async function pingWfh(client) {
     );
 
     const userDiffrentWfhWithSomeCodition = await userData.aggregate(
-      filterFindUser({ $nin: wfhUserEmail })
+      filterFindUser({ $nin: [...wfhUserEmail, ...userOff] })
     );
     let arrayMessUserDiffWfh = userDiffrentWfhWithSomeCodition.filter(
       (user) => Date.now() - user.last_message_time >= 1800000
@@ -373,52 +379,67 @@ async function topTracker(client) {
 }
 
 async function sendQuiz(client) {
-  const userDb = await userData
-    .find({
-      deactive: { $ne: true },
-      roles_discord: { $ne: [], $exists: true },
-    })
-    .select('id username roles -_id');
+  try {
+    let userOff = [];
+    try {
+      const { notSendUser } = await getUserOffWork();
+      userOff = notSendUser;
+    } catch (error) {
+      console.log(error);
+    }
 
-  async function sendQuizWithCondition(client, user) {
-    const quizNearest = await userQuizData.aggregate([
-      {
-        $match: {
-          userid: user.id,
+    const userDb = await userData
+      .find({
+        deactive: { $ne: true },
+        roles_discord: { $ne: [], $exists: true },
+        email: { $nin: userOff },
+      })
+      .select('id username roles -_id');
+
+    async function sendQuizWithCondition(client, user) {
+      const quizNearest = await userQuizData.aggregate([
+        {
+          $match: {
+            userid: user.id,
+          },
         },
-      },
-      {
-        $sort: { createAt: -1 },
-      },
-      {
-        $limit: 1,
-      },
-      {
-        $project: {
-          _id: 0,
-          createAt: 1,
+        {
+          $sort: { createAt: -1 },
         },
-      },
-    ]);
-    if (quizNearest.length === 0) {
-      await sendQuizToSingleUser(client, user);
-      return;
-    }
-    const checkDate = () => {
-      let result = false;
-      if (
-        Date.now() - new Date(quizNearest[0].createAt).getTime() >=
-        1000 * 60 * 60 * 2
-      ) {
-        result = true;
+        {
+          $limit: 1,
+        },
+        {
+          $project: {
+            _id: 0,
+            createAt: 1,
+          },
+        },
+      ]);
+      if (quizNearest.length === 0) {
+        await sendQuizToSingleUser(client, user);
+        return;
       }
-      return result;
-    };
-    if (quizNearest.length > 0 && checkDate()) {
-      await sendQuizToSingleUser(client, user);
+      const checkDate = () => {
+        let result = false;
+        if (
+          Date.now() - new Date(quizNearest[0].createAt).getTime() >=
+          1000 * 60 * 60 * 2
+        ) {
+          result = true;
+        }
+        return result;
+      };
+      if (quizNearest.length > 0 && checkDate()) {
+        await sendQuizToSingleUser(client, user);
+      }
     }
+    await Promise.all(
+      userDb.map((user) => sendQuizWithCondition(client, user))
+    );
+  } catch (error) {
+    console.log(error);
   }
-  await Promise.all(userDb.map((user) => sendQuizWithCondition(client, user)));
 }
 
 async function tagMeeting(client) {
