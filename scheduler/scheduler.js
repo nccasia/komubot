@@ -18,7 +18,8 @@ const audioPlayer = require('../util/audioPlayer');
 const joincallData = require('../models/joincallData');
 const meetingData = require('../models/meetingData');
 const voiceChannelData = require('../models/voiceChannelData');
-// const testQuiz = require("../testquiz");
+const userQuizData = require('../models/userQuiz');
+const { updateRoleProject, updateRoleDiscord } = require('../util/roles');
 
 // Deepai
 const deepai = require('deepai');
@@ -198,33 +199,6 @@ async function pingWfh(client) {
   }
 }
 
-// eslint-disable-next-line no-unused-vars
-async function sendQuiz(client) {
-  try {
-    console.log('Send quiz run ');
-    const randomUser = await userData.aggregate([
-      {
-        $match: {
-          deactive: { $ne: true },
-          roles_discord: { $ne: [], $exists: true },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          id: 1,
-          username: 1,
-          roles: 1,
-        },
-      },
-    ]);
-    return await Promise.all(
-      randomUser.map((user) => sendQuizToSingleUser(client, user))
-    );
-  } catch (error) {
-    console.log(error);
-  }
-}
 async function happyBirthday(client) {
   const result = await birthdayUser(client);
 
@@ -398,59 +372,53 @@ async function topTracker(client) {
   );
 }
 
-async function remindWater(client) {
-  try {
-    let notSendUserArray = [];
-    try {
-      const { notSendUser } = await getUserOffWork();
-      notSendUserArray = notSendUser;
-    } catch (error) {
-      console.log(error);
-    }
-    const userid = await userData
-      .find({
-        email: { $nin: notSendUserArray },
-        deactive: { $ne: true },
-        roles_discord: { $ne: [], $exists: true },
-      })
-      .select('email -_id');
-    const emails = userid.map((item) => item.email);
-    let message =
-      'Uống nước đầy đủ mang lại các lợi ích tuyệt vời sau:' +
-      '\n' +
-      '- Tăng cường chức năng não bộ' +
-      '\n' +
-      '- Giảm cân' +
-      '\n' +
-      '- Giải độc' +
-      '\n' +
-      '- Tiêu hóa tốt' +
-      '\n' +
-      '- Tốt cho cơ bắp' +
-      '\n' +
-      '- Giữ được làn da trẻ trung' +
-      '\n' +
-      '**Hãy đứng dậy và uống nước đầy đủ nhé! Bạn không cần phải trả lời tin nhắn này, nếu muốn trò chuyện với mình thì nhắn cũng được (welcome).**';
+async function sendQuiz(client) {
+  const userDb = await userData
+    .find({
+      deactive: { $ne: true },
+      roles_discord: { $ne: [], $exists: true },
+    })
+    .select('id username roles -_id');
 
-    const embed = new MessageEmbed()
-      .setImage(
-        'https://i.pinimg.com/474x/d8/e4/b1/d8e4b1074f4a9046613a2efaeb2392b1.jpg'
-      )
-      .setDescription(message)
-      .setTitle('Ông cha ta đã có câu : Uống nước nhớ nguồn!');
-
-    for (email of emails) {
-      await sendMessageKomuToUser(
-        client,
-        {
-          embeds: [embed],
+  async function sendQuizWithCondition(client, user) {
+    const quizNearest = await userQuizData.aggregate([
+      {
+        $match: {
+          userid: user.id,
         },
-        email
-      );
+      },
+      {
+        $sort: { createAt: -1 },
+      },
+      {
+        $limit: 1,
+      },
+      {
+        $project: {
+          _id: 0,
+          createAt: 1,
+        },
+      },
+    ]);
+    if (quizNearest.length === 0) {
+      await sendQuizToSingleUser(client, user);
+      return;
     }
-  } catch (error) {
-    console.log(error);
+    const checkDate = () => {
+      let result = false;
+      if (
+        Date.now() - new Date(quizNearest[0].createAt).getTime() >=
+        1000 * 60 * 60 * 2
+      ) {
+        result = true;
+      }
+      return result;
+    };
+    if (quizNearest.length > 0 && checkDate()) {
+      await sendQuizToSingleUser(client, user);
+    }
   }
+  await Promise.all(userDb.map((user) => sendQuizWithCondition(client, user)));
 }
 
 async function tagMeeting(client) {
@@ -763,6 +731,27 @@ async function sendSubmitTimesheet(client) {
   });
 }
 
+async function checkJoinCall(client) {
+  console.log(['Schulder run']);
+  const now = new Date();
+  const HOURS = 2;
+  const beforeHours = new Date(now.getTime() - 1000 * 60 * 60 * HOURS);
+
+  await joincallData.updateMany(
+    {
+      status: 'joining',
+      start_time: {
+        $lte: beforeHours,
+      },
+    },
+    {
+      $set: {
+        status: 'finish',
+        end_time: new Date(),
+      },
+    }
+  );
+}
 async function turnOffBot(client) {
   const fetchVoiceNcc8 = await client.channels.fetch('921323636491710504');
   const target = await fetchVoiceNcc8.guild.members.fetch('922003239887581205');
@@ -820,13 +809,6 @@ exports.scheduler = {
       false,
       'Asia/Ho_Chi_Minh'
     ).start();
-    // new cron.CronJob(
-    //   "*/10 * 8-17 * * 1-5",
-    //   async () => await sendQuiz(client),
-    //   null,
-    //   false,
-    //   "Asia/Ho_Chi_Minh"
-    // ).start();
     new cron.CronJob(
       '*/1 9-11,13-17 * * 1-5',
       () => checkMention(client),
@@ -842,13 +824,6 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '0 9-15/2 * * 1-5',
-      async () => await remindWater(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
       '30 17 * * 1-5',
       () => sendMessTurnOffPc(client),
       null,
@@ -858,6 +833,34 @@ exports.scheduler = {
     new cron.CronJob(
       '00 12 * * 0',
       () => sendSubmitTimesheet(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '0 0 * * 1',
+      () => updateRoleProject(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '0 * * * *',
+      () => updateRoleDiscord(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '0 9-11,13-17 * * 1-5',
+      () => checkJoinCall(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '0 9,11,13,15 * * 1-5',
+      () => sendQuiz(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
