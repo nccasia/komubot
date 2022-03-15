@@ -775,10 +775,10 @@ async function turnOffBot(client) {
 }
 
 async function kickMemberVoiceChannel(client) {
-  let guild = client.guilds.fetch('922445994929586208');
+  let guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
-      guild.type === 'GUILD_VOICE' && guild.parentId === '922445995420315700'
+      guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
   );
   const voiceChannel = getAllVoice.map((item) => item.id);
 
@@ -836,13 +836,13 @@ async function kickMemberVoiceChannel(client) {
 
 exports.scheduler = {
   run(client) {
-    // new cron.CronJob(
-    //   '*/1 * * * *',
-    //   () => kickMemberVoiceChannel(client),
-    //   null,
-    //   false,
-    //   'Asia/Ho_Chi_Minh'
-    // ).start();
+    new cron.CronJob(
+      '*/1 * * * *',
+      () => kickMemberVoiceChannel(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     new cron.CronJob(
       '*/1 * * * *',
       () => updateReminderMeeting(client),
