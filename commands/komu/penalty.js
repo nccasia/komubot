@@ -115,7 +115,7 @@ module.exports = {
       } else if (args[0] === 'clear') {
         // clear
         await penatlyData.updateMany(
-          { channel_id: message.channel.id, delete: false },
+          { channel_id: message.channel.id, delete: { $ne: true } },
           { delete: true }
         );
         message.reply({
