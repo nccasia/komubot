@@ -493,15 +493,16 @@ async function tagMeeting(client) {
       const timeCheck = repeatMeet.map(async (item) => {
         let checkFiveMinute;
         let hourTimestamp;
+        const dateScheduler = new Date(+item.createdTimestamp);
+        const minuteDb = dateScheduler.getMinutes();
 
-        const minuteDb = new Date(+item.createdTimestamp).getMinutes();
-        if (minuteDb > 0 && minuteDb < 4) {
+        if (minuteDb >= 0 && minuteDb <= 4) {
           checkFiveMinute = minuteDb + 60 - minuteDateNow;
-          const hourDb = new Date(+item.createdTimestamp);
+          const hourDb = dateScheduler;
           hourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
         } else {
           checkFiveMinute = minuteDb - minuteDateNow;
-          hourTimestamp = new Date(+item.createdTimestamp).getHours();
+          hourTimestamp = dateScheduler.getHours();
         }
 
         const dateCreatedTimestamp = new Date(
@@ -705,15 +706,16 @@ async function updateReminderMeeting(client) {
   const timeCheck = repeatMeet.map(async (item) => {
     let checkFiveMinute;
     let hourTimestamp;
+    const dateScheduler = new Date(+item.createdTimestamp);
 
-    const minuteDb = new Date(+item.createdTimestamp).getMinutes();
-    if (minuteDb > 0 && minuteDb < 4) {
+    const minuteDb = dateScheduler.getMinutes();
+    if (minuteDb >= 0 && minuteDb <= 4) {
       checkFiveMinute = minuteDb + 60 - minuteDateNow;
-      const hourDb = new Date(+item.createdTimestamp);
+      const hourDb = dateScheduler;
       hourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
     } else {
       checkFiveMinute = minuteDateNow - minuteDb;
-      hourTimestamp = new Date(+item.createdTimestamp).getHours();
+      hourTimestamp = dateScheduler.getHours();
     }
 
     if (hourDateNow === hourTimestamp && checkFiveMinute > 5) {
