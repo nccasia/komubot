@@ -474,7 +474,8 @@ async function tagMeeting(client) {
         if (minuteDb >= 0 && minuteDb <= 4) {
           checkFiveMinute = minuteDb + 60 - minuteDateNow;
           const hourDb = dateScheduler;
-          hourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+          setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+          hourTimestamp = new Date(setHourTimestamp).getHours();
         } else {
           checkFiveMinute = minuteDb - minuteDateNow;
           hourTimestamp = dateScheduler.getHours();
@@ -687,7 +688,8 @@ async function updateReminderMeeting(client) {
     if (minuteDb >= 0 && minuteDb <= 4) {
       checkFiveMinute = minuteDb + 60 - minuteDateNow;
       const hourDb = dateScheduler;
-      hourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+      setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+      hourTimestamp = new Date(setHourTimestamp).getHours();
     } else {
       checkFiveMinute = minuteDateNow - minuteDb;
       hourTimestamp = dateScheduler.getHours();
@@ -834,13 +836,13 @@ async function kickMemberVoiceChannel(client) {
 
 exports.scheduler = {
   run(client) {
-    new cron.CronJob(
-      '*/1 * * * *',
-      () => kickMemberVoiceChannel(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
+    // new cron.CronJob(
+    //   '*/1 * * * *',
+    //   () => kickMemberVoiceChannel(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
     new cron.CronJob(
       '*/1 * * * *',
       () => updateReminderMeeting(client),
