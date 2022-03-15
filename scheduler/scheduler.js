@@ -791,7 +791,7 @@ async function kickMemberVoiceChannel(client) {
   });
   timeVoiceAlone.map(async (item) => {
     voiceNow.push(item.channelId);
-    if (timeNow - item.start_time >= 120000) {
+    if (timeNow - item.start_time >= 600000) {
       const fetchVoiceNcc8 = await client.channels.fetch(item.channelId);
       if (fetchVoiceNcc8.members.first) {
         const target = fetchVoiceNcc8.members.first();
