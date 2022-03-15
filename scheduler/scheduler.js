@@ -54,6 +54,25 @@ function checkTime(time) {
   return result;
 }
 
+function withoutTime(dateTime) {
+  const date = new Date(dateTime);
+  const curDate = new Date();
+  const timezone = curDate.getTimezoneOffset() / -60;
+  date.setHours(0 + timezone, 0, 0, 0);
+  return date;
+}
+
+function getTimeToDay() {
+  const today = new Date();
+  const tomorrows = new Date();
+  const tomorrowsDate = tomorrows.setDate(tomorrows.getDate() + 1);
+
+  return {
+    firstDay: new Date(withoutTime(today)),
+    lastDay: new Date(withoutTime(tomorrowsDate)),
+  };
+}
+
 async function showDaily(client) {
   console.log('[Scheduler] Run');
   try {
@@ -266,7 +285,11 @@ async function punish(client) {
   ]);
 
   users.map(async (user) => {
-    if (Date.now() - user.createdTimestamp >= 1800000) {
+    if (
+      Date.now() - user.createdTimestamp >= 1800000 &&
+      user.createdTimestamp <= getTimeToDay().lastDay.getTime() &&
+      user.createdTimestamp >= getTimeToDay().firstDay.getTime()
+    ) {
       const content = `<@${user.id}> không trả lời tin nhắn WFH lúc ${moment(
         parseInt(user.createdTimestamp.toString())
       )
@@ -408,7 +431,6 @@ async function sendQuiz(client) {
           $match: {
             email: filterEmail,
             deactive: { $ne: true },
-            id: { $nin: useridJoining },
             $or: [
               { roles_discord: { $all: ['INTERN'] } },
               { roles_discord: { $all: ['STAFF'] } },
@@ -446,12 +468,12 @@ async function sendQuiz(client) {
       ];
     };
     const userSendQuiz = await userData.aggregate(
-      filterFindUser({ $nin: notSendUser })
+      filterFindUser({ $nin: userOff })
     );
+
     let arrayUser = userSendQuiz.filter(
       (user) => Date.now() - user.last_message_time >= 1800000
     );
-
     await Promise.all(
       arrayUser.map((user) => sendQuizToSingleUser(client, user, true))
     );
