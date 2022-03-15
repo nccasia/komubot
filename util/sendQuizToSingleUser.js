@@ -7,6 +7,7 @@ const {
   saveQuestionCorrect,
   saveQuestionInCorrect,
 } = require('./quiz');
+const userData = require('../models/userData');
 const newEmbed = (message, color) =>
   new MessageEmbed().setTitle(message).setColor(color);
 

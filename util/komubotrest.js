@@ -1,5 +1,6 @@
 const userData = require('../models/userData');
 const wfhData = require('../models/wfhData');
+const msgData = require('../models/msgData');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 
 const getUserIdByUsername = async (client, req, res) => {
@@ -63,6 +64,8 @@ const sendMessageKomuToUser = async (
       return null;
     }
     const sent = await user.send(msg);
+    const newMessage = new msgData(sent);
+    await newMessage.save();
     if (botPing) {
       userdb.last_bot_message_id = sent.id;
     }
