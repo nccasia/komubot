@@ -25,14 +25,11 @@ module.exports = {
         const { id, key, correct, userid } = queryString.parse(
           interaction.customId
         );
-        const userquiz = await userQuizData.findOne({
-          userid,
-          quizid: id,
+        // Clear Button
+        await interaction.message.edit({
+          components: [],
         });
-        if (userquiz) {
-          await interaction.reply('You have answered this question before!');
-          return;
-        }
+
         if (key == correct) {
           const newUser = await addScores(userid);
           if (!newUser) return;
@@ -51,10 +48,6 @@ module.exports = {
           );
           await interaction.reply({ embeds: [EmbedInCorrect] });
         }
-
-        await interaction.message.edit({
-          components: [],
-        });
 
         await userData.updateOne(
           { id: userid },

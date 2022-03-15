@@ -21,6 +21,7 @@
     "hex-color-regex": "^1.1.0",
     "image-downloader": "^4.0.3",
     "is-url": "^1.2.4",
+    "local-devices": "^3.2.0",
     "moment": "^2.29.1",
     "mongoose": "^5.12.8",
     "mongoose-unique-validation": "^0.1.0",
@@ -34,7 +35,8 @@
     "tiktok-scraper": "^1.4.23",
     "topgg-autoposter": "^1.1.10",
     "twemoji-parser": "^13.0.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "wake_on_lan": "^1.0.0"
   },
   "scripts": {
     "start": "node sharder.js ",

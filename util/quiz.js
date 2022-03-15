@@ -30,12 +30,7 @@ async function randomQuiz(userInput, context, type) {
       }
     );
 
-    let questionAnsweredId;
-    if (questionAnswered) {
-      questionAnsweredId = questionAnswered.map((item) => item.quizid);
-    } else {
-      return;
-    }
+    let questionAnsweredId = questionAnswered.map((item) => item.quizid);
 
     const questions = await questionData.aggregate([
       {

@@ -11,6 +11,14 @@ const defEmojiList = [
   '\u0038\u20E3',
   '\u0039\u20E3',
   '\uD83D\uDD1F',
+  ':regional_indicator_j:',
+  ':regional_indicator_q:',
+  ':regional_indicator_k:',
+  ':regional_indicator_a:',
+  ':pear:',
+  ':crab:',
+  ':fried_shrimp:',
+  ':whale2:',
 ];
 
 const pollEmbed = async (
