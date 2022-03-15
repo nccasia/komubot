@@ -474,7 +474,8 @@ async function tagMeeting(client) {
         if (minuteDb >= 0 && minuteDb <= 4) {
           checkFiveMinute = minuteDb + 60 - minuteDateNow;
           const hourDb = dateScheduler;
-          hourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+          setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+          hourTimestamp = new Date(setHourTimestamp).getHours();
         } else {
           checkFiveMinute = minuteDb - minuteDateNow;
           hourTimestamp = dateScheduler.getHours();
@@ -687,7 +688,8 @@ async function updateReminderMeeting(client) {
     if (minuteDb >= 0 && minuteDb <= 4) {
       checkFiveMinute = minuteDb + 60 - minuteDateNow;
       const hourDb = dateScheduler;
-      hourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+      setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+      hourTimestamp = new Date(setHourTimestamp).getHours();
     } else {
       checkFiveMinute = minuteDateNow - minuteDb;
       hourTimestamp = dateScheduler.getHours();
@@ -773,10 +775,10 @@ async function turnOffBot(client) {
 }
 
 async function kickMemberVoiceChannel(client) {
-  let guild = client.guilds.fetch('922445994929586208');
+  let guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
-      guild.type === 'GUILD_VOICE' && guild.parentId === '922445995420315700'
+      guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
   );
   const voiceChannel = getAllVoice.map((item) => item.id);
 
