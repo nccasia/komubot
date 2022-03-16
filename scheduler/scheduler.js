@@ -310,6 +310,10 @@ async function punish(client) {
       const channel = await client.channels.fetch(
         client.config.komubotrest.machleo_channel_id
       );
+      await userData.updateOne(
+        { id: user.id, deactive: { $ne: true } },
+        { last_bot_message_id: '' }
+      );
       await channel.send(message);
     }
   });
