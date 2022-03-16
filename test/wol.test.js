@@ -6,4 +6,3 @@ wolCommmand.execute(
   },
   ['34:e8:94:93:e8:69']
 );
-

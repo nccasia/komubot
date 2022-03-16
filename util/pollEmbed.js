@@ -18,7 +18,7 @@ const defEmojiList = [
   ':pear:',
   ':crab:',
   ':fried_shrimp:',
-  ':whale2:'
+  ':whale2:',
 ];
 
 const pollEmbed = async (

@@ -18,6 +18,8 @@ const audioPlayer = require('../util/audioPlayer');
 const joincallData = require('../models/joincallData');
 const meetingData = require('../models/meetingData');
 const voiceChannelData = require('../models/voiceChannelData');
+const timeVoiceAloneData = require('../models/timeVoiceAloneData');
+// const testQuiz = require("../testquiz");
 const userQuizData = require('../models/userQuiz');
 const { updateRoleProject, updateRoleDiscord } = require('../util/roles');
 
@@ -460,7 +462,7 @@ async function sendQuiz(client) {
             roles: 1,
           },
         },
-        { $match: { last_bot_message_id: { $exists: true } } },
+        { $match: { last_bot_message_id: { $exists: true, $ne: '' } } },
         {
           $lookup: {
             from: 'komu_msgs',
@@ -517,6 +519,7 @@ async function tagMeeting(client) {
   const dateNowTimestamp = now / 1000 / 60;
   const hourDateNow = now.getHours();
   const dateNow = now.toLocaleDateString('en-US');
+  const minuteDateNow = now.getMinutes();
 
   let countVoice = 0;
   let roomMap = [];
@@ -540,9 +543,20 @@ async function tagMeeting(client) {
 
     if (index === voiceChannel.length - 1) {
       const timeCheck = repeatMeet.map(async (item) => {
-        const hourTimestamp = new Date(+item.createdTimestamp).getHours();
-        const minuteTimestamp = +item.createdTimestamp / 1000 / 60;
-        const checkFiveMinute = dateNowTimestamp - minuteTimestamp;
+        let checkFiveMinute;
+        let hourTimestamp;
+        const dateScheduler = new Date(+item.createdTimestamp);
+        const minuteDb = dateScheduler.getMinutes();
+
+        if (minuteDb >= 0 && minuteDb <= 4) {
+          checkFiveMinute = minuteDb + 60 - minuteDateNow;
+          const hourDb = dateScheduler;
+          setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+          hourTimestamp = new Date(setHourTimestamp).getHours();
+        } else {
+          checkFiveMinute = minuteDb - minuteDateNow;
+          hourTimestamp = dateScheduler.getHours();
+        }
 
         const dateCreatedTimestamp = new Date(
           +item.createdTimestamp.toString()
@@ -550,8 +564,8 @@ async function tagMeeting(client) {
         if (
           countVoice === voiceChannel.length &&
           hourDateNow === hourTimestamp &&
-          -5 <= checkFiveMinute &&
-          checkFiveMinute <= 0 &&
+          0 <= checkFiveMinute &&
+          checkFiveMinute <= 5 &&
           dateCreatedTimestamp === dateNow
         ) {
           const fetchChannelFull = await client.channels.fetch(item.channelId);
@@ -561,8 +575,8 @@ async function tagMeeting(client) {
             case 'once':
               if (
                 hourDateNow === hourTimestamp &&
-                -5 <= checkFiveMinute &&
-                checkFiveMinute <= 0 &&
+                0 <= checkFiveMinute &&
+                checkFiveMinute <= 5 &&
                 dateCreatedTimestamp === dateNow
               ) {
                 const onceFetchChannel = await client.channels.fetch(
@@ -601,8 +615,8 @@ async function tagMeeting(client) {
               if (day === 0 || day === 6) return;
               if (
                 hourDateNow === hourTimestamp &&
-                -5 <= checkFiveMinute &&
-                checkFiveMinute <= 0
+                0 <= checkFiveMinute &&
+                checkFiveMinute <= 5
               ) {
                 const dailyFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -643,8 +657,8 @@ async function tagMeeting(client) {
               const weeklyCreatedTimestamp = new Date(dateTimeWeekly).valueOf();
               if (
                 hourDateNow === hourTimestamp &&
-                -5 <= checkFiveMinute &&
-                checkFiveMinute <= 0 &&
+                0 <= checkFiveMinute &&
+                checkFiveMinute <= 5 &&
                 dateCreatedTimestamp === dateNow
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
@@ -688,8 +702,8 @@ async function tagMeeting(client) {
               const repeatCreatedTimestamp = new Date(dateTimeRepeat).valueOf();
               if (
                 hourDateNow === hourTimestamp &&
-                -5 <= checkFiveMinute &&
-                checkFiveMinute <= 0 &&
+                0 <= checkFiveMinute &&
+                checkFiveMinute <= 5 &&
                 dateCreatedTimestamp === dateNow
               ) {
                 const repeatFetchChannel = await client.channels.fetch(
@@ -739,24 +753,26 @@ async function updateReminderMeeting(client) {
 
   const now = new Date();
   now.setHours(now.getHours() + 7);
-  const dateNowTimestamp = now / 1000 / 60;
   const hourDateNow = now.getHours();
-  const dateNow = now.toLocaleDateString('en-US');
+  const minuteDateNow = now.getMinutes();
 
   const timeCheck = repeatMeet.map(async (item) => {
-    const hourTimestamp = new Date(+item.createdTimestamp).getHours();
-    const minuteTimestamp = +item.createdTimestamp / 1000 / 60;
-    const checkFiveMinute = dateNowTimestamp - minuteTimestamp;
+    let checkFiveMinute;
+    let hourTimestamp;
+    const dateScheduler = new Date(+item.createdTimestamp);
 
-    const dateCreatedTimestamp = new Date(
-      +item.createdTimestamp.toString()
-    ).toLocaleDateString('en-US');
+    const minuteDb = dateScheduler.getMinutes();
+    if (minuteDb >= 0 && minuteDb <= 4) {
+      checkFiveMinute = minuteDb + 60 - minuteDateNow;
+      const hourDb = dateScheduler;
+      setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+      hourTimestamp = new Date(setHourTimestamp).getHours();
+    } else {
+      checkFiveMinute = minuteDateNow - minuteDb;
+      hourTimestamp = dateScheduler.getHours();
+    }
 
-    if (
-      hourDateNow === hourTimestamp &&
-      checkFiveMinute >= 5 &&
-      dateCreatedTimestamp === dateNow
-    ) {
+    if (hourDateNow === hourTimestamp && checkFiveMinute > 5) {
       await meetingData.updateOne({ _id: item._id }, { reminder: false });
     }
   });
@@ -835,8 +851,75 @@ async function turnOffBot(client) {
   target.voice.disconnect().catch(console.error);
 }
 
+async function kickMemberVoiceChannel(client) {
+  let guild = client.guilds.fetch('921239248991055882');
+  const getAllVoice = client.channels.cache.filter(
+    (guild) =>
+      guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
+  );
+  const voiceChannel = getAllVoice.map((item) => item.id);
+
+  const timeNow = Date.now();
+  let roomMap = [];
+  let voiceNow = [];
+
+  const timeVoiceAlone = await timeVoiceAloneData.find({
+    status: { $ne: true },
+  });
+  timeVoiceAlone.map(async (item) => {
+    voiceNow.push(item.channelId);
+    if (timeNow - item.start_time >= 600000) {
+      const fetchVoiceNcc8 = await client.channels.fetch(item.channelId);
+      if (fetchVoiceNcc8.members.first) {
+        const target = fetchVoiceNcc8.members.first();
+        target.voice.disconnect().catch(console.error);
+      }
+
+      await timeVoiceAloneData.updateMany(
+        { channelId: item.channelId },
+        { status: true }
+      );
+    }
+  });
+
+  const newList = voiceChannel.map(async (voice, index) => {
+    const userDiscord = await client.channels.fetch(voice);
+    if (userDiscord.members.size === 0 || userDiscord.members.size > 1) {
+      await timeVoiceAloneData.updateMany(
+        { channelId: voice },
+        { status: true }
+      );
+    }
+
+    if (userDiscord.members.size === 1) {
+      roomMap.push(userDiscord.id);
+    }
+
+    let roomVoice = roomMap.filter((room) => !voiceNow.includes(room));
+
+    if (index === voiceChannel.length - 1) {
+      roomVoice.map(async (item) => {
+        await new timeVoiceAloneData({
+          channelId: item,
+          status: false,
+          start_time: timeNow,
+        })
+          .save()
+          .catch((err) => console.log(err));
+      });
+    }
+  });
+}
+
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '*/1 * * * *',
+      () => kickMemberVoiceChannel(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     new cron.CronJob(
       '*/1 * * * *',
       () => updateReminderMeeting(client),
