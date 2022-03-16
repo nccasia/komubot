@@ -158,16 +158,16 @@ async function pingWfh(client) {
           $project: {
             _id: 0,
             username: 1,
-            last_bot_message_id: 1,
+            last_message_id: 1,
             id: 1,
             roles: 1,
           },
         },
-        { $match: { last_bot_message_id: { $exists: true, $ne: '' } } },
+        { $match: { last_message_id: { $exists: true } } },
         {
           $lookup: {
             from: 'komu_msgs',
-            localField: 'last_bot_message_id',
+            localField: 'last_message_id',
             foreignField: 'id',
             as: 'last_message',
           },
@@ -312,6 +312,10 @@ async function punish(client) {
       const channel = await client.channels.fetch(
         client.config.komubotrest.machleo_channel_id
       );
+      await userData.updateOne(
+        { id: user.id, deactive: { $ne: true } },
+        { last_bot_message_id: '' }
+      );
       await channel.send(message);
     }
   });
@@ -444,7 +448,7 @@ async function sendQuiz(client) {
             roles: 1,
           },
         },
-        { $match: { last_bot_message_id: { $exists: true, $ne: '' } } },
+        { $match: { last_bot_message_id: { $exists: true } } },
         {
           $lookup: {
             from: 'komu_msgs',
@@ -470,7 +474,7 @@ async function sendQuiz(client) {
     );
 
     let arrayUser = userSendQuiz.filter(
-      (user) => Date.now() - user.last_message_time >= 1800000
+      (user) => Date.now() - user.last_message_time >= 1000 * 60 * 60 * 2
     );
     await Promise.all(
       arrayUser.map((user) => sendQuizToSingleUser(client, user, true))
