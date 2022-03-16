@@ -68,6 +68,7 @@ const sendMessageKomuToUser = async (
     await newMessage.save();
     if (botPing) {
       userdb.last_bot_message_id = sent.id;
+      userdb.botPing = true;
     }
     await userdb.save();
     return user;

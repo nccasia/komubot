@@ -159,9 +159,25 @@ async function pingWfh(client) {
             last_message_id: 1,
             id: 1,
             roles: 1,
+            last_bot_message_id: 1,
           },
         },
-        { $match: { last_message_id: { $exists: true } } },
+        {
+          $match: {
+            last_message_id: { $exists: true },
+            last_bot_message_id: {
+              $exists: true,
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: 'komu_msgs',
+            localField: 'last_bot_message_id',
+            foreignField: 'id',
+            as: 'last_message_bot',
+          },
+        },
         {
           $lookup: {
             from: 'komu_msgs',
@@ -173,7 +189,10 @@ async function pingWfh(client) {
         {
           $project: {
             username: 1,
-            last_message_time: {
+            message_bot_timestamp: {
+              $first: '$last_message_bot.createdTimestamp',
+            },
+            message_timestamp: {
               $first: '$last_message.createdTimestamp',
             },
             id: 1,
@@ -183,34 +202,28 @@ async function pingWfh(client) {
       ];
     };
     const userWfhWithSomeCodition = await userData.aggregate(
-      filterFindUser({ $in: wfhUserEmail })
+      filterFindUser({ $nin: userOff })
     );
-    let arrayMessUserWfh = userWfhWithSomeCodition.filter(
-      (user) => Date.now() - user.last_message_time >= 1800000
+    const coditionGetTimeStamp = (user) => {
+      let result = false;
+      if (!user.message_bot_timestamp || !user.message_timestamp) {
+        result = true;
+      } else {
+        if (
+          Date.now() - user.message_bot_timestamp >= 1800000 &&
+          Date.now() - user.message_timestamp >= 1800000
+        ) {
+          result = true;
+        }
+      }
+      return result;
+    };
+    const arrayUser = userWfhWithSomeCodition.filter((user) =>
+      coditionGetTimeStamp(user)
     );
-
-    const userDiffrentWfhWithSomeCodition = await userData.aggregate(
-      filterFindUser({ $nin: [...wfhUserEmail, ...userOff] })
-    );
-    let arrayMessUserDiffWfh = userDiffrentWfhWithSomeCodition.filter(
-      (user) => Date.now() - user.last_message_time >= 1800000
-    );
-
     try {
       await Promise.all(
-        arrayMessUserWfh.map((userWfh) =>
-          sendQuizToSingleUser(client, userWfh, true)
-        )
-      );
-    } catch (error) {
-      console.log(error);
-    }
-
-    try {
-      await Promise.all(
-        arrayMessUserDiffWfh.map((userDiffWfh) =>
-          sendQuizToSingleUser(client, userDiffWfh, true)
-        )
+        arrayUser.map((userWfh) => sendQuizToSingleUser(client, userWfh, true))
       );
     } catch (error) {
       console.log(error);
@@ -263,6 +276,7 @@ async function punish(client) {
         roles_discord: { $ne: [], $exists: true },
         last_bot_message_id: { $exists: true, $ne: '' },
         email: { $in: wfhUserEmail },
+        botPing: true,
       },
     },
     {
@@ -312,7 +326,7 @@ async function punish(client) {
       );
       await userData.updateOne(
         { id: user.id, deactive: { $ne: true } },
-        { last_bot_message_id: '' }
+        { botPing: false }
       );
       await channel.send(message);
     }
@@ -472,7 +486,9 @@ async function sendQuiz(client) {
     );
 
     let arrayUser = userSendQuiz.filter(
-      (user) => Date.now() - user.last_message_time >= 1000 * 60 * 60 * 2
+      (user) =>
+        !user.last_message_time ||
+        Date.now() - user.last_message_time >= 1000 * 60 * 60 * 2
     );
     await Promise.all(
       arrayUser.map((user) => sendQuizToSingleUser(client, user, true))
