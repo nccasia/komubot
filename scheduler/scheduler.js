@@ -156,16 +156,16 @@ async function pingWfh(client) {
           $project: {
             _id: 0,
             username: 1,
-            last_bot_message_id: 1,
+            last_message_id: 1,
             id: 1,
             roles: 1,
           },
         },
-        { $match: { last_bot_message_id: { $exists: true } } },
+        { $match: { last_message_id: { $exists: true } } },
         {
           $lookup: {
             from: 'komu_msgs',
-            localField: 'last_bot_message_id',
+            localField: 'last_message_id',
             foreignField: 'id',
             as: 'last_message',
           },
