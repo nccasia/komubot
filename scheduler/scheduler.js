@@ -448,7 +448,7 @@ async function sendQuiz(client) {
             roles: 1,
           },
         },
-        { $match: { last_bot_message_id: { $exists: true } } },
+        { $match: { last_bot_message_id: { $exists: true, $ne: '' } } },
         {
           $lookup: {
             from: 'komu_msgs',
