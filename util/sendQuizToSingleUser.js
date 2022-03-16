@@ -6,6 +6,7 @@ const {
   addScores,
   saveQuestionCorrect,
   saveQuestionInCorrect,
+  saveQuestion,
 } = require('./quiz');
 const userData = require('../models/userData');
 const newEmbed = (message, color) =>
@@ -41,6 +42,7 @@ async function sendQuizToSingleUser(client, userInput, botPing = false) {
       username,
       botPing
     );
+    await saveQuestion(userid, q._id);
   } catch (error) {
     console.log(error);
   }
