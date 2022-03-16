@@ -53,6 +53,7 @@ module.exports = {
           { id: userid },
           {
             last_message_id: interaction.message.id,
+            last_bot_message_id: '',
           }
         );
       }
