@@ -95,28 +95,17 @@ async function addScores(userid) {
 
 async function saveQuestionCorrect(userid, questionid, answerkey) {
   try {
-    const answer = await userquizData.findOne({
-      $and: [
-        { userid: userid },
-        {
-          quizid: questionid,
-        },
-      ],
-    });
-
-    if (!answer) {
-      const newAnswer = new userquizData({
-        userid: userid,
+    await userquizData.updateOne(
+      {
+        userid,
         quizid: questionid,
+      },
+      {
         correct: true,
         answer: answerkey,
-      });
-      await newAnswer.save();
-    } else {
-      answer.answer = answerkey;
-      answer.correct = true;
-      await answer.save();
-    }
+        updateAt: new Date(),
+      }
+    );
   } catch (error) {
     console.log(error);
   }
@@ -124,31 +113,32 @@ async function saveQuestionCorrect(userid, questionid, answerkey) {
 
 async function saveQuestionInCorrect(userid, questionid, answerkey) {
   try {
-    const answer = await userquizData.findOne({
-      $and: [
-        { userid: userid },
-        {
-          quizid: questionid,
-        },
-      ],
-    });
-    if (!answer) {
-      const newAnswer = new userquizData({
-        userid: userid,
+    await userquizData.updateOne(
+      {
+        userid,
         quizid: questionid,
+      },
+      {
         correct: false,
         answer: answerkey,
-      });
-      await newAnswer.save();
-    } else {
-      answer.answer = answerkey;
-      await answer.save();
-    }
+        updateAt: new Date(),
+      }
+    );
   } catch (error) {
     console.log(error);
   }
 }
-
+async function saveQuestion(userid, questionid) {
+  try {
+    let newQuiz = new userquizData({
+      userid,
+      quizid: questionid,
+    });
+    await newQuiz.save();
+  } catch (error) {
+    console.log(error);
+  }
+}
 // const filterAwaitMessage = (userid) => ({
 //   filter: (u2) => u2.author.id === userid,
 //   time: 60000,
@@ -161,4 +151,5 @@ module.exports = {
   addScores,
   saveQuestionCorrect,
   saveQuestionInCorrect,
+  saveQuestion,
 };

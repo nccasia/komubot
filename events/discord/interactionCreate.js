@@ -30,6 +30,13 @@ module.exports = {
           components: [],
         });
 
+        await userData.updateOne(
+          { id: userid },
+          {
+            botPing: false,
+          }
+        );
+
         if (key == correct) {
           const newUser = await addScores(userid);
           if (!newUser) return;
@@ -48,14 +55,6 @@ module.exports = {
           );
           await interaction.reply({ embeds: [EmbedInCorrect] });
         }
-
-        await userData.updateOne(
-          { id: userid },
-          {
-            last_message_id: interaction.message.id,
-            last_bot_message_id: '',
-          }
-        );
       }
       if (interaction.customId.startsWith('8/3_')) {
         await interaction.message.edit({
