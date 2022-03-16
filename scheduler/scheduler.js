@@ -472,7 +472,7 @@ async function sendQuiz(client) {
     );
 
     let arrayUser = userSendQuiz.filter(
-      (user) => Date.now() - user.last_message_time >= 1800000
+      (user) => Date.now() - user.last_message_time >= 1000 * 60 * 60 * 2
     );
     await Promise.all(
       arrayUser.map((user) => sendQuizToSingleUser(client, user, true))
