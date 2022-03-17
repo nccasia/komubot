@@ -61,32 +61,6 @@ const dmmessage = async (message, client) => {
       .catch(console.log);
 
     if (!authorId || !content) return;
-    const newMsg = new msgData({
-      channelId: message.channelId,
-      guildId: message.guildId,
-      id: message.id,
-      createdTimestamp: message.createdTimestamp,
-      type: message.type,
-      system: message.system,
-      content: message.content,
-      author: message.author.id,
-      pinned: message.pinned,
-      tts: message.tts,
-      nonce: message.nonce,
-      webhookId: message.webhookId,
-      applicationId: message.applicationId,
-      flags: message.flags,
-    });
-    const newMsgAfter = await newMsg.save();
-
-    await userData.updateOne(
-      { id: authorId, deactive: { $ne: true } },
-      {
-        last_message_id: newMsgAfter.id,
-        last_bot_message_id: '',
-      }
-    );
-
     const res = await getMessageAI(
       API_URL,
       message.author.username,
