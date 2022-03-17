@@ -407,24 +407,36 @@ const sendEmbedMessage = async (client, req, res) => {
     const { title, description, image } = req.body;
     let isSendChannel = true;
     let isSendAllUser = false;
+    let isSendUserAndChannel = false;
     if (!req.body.channelId && !req.body.userId) {
       isSendAllUser = true;
     } else if (req.body.channelId && req.body.userId) {
-      res.status(400).send({ message: 'image can not be empty!' });
-      return;
+      isSendUserAndChannel = true;
     } else if (!req.body.channelId) {
       isSendChannel = false;
     } else if (!req.body.userId) {
       isSendAllUser = true;
     }
-
-    if (isSendChannel) {
+    if (isSendUserAndChannel) {
+      const channelId = req.body.channelId;
+      const userId = req.body.userId;
+      await sendMessageToChannelById(client, channelId, {
+        embeds: [embed(title, description, image)],
+      });
+      const user = await userData
+        .findOne({ id: userId })
+        .select('-_id username');
+      await sendMessageKomuToUser(
+        client,
+        { embeds: [embed(title, description, image)] },
+        user.username
+      );
+    } else if (isSendChannel) {
       const channelId = req.body.channelId;
       await sendMessageToChannelById(client, channelId, {
         embeds: [embed(title, description, image)],
       });
-    }
-    if (isSendAllUser) {
+    } else if (isSendAllUser) {
       const users = await userData.find({}).select('username -_id');
       await Promise.all(
         users.map((user) =>
@@ -435,8 +447,7 @@ const sendEmbedMessage = async (client, req, res) => {
           )
         )
       );
-    }
-    if (!isSendAllUser) {
+    } else if (!isSendAllUser) {
       const userId = req.body.userId;
       const user = await userData
         .findOne({ id: userId })
