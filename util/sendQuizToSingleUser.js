@@ -37,7 +37,7 @@ async function sendQuizToSingleUser(client, userInput, botPing = false) {
     const btn = new MessageEmbed()
       .setColor('#e11919')
       .setTitle('Complain')
-      .setURL(`http://quiz.nccsoft.vn/question/edit/${q._id}`);
+      .setURL(`http://quiz.nccsoft.vn/question/update/${q._id}`);
 
     await sendMessageKomuToUser(
       client,
