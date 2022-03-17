@@ -8,6 +8,7 @@ const questiondb = new mongoose.Schema({
   isVerify: Boolean,
   accept: Boolean,
   author_email: String,
+  topic: String,
 });
 
 module.exports = mongoose.model('komu_question', questiondb);
