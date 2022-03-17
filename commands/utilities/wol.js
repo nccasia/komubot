@@ -12,16 +12,18 @@ function getAvailableBroadcastAddresses() {
       addresses.push(addr);
     } catch (e) {
       // ingnore
+      console.log(e);
     }
   }
   return addresses;
 }
 
-function discoverDevice(macOrIp) {
+function discoverDevice(macOrIp, ipAddress) {
   const isIp = (macOrIp || '').indexOf('.') > -1;
   if (!isIp) {
     return Promise.resolve({
       mac: macOrIp,
+      ip: ipAddress,
     });
   }
   return find(macOrIp).catch(() => {
@@ -41,12 +43,12 @@ function wakeDevice(macAddress, netMask, silent) {
   return new Promise((resolve, reject) => {
     wol.wake(
       macAddress,
-      { address: netMask, port: 7, num_packets: 5 },
+      { address: netMask, port: 7, num_packets: 3 },
       (error) => {
         if (error && !silent) {
           return reject(new Error('Cannot send WoL packet.'));
         }
-        return resolve(macAddress);
+        return resolve({ macAddress, netMask });
       }
     );
   });
@@ -54,6 +56,7 @@ function wakeDevice(macAddress, netMask, silent) {
 
 function wakeDeviceOnAvailableNetworks(macAddress) {
   const addresses = getAvailableBroadcastAddresses();
+
   return Promise.all(
     addresses.map((addr) => wakeDevice(macAddress, addr, true))
   );
@@ -61,16 +64,26 @@ function wakeDeviceOnAvailableNetworks(macAddress) {
 
 function handleWoL(message, args) {
   const identity = args[0];
-  return discoverDevice(identity)
+  const ipAddress = args[1];
+  return discoverDevice(identity, ipAddress)
     .then((device) => {
       if (!device || !device.mac) {
         console.log(device);
         throw new Error('error while discovering device.');
       }
+      return device;
+    })
+    .then((device) => {
+      if (device.ip) {
+        return wakeDevice(device.mac, device.ip);
+      }
       return wakeDeviceOnAvailableNetworks(device.mac);
     })
-    .then(() => {
-      return message.reply('WoL packet sent!');
+    .then((res) => {
+      if (!res.macAddress && !res.length) {
+        throw new Error('no WoL packet sent!');
+      }
+      return message.reply('Done, WoL packet sent!');
     })
     .catch((err) => {
       console.error(err);
