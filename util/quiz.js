@@ -39,7 +39,7 @@ async function randomQuiz(userInput, context, type) {
           role: roleRandom,
           isVerify: true,
           accept: true,
-          $expr: { $lte: [{ $strLenCP: '$title' }, 256] },
+          $expr: { $lte: [{ $strLenCP: '$title' }, 200] },
         },
       },
       {
@@ -62,10 +62,17 @@ async function randomQuiz(userInput, context, type) {
 }
 
 function embedQuestion(question) {
+  const title = question.topic
+    ? `[${question.topic.toUpperCase()}] ${question.title}`
+    : question.title;
   const Embed = new MessageEmbed()
-    .setTitle(question.title)
+    .setTitle(title)
     .setDescription(
-      question.options.map((otp, index) => `${index + 1} - ${otp}`).join('\n')
+      '```' +
+        question.options
+          .map((otp, index) => `${index + 1} - ${otp}`)
+          .join('\n') +
+        '```'
     )
     .setColor('RANDOM')
     .setFooter({

@@ -368,7 +368,89 @@ const sendMessageToNhaCuaChung = async (client, msg) => {
     .catch(console.error);
   return null;
 };
+const sendMessageToChannelById = async (client, channelId, msg) => {
+  try {
+    const channel = await client.channels.fetch(channelId);
+    await channel.send(msg);
+  } catch (error) {
+    console.log(error);
+  }
+};
+const sendEmbedMessage = async (client, req, res) => {
+  try {
+    if (
+      !req.get('X-Secret-Key') ||
+      req.get('X-Secret-Key') !== client.config.komubotrest.komu_bot_secret_key
+    ) {
+      res.status(403).send({ message: 'Missing secret key!' });
+      return;
+    }
+    if (!req.body.title) {
+      res.status(400).send({ message: 'title can not be empty!' });
+      return;
+    }
+    if (!req.body.description) {
+      res.status(400).send({ message: 'decription can not be empty!' });
+      return;
+    }
+    if (!req.body.image) {
+      res.status(400).send({ message: 'image can not be empty!' });
+      return;
+    }
+    const embed = (title, des, image) =>
+      new MessageEmbed()
+        .setTitle(title)
+        .setDescription(des)
+        .setColor('RED')
+        .setImage(image);
 
+    const { title, description, image } = req.body;
+    let isSendChannel = true;
+    let isSendAllUser = false;
+    if (!req.body.channelId && !req.body.userId) {
+      isSendAllUser = true;
+    } else if (req.body.channelId && req.body.userId) {
+      res.status(400).send({ message: 'image can not be empty!' });
+      return;
+    } else if (!req.body.channelId) {
+      isSendChannel = false;
+    } else if (!req.body.userId) {
+      isSendAllUser = true;
+    }
+
+    if (isSendChannel) {
+      const channelId = req.body.channelId;
+      await sendMessageToChannelById(client, channelId, {
+        embeds: [embed(title, description, image)],
+      });
+    }
+    if (isSendAllUser) {
+      const users = await userData.find({}).select('username -_id');
+      await Promise.all(
+        users.map((user) =>
+          sendMessageKomuToUser(
+            client,
+            { embeds: [embed(title, description, image)] },
+            user.username
+          )
+        )
+      );
+    }
+    if (!isSendAllUser) {
+      const userId = req.body.userId;
+      const user = await userData
+        .findOne({ id: userId })
+        .select('-_id username');
+      await sendMessageKomuToUser(
+        client,
+        { embeds: [embed(title, description, image)] },
+        user.username
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 const init = async (client) => {
   const express = require('express');
   const bodyParser = require('body-parser');
@@ -430,6 +512,9 @@ const init = async (client) => {
   });
   app.post('/sendMessageToFinance', (req, res) => {
     sendMessageToFinance(client, req, res);
+  });
+  app.post('/sendEmbedMessage', (req, res) => {
+    sendEmbedMessage(client, req, res);
   });
   app.post('/uploadFile', mp3.single('File'), async (req, res, next) => {
     const file = req.file;
