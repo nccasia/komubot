@@ -39,7 +39,7 @@ async function randomQuiz(userInput, context, type) {
           role: roleRandom,
           isVerify: true,
           accept: true,
-          $expr: { $lte: [{ $strLenCP: '$title' }, 200] },
+          $expr: { $lte: [{ $strLenCP: '$title' }, 236] },
         },
       },
       {
