@@ -36,9 +36,14 @@ async function sendQuizToSingleUser(client, userInput, botPing = false) {
           .setStyle('PRIMARY')
       );
     }
+    const btn = new MessageEmbed()
+      .setColor('#e11919')
+      .setTitle('Complain')
+      .setURL(`http://quiz.nccsoft.vn/question/edit/${q._id}`);
+
     await sendMessageKomuToUser(
       client,
-      { embeds: [Embed], components: [row] },
+      { embeds: [Embed, btn], components: [row] },
       username,
       botPing
     );
