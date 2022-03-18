@@ -534,10 +534,16 @@ const init = async (client) => {
       error.httpStatusCode = 400;
       return next(error);
     }
+    if (!req.body.episode) {
+      res.status(400).send({ message: 'episode can not be empty!' });
+      return;
+    }
+    const episode = req.body.episode;
     await new uploadFileData({
       filePath: file.path,
       fileName: `${file.filename}`,
       createdTimestamp: Date.now(),
+      episode,
     })
       .save()
       .catch((err) => console.log(err));

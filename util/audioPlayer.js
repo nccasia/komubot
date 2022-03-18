@@ -29,7 +29,7 @@ function getLastSundayNextWeek() {
   return new Date(withoutFirstTime(newDate)).valueOf();
 }
 
-async function audioPlayer(client) {
+async function audioPlayer(client, message, episode) {
   try {
     const channel = await client.channels.fetch('921323636491710504');
     const player = createAudioPlayer();
@@ -41,16 +41,25 @@ async function audioPlayer(client) {
       selfDeaf: false,
       selfMute: false,
     }).subscribe(player);
-
-    const dataMp3 = await uploadFileData
-      .find({
-        createdTimestamp: {
-          $gte: getLastSundayLastWeek(),
-          $lte: getLastSundayNextWeek(),
-        },
-      })
-      .sort({ _id: -1 })
-      .limit(1);
+    let dataMp3;
+    if (!episode) {
+      dataMp3 = await uploadFileData
+        .find({
+          createdTimestamp: {
+            $gte: getLastSundayLastWeek(),
+            $lte: getLastSundayNextWeek(),
+          },
+        })
+        .sort({ _id: -1 })
+        .limit(1);
+    } else {
+      dataMp3 = await uploadFileData.find({
+        episode,
+      });
+      if (dataMp3.length === 0) {
+        return message.reply('not released yet');
+      }
+    }
 
     const fileNameMp3 = dataMp3.map((item) => {
       return item.fileName;
@@ -61,6 +70,10 @@ async function audioPlayer(client) {
     );
 
     player.play(resource);
+
+    if (episode && message) {
+      message.channel.send(`@here go to <#921323636491710504>`);
+    }
   } catch (err) {
     console.log(err);
   }
