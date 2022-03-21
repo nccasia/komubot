@@ -39,6 +39,11 @@ async function randomQuiz(userInput, context, type) {
           role: roleRandom,
           isVerify: true,
           accept: true,
+        },
+      },
+      {
+        $match: {
+          title: { $exists: true },
           $expr: { $lte: [{ $strLenCP: '$title' }, 236] },
         },
       },
