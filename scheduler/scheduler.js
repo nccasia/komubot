@@ -795,7 +795,8 @@ async function kickMemberVoiceChannel(client) {
       const fetchVoiceNcc8 = await client.channels.fetch(item.channelId);
       if (fetchVoiceNcc8.members.first) {
         const target = fetchVoiceNcc8.members.first();
-        if (target.voice) target.voice.disconnect().catch(console.error);
+        if (target && target.voice)
+          target.voice.disconnect().catch(console.error);
       }
 
       await timeVoiceAloneData.updateMany(
