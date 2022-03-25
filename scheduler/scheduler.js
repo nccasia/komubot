@@ -925,8 +925,9 @@ async function dating(client) {
   let datingEmailWoman = [];
   let resCheckUserMan = [];
   let resCheckUserWoman = [];
+  let list = [];
 
-  if (hour === 16 && day === 5 && minute === 0) {
+  if (hour === 16 && day === 5 && minute === 30) {
     const response = await axios.get(
       'http://timesheetapi.nccsoft.vn/api/services/app/Public/GetAllUser'
     );
@@ -980,6 +981,15 @@ async function dating(client) {
 
     if (!checkUserMan || !checkUserWoman) return;
 
+    let guild = client.guilds.fetch('921239248991055882');
+    const getAllVoice = client.channels.cache.filter(
+      (guild) =>
+        guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
+    );
+    const voiceChannel = getAllVoice.map((item) => item.id);
+    let roomMap = [];
+    let countVoice = 0;
+
     for (let i = 0; i < 5; i++) {
       let checkCaseMan = [];
       let checkCaseWoman = [];
@@ -1004,7 +1014,7 @@ async function dating(client) {
       checkUserMan.map((item) => {
         resCheckUserMan.push(item.email);
       });
-      const datingUserMan = resCheckUserMan.filter((item) =>
+      const listDatingUserMan = resCheckUserMan.filter((item) =>
         checkCaseMan.includes(item)
       );
 
@@ -1012,9 +1022,22 @@ async function dating(client) {
         resCheckUserWoman.push(item.email);
       });
 
-      const datingUserWoman = resCheckUserWoman.filter((item) =>
+      const listDatingUserWoman = resCheckUserWoman.filter((item) =>
         checkCaseWoman.includes(item)
       );
+      let datingUserMan = [];
+      let datingUserWoman = [];
+
+      voiceChannel.map(async (voice, index) => {
+        const userDaily = await client.channels.fetch(voice);
+        userDaily.members.map((item) => {
+          if (item.user.id) {
+            list.push(item.user.id);
+          }
+        });
+        datingUserMan = listDatingUserMan.filter((a) => !list.includes(a));
+        datingUserWoman = listDatingUserWoman.filter((a) => !list.includes(a));
+      });
 
       if (datingUserMan.length > 0 && datingUserWoman.length > 0) {
         indexMan = Math.floor(Math.random() * datingUserMan.length);
@@ -1042,15 +1065,6 @@ async function dating(client) {
       } else continue;
     }
 
-    let guild = client.guilds.fetch('921239248991055882');
-    const getAllVoice = client.channels.cache.filter(
-      (guild) =>
-        guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
-    );
-    const voiceChannel = getAllVoice.map((item) => item.id);
-    let roomMap = [];
-    let countVoice = 0;
-
     voiceChannel.map(async (voice, index) => {
       const userDiscord = await client.channels.fetch(voice);
 
@@ -1075,7 +1089,7 @@ async function dating(client) {
           for (i = 0; i < datingIdWoman.length; i++) {
             if (roomMap.length !== 0) {
               await nowFetchChannel.send(
-                `Hãy vào <#${roomMap[0]}> trò chuyện cuối tuần thôi nào <@${datingIdMan[i]}> và <@${datingIdWoman[i]}>`
+                `Hãy vào <#${roomMap[0]}> trò chuyện cuối tuần thôi nào <@${datingIdMan[i]}> <@${datingIdWoman[i]}>`
               );
               await new datingData({
                 userid: datingIdMan[i],
@@ -1104,7 +1118,7 @@ async function dating(client) {
     });
   }
 
-  if (hour === 16 && day === 5 && minute > 0 && minute < 6) {
+  if (hour === 16 && day === 5 && minute > 30 && minute < 36) {
     let idManPrivate = [];
     let idWomanPrivate = [];
 
@@ -1147,7 +1161,7 @@ async function dating(client) {
       if (index === voiceChannelPrivate.length - 1) {
         for (i = 0; i < idWomanPrivate.length; i++) {
           const fetchChannel = await client.channels.fetch(
-            '925707563629150238'
+            '921239541388554240'
           );
 
           fetchChannel.members.map(async (item) => {
@@ -1170,7 +1184,7 @@ exports.scheduler = {
   run(client) {
     dating(client);
     new cron.CronJob(
-      '*/1 15-17 * * 5',
+      '30-35/1 16 * * 5',
       () => dating(client),
       null,
       false,
