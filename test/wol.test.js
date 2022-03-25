@@ -4,5 +4,12 @@ wolCommmand.execute(
   {
     reply: console.log,
   },
-  ['34:e8:94:93:e8:69']
+  ['2C-F0-5D-EA-14-68', '10.10.40.255']
+);
+
+wolCommmand.execute(
+  {
+    reply: console.log,
+  },
+  ['2C-F0-5D-EA-14-68']
 );

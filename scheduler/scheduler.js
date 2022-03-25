@@ -22,6 +22,7 @@ const timeVoiceAloneData = require('../models/timeVoiceAloneData');
 // const testQuiz = require("../testquiz");
 const userQuizData = require('../models/userQuiz');
 const { updateRoleProject, updateRoleDiscord } = require('../util/roles');
+const datingData = require('../models/datingData');
 
 // Deepai
 const deepai = require('deepai');
@@ -872,7 +873,8 @@ async function kickMemberVoiceChannel(client) {
       const fetchVoiceNcc8 = await client.channels.fetch(item.channelId);
       if (fetchVoiceNcc8.members.first) {
         const target = fetchVoiceNcc8.members.first();
-        target.voice.disconnect().catch(console.error);
+        if (target && target.voice)
+          target.voice.disconnect().catch(console.error);
       }
 
       await timeVoiceAloneData.updateMany(
@@ -911,8 +913,267 @@ async function kickMemberVoiceChannel(client) {
   });
 }
 
+async function dating(client) {
+  const now = new Date();
+  let minute = now.getMinutes();
+  let dating = [];
+  let datingIdMan = [];
+  let datingIdWoman = [];
+  let datingEmailMAn = [];
+  let datingEmailWoman = [];
+  let resCheckUserMan = [];
+  let resCheckUserWoman = [];
+  let list = [];
+
+  if (minute === 0) {
+    const response = await axios.get(
+      'http://timesheetapi.nccsoft.vn/api/services/app/Public/GetAllUser'
+    );
+    if (!response.data || !response.data.result) return;
+
+    let userMan = [];
+    let userWomen = [];
+    response.data.result.map((item) => {
+      if (item.sex === 0)
+        userMan.push({
+          email: getUserNameByEmail(item.emailAddress),
+          branch: item.branch,
+        });
+      if (item.sex === 1)
+        userWomen.push({
+          email: getUserNameByEmail(item.emailAddress),
+          branch: item.branch,
+        });
+    });
+
+    let emailUserMan = [];
+    let emailUserWomen = [];
+    userMan.map((item) => {
+      if (!item.email) return;
+      emailUserMan.push(item.email);
+    });
+    userWomen.map((item) => {
+      if (!item.email) return;
+      emailUserWomen.push(item.email);
+    });
+
+    let result = [];
+    const userDating = await datingData.find();
+    userDating.map(async (item) => {
+      result.push(item.email);
+    });
+
+    const checkUserMan = await userData
+      .find({
+        email: { $in: emailUserMan, $nin: result },
+        deactive: { $ne: true },
+      })
+      .select('id email -_id');
+
+    const checkUserWoman = await userData
+      .find({
+        email: { $in: emailUserWomen, $nin: result },
+        deactive: { $ne: true },
+      })
+      .select('id email -_id');
+
+    if (!checkUserMan || !checkUserWoman) return;
+
+    let guild = client.guilds.fetch('921239248991055882');
+    const getAllVoice = client.channels.cache.filter(
+      (guild) =>
+        guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
+    );
+    const voiceChannel = getAllVoice.map((item) => item.id);
+    let roomMap = [];
+    let countVoice = 0;
+
+    for (let i = 0; i < 5; i++) {
+      let checkCaseMan = [];
+      let checkCaseWoman = [];
+      const arr = [0, 1, 2, 3];
+      randomOne = Math.floor(Math.random() * arr.length);
+      arrMan = arr[randomOne];
+      arr.splice(arrMan, 1);
+      randomTwo = Math.floor(Math.random() * arr.length);
+      arrWoman = arr[randomTwo];
+      console.log(arrMan);
+      console.log(arrWoman);
+
+      userMan.map((man) => {
+        if (man.branch === arrMan && man.email) checkCaseMan.push(man.email);
+      });
+
+      userWomen.map((women) => {
+        if (women.branch === arrWoman && women.email)
+          checkCaseWoman.push(women.email);
+      });
+
+      checkUserMan.map((item) => {
+        resCheckUserMan.push(item.email);
+      });
+      const datingUserMan = resCheckUserMan.filter((item) =>
+        checkCaseMan.includes(item)
+      );
+
+      checkUserWoman.map((item) => {
+        resCheckUserWoman.push(item.email);
+      });
+
+      const datingUserWoman = resCheckUserWoman.filter((item) =>
+        checkCaseWoman.includes(item)
+      );
+
+      if (datingUserMan.length > 0 && datingUserWoman.length > 0) {
+        indexMan = Math.floor(Math.random() * datingUserMan.length);
+        indexWoman = Math.floor(Math.random() * datingUserWoman.length);
+        randomMan = datingUserMan[indexMan];
+        randomWoman = datingUserWoman[indexWoman];
+        dating.push(randomMan, randomWoman);
+
+        checkUserMan.map((item) => {
+          dating.map((dt) => {
+            if (item.email === dt && !datingIdMan.includes(item.id)) {
+              datingIdMan.push(item.id);
+              datingEmailMAn.push(item.email);
+            }
+          });
+        });
+        checkUserWoman.map((item) => {
+          dating.map((dt) => {
+            if (item.email === dt && !datingIdWoman.includes(item.id)) {
+              datingIdWoman.push(item.id);
+              datingEmailWoman.push(item.email);
+            }
+          });
+        });
+      } else continue;
+    }
+
+    voiceChannel.map(async (voice, index) => {
+      const userDiscord = await client.channels.fetch(voice);
+
+      if (userDiscord.members.size > 0) {
+        countVoice++;
+      }
+      if (userDiscord.members.size === 0) {
+        roomMap.push(userDiscord.id);
+      }
+      if (index === voiceChannel.length - 1) {
+        if (countVoice === voiceChannel.length) {
+          {
+            const fetchChannelFull = await client.channels.fetch(
+              '956782882226073610'
+            );
+            fetchChannelFull.send(`Voice channel full`);
+          }
+        } else {
+          const nowFetchChannel = await client.channels.fetch(
+            '956782882226073610'
+          );
+          for (i = 0; i < datingIdWoman.length; i++) {
+            if (roomMap.length !== 0) {
+              await nowFetchChannel.send(
+                `Hãy vào <#${roomMap[0]}> trò chuyện cuối tuần thôi nào <@${datingIdMan[i]}> <@${datingIdWoman[i]}>`
+              );
+              await new datingData({
+                userid: datingIdMan[i],
+                email: datingEmailMAn[i],
+                createdTimestamp: Date.now(),
+                sex: 0,
+                loop: i,
+              })
+                .save()
+                .catch((err) => console.log(err));
+
+              await new datingData({
+                userid: datingIdWoman[i],
+                email: datingEmailWoman[i],
+                createdTimestamp: Date.now(),
+                sex: 1,
+                loop: i,
+              })
+                .save()
+                .catch((err) => console.log(err));
+              roomMap.shift(roomMap[0]);
+            } else nowFetchChannel.send(`Voice channel full`);
+          }
+        }
+      }
+    });
+  }
+
+  if (minute > 0 && minute < 6) {
+    let idManPrivate = [];
+    let idWomanPrivate = [];
+
+    const timeNow = new Date();
+    const timeStart = timeNow.setHours(0, 0, 0, 0);
+    const timeEnd = timeNow.setHours(23, 0, 0, 0);
+    const findDating = await datingData
+      .find({
+        createdTimestamp: {
+          $gte: timeStart,
+          $lte: timeEnd,
+        },
+      })
+      .sort({ loop: 1 });
+
+    findDating.map((item) => {
+      if (item.sex === 0) {
+        idManPrivate.push(item.userid);
+      } else idWomanPrivate.push(item.userid);
+    });
+
+    let fetchGuild = client.guilds.fetch('921239248991055882');
+    const getAllVoicePrivate = client.channels.cache.filter(
+      (guild) =>
+        guild.type === 'GUILD_VOICE' && guild.parentId === '956767420377346088'
+    );
+    const voiceChannelPrivate = getAllVoicePrivate.map((item) => item.id);
+    let roomMapPrivate = [];
+    let countVoicePrivate = 0;
+
+    voiceChannelPrivate.map(async (voice, index) => {
+      const userDiscordPrivate = await client.channels.fetch(voice);
+
+      if (userDiscordPrivate.members.size > 0) {
+        countVoicePrivate++;
+      }
+      if (userDiscordPrivate.members.size === 0) {
+        roomMapPrivate.push(userDiscordPrivate.id);
+      }
+      if (index === voiceChannelPrivate.length - 1) {
+        for (i = 0; i < idWomanPrivate.length; i++) {
+          const fetchChannel = await client.channels.fetch(
+            '921239541388554240'
+          );
+
+          fetchChannel.members.map(async (item) => {
+            if (item.user.id === idManPrivate[i]) {
+              if (item.voice) await item.voice.setChannel(roomMapPrivate[0]);
+            }
+
+            if (item.user.id === idWomanPrivate[i]) {
+              if (item.voice) await item.voice.setChannel(roomMapPrivate[0]);
+            }
+            roomMapPrivate.shift(roomMapPrivate[0]);
+          });
+        }
+      }
+    });
+  }
+}
+
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '0-5/1 17 * * 5',
+      () => dating(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     new cron.CronJob(
       '*/1 * * * *',
       () => kickMemberVoiceChannel(client),

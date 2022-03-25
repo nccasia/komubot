@@ -21,6 +21,11 @@ async function sendQuizToSingleUser(client, userInput, botPing = false) {
 
     const q = await randomQuiz(userInput, client, 'scheduler');
     if (!q) return;
+    const btn = new MessageEmbed()
+      .setColor('#e11919')
+      .setTitle('Complain')
+      .setURL(`http://quiz.nccsoft.vn/question/update/${q._id}`);
+
     const Embed = embedQuestion(q);
     const LIMIT = 5;
     const totalRow = Math.ceil(q.options.length / LIMIT);
@@ -40,7 +45,7 @@ async function sendQuizToSingleUser(client, userInput, botPing = false) {
       }
       await sendMessageKomuToUser(
         client,
-        { embeds: [Embed], components: [row] },
+        { embeds: [Embed, btn], components: [row] },
         username,
         botPing
       );
@@ -75,7 +80,7 @@ async function sendQuizToSingleUser(client, userInput, botPing = false) {
       }
       await sendMessageKomuToUser(
         client,
-        { embeds: [Embed], components: [row1, row2] },
+        { embeds: [Embed, btn], components: [row1, row2] },
         username,
         botPing
       );
