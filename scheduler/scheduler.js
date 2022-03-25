@@ -915,8 +915,6 @@ async function kickMemberVoiceChannel(client) {
 
 async function dating(client) {
   const now = new Date();
-  let hour = now.getHours();
-  let day = now.getDay();
   let minute = now.getMinutes();
   let dating = [];
   let datingIdMan = [];
@@ -927,7 +925,7 @@ async function dating(client) {
   let resCheckUserWoman = [];
   let list = [];
 
-  if (hour === 16 && day === 5 && minute === 30) {
+  if (minute === 0) {
     const response = await axios.get(
       'http://timesheetapi.nccsoft.vn/api/services/app/Public/GetAllUser'
     );
@@ -1105,7 +1103,7 @@ async function dating(client) {
     });
   }
 
-  if (hour === 16 && day === 5 && minute > 30 && minute < 36) {
+  if (minute > 0 && minute < 6) {
     let idManPrivate = [];
     let idWomanPrivate = [];
 
@@ -1169,9 +1167,8 @@ async function dating(client) {
 
 exports.scheduler = {
   run(client) {
-    dating(client);
     new cron.CronJob(
-      '30-35/1 16 * * 5',
+      '0-5/1 17 * * 5',
       () => dating(client),
       null,
       false,
