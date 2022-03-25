@@ -927,7 +927,7 @@ async function dating(client) {
   let resCheckUserWoman = [];
   let list = [];
 
-  if (hour === 16 && day === 5 && minute === 30) {
+  if (hour === 9 && day === 5 && minute === 30) {
     const response = await axios.get(
       'http://timesheetapi.nccsoft.vn/api/services/app/Public/GetAllUser'
     );
@@ -1105,7 +1105,7 @@ async function dating(client) {
     });
   }
 
-  if (hour === 16 && day === 5 && minute > 30 && minute < 36) {
+  if (hour === 9 && day === 5 && minute > 30 && minute < 36) {
     let idManPrivate = [];
     let idWomanPrivate = [];
 
@@ -1169,7 +1169,6 @@ async function dating(client) {
 
 exports.scheduler = {
   run(client) {
-    dating(client);
     new cron.CronJob(
       '30-35/1 16 * * 5',
       () => dating(client),
