@@ -1,0 +1,11 @@
+const mongoose = require('mongoose');
+
+const datingdb = new mongoose.Schema({
+  userid: { type: String, required: true },
+  loop: { type: Number, required: true },
+  sex: { type: Number },
+  loop: { type: Number },
+  createdTimestamp: { type: mongoose.Decimal128, required: false },
+});
+
+module.exports = mongoose.model('komu_dating', datingdb);
