@@ -38,7 +38,14 @@ async function audioPlayer(client, message, episode) {
     }).subscribe(player);
     let dataMp3;
     if (!episode) {
-      dataMp3 = await uploadFileData.find({}).sort({ episode: -1 }).limit(1);
+      dataMp3 = await uploadFileData
+        .find({
+          episode: {
+            $exists: true,
+          },
+        })
+        .sort({ episode: -1 })
+        .limit(1);
     } else {
       if (checkTimeSchulderNCC8()) {
         return message.reply('scheduled playing');
