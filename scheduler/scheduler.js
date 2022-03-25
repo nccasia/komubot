@@ -1014,7 +1014,7 @@ async function dating(client) {
       checkUserMan.map((item) => {
         resCheckUserMan.push(item.email);
       });
-      const listDatingUserMan = resCheckUserMan.filter((item) =>
+      const datingUserMan = resCheckUserMan.filter((item) =>
         checkCaseMan.includes(item)
       );
 
@@ -1022,22 +1022,9 @@ async function dating(client) {
         resCheckUserWoman.push(item.email);
       });
 
-      const listDatingUserWoman = resCheckUserWoman.filter((item) =>
+      const datingUserWoman = resCheckUserWoman.filter((item) =>
         checkCaseWoman.includes(item)
       );
-      let datingUserMan = [];
-      let datingUserWoman = [];
-
-      voiceChannel.map(async (voice, index) => {
-        const userDaily = await client.channels.fetch(voice);
-        userDaily.members.map((item) => {
-          if (item.user.id) {
-            list.push(item.user.id);
-          }
-        });
-        datingUserMan = listDatingUserMan.filter((a) => !list.includes(a));
-        datingUserWoman = listDatingUserWoman.filter((a) => !list.includes(a));
-      });
 
       if (datingUserMan.length > 0 && datingUserWoman.length > 0) {
         indexMan = Math.floor(Math.random() * datingUserMan.length);
