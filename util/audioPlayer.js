@@ -43,15 +43,7 @@ async function audioPlayer(client, message, episode) {
     }).subscribe(player);
     let dataMp3;
     if (!episode) {
-      dataMp3 = await uploadFileData
-        .find({
-          createdTimestamp: {
-            $gte: getLastSundayLastWeek(),
-            $lte: getLastSundayNextWeek(),
-          },
-        })
-        .sort({ _id: -1 })
-        .limit(1);
+      dataMp3 = await uploadFileData.find({}).sort({ episode: -1 }).limit(1);
     } else {
       dataMp3 = await uploadFileData.find({
         episode,
