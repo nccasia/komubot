@@ -7,26 +7,21 @@ const { createReadStream } = require('fs');
 const uploadFileData = require('../models/uploadFileData');
 const { join } = require('path');
 
-function withoutFirstTime(dateTime) {
-  const date = new Date(dateTime);
-  date.setHours(0, 0, 0, 0);
-  return date;
+function setTime(date, hours, minute, second, msValue) {
+  return date.setHours(hours, minute, second, msValue);
 }
-
-function getLastSundayLastWeek() {
-  const date = new Date();
-  const today = date.getDate();
-  const dayOfTheWeek = date.getDay();
-  const newDate = date.setDate(today - (dayOfTheWeek || 0));
-  return new Date(withoutFirstTime(newDate)).valueOf();
-}
-
-function getLastSundayNextWeek() {
-  const date = new Date();
-  const today = date.getDate();
-  const dayOfTheWeek = date.getDay();
-  const newDate = date.setDate(today - (dayOfTheWeek - 7 || 7));
-  return new Date(withoutFirstTime(newDate)).valueOf();
+function checkTimeSchulderNCC8() {
+  let result = false;
+  const time = new Date();
+  const cur = new Date();
+  const timezone = time.getTimezoneOffset() / -60;
+  const day = time.getDay();
+  const fisrtTime = new Date(setTime(time, 6 + timezone, 15, 0, 0)).getTime();
+  const lastTime = new Date(setTime(time, 7 + timezone, 15, 0, 0)).getTime();
+  if (cur.getTime() >= fisrtTime && cur.getTime() <= lastTime && day == 5) {
+    result = true;
+  }
+  return result;
 }
 
 async function audioPlayer(client, message, episode) {
@@ -45,6 +40,9 @@ async function audioPlayer(client, message, episode) {
     if (!episode) {
       dataMp3 = await uploadFileData.find({}).sort({ episode: -1 }).limit(1);
     } else {
+      if (checkTimeSchulderNCC8()) {
+        return message.reply('scheduled playing');
+      }
       dataMp3 = await uploadFileData.find({
         episode,
       });

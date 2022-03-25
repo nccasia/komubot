@@ -9,10 +9,10 @@ module.exports = {
   async execute(message, args, client) {
     try {
       if (args[0] !== 'play' || args[0] === 'help' || !args[1]) {
-        return message.channel.send('```' + '*ncc8 play episode' + '```');
+        return message.reply('```' + '*ncc8 play episode' + '```');
       }
       if (!checkNumber(args[1])) {
-        return message.channel.send('```' + 'episode must be number' + '```');
+        return message.reply('```' + 'episode must be number' + '```');
       }
       await audioPlayer(client, message, args[1]);
     } catch (err) {
