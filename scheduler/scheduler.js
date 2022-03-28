@@ -517,7 +517,6 @@ async function tagMeeting(client) {
   const now = new Date();
   now.setHours(now.getHours() + 7);
   let day = now.getDay();
-  const dateNowTimestamp = now / 1000 / 60;
   const hourDateNow = now.getHours();
   const dateNow = now.toLocaleDateString('en-US');
   const minuteDateNow = now.getMinutes();
@@ -591,10 +590,22 @@ async function tagMeeting(client) {
                   const channelNameOnce = await client.channels.fetch(
                     onceShift
                   );
-                  const originalNameOnce = channelNameOnce.name;
-                  await channelNameOnce.setName(
-                    `${channelNameOnce.name} (${item.task})`
-                  );
+                  let originalNameOnce = channelNameOnce.name;
+                  const searchTermOnce = '(';
+                  const indexOfFirstOnce =
+                    originalNameOnce.indexOf(searchTermOnce);
+                  if (indexOfFirstOnce > 0) {
+                    originalNameOnce = originalNameOnce.slice(
+                      0,
+                      indexOfFirstOnce - 1
+                    );
+                    await channelNameOnce.setName(
+                      `${originalNameOnce} (${item.task})`
+                    );
+                  } else
+                    await channelNameOnce.setName(
+                      `${channelNameOnce.name} (${item.task})`
+                    );
 
                   const newRoomOnce = channelNameOnce.name;
                   await new voiceChannelData({
@@ -630,10 +641,22 @@ async function tagMeeting(client) {
                   const channelNameDaily = await client.channels.fetch(
                     dailyShift
                   );
-                  const originalNameDaily = channelNameDaily.name;
-                  await channelNameDaily.setName(
-                    `${channelNameDaily.name} (${item.task})`
-                  );
+                  let originalNameDaily = channelNameDaily.name;
+                  const searchTermDaily = '(';
+                  const indexOfFirstDaily =
+                    originalNameDaily.indexOf(searchTermDaily);
+                  if (indexOfFirstDaily > 0) {
+                    originalNameDaily = originalNameDaily.slice(
+                      0,
+                      indexOfFirstDaily - 1
+                    );
+                    await channelNameDaily.setName(
+                      `${originalNameDaily} (${item.task})`
+                    );
+                  } else
+                    await channelNameDaily.setName(
+                      `${channelNameDaily.name} (${item.task})`
+                    );
                   const newRoomDaily = channelNameDaily.name;
                   await new voiceChannelData({
                     id: channelNameDaily.id,
@@ -673,10 +696,22 @@ async function tagMeeting(client) {
                   const channelNameWeekly = await client.channels.fetch(
                     weeklyShift
                   );
-                  const originalNameWeekly = channelNameWeekly.name;
-                  await channelNameWeekly.setName(
-                    `${channelNameWeekly.name} (${item.task})`
-                  );
+                  let originalNameWeekly = channelNameWeekly.name;
+                  const searchTermWeekly = '(';
+                  const indexOfFirstWeekly =
+                    originalNameWeekly.indexOf(searchTermWeekly);
+                  if (indexOfFirstWeekly > 0) {
+                    originalNameWeekly = originalNameWeekly.slice(
+                      0,
+                      indexOfFirstWeekly - 1
+                    );
+                    await channelNameWeekly.setName(
+                      `${originalNameWeekly} (${item.task})`
+                    );
+                  } else
+                    await channelNameWeekly.setName(
+                      `${channelNameWeekly.name} (${item.task})`
+                    );
                   const newRoomWeekly = channelNameWeekly.name;
                   await new voiceChannelData({
                     id: channelNameWeekly.id,
@@ -718,10 +753,22 @@ async function tagMeeting(client) {
                   const channelNameRepeat = await client.channels.fetch(
                     repeatShift
                   );
-                  const originalNameRepeat = channelNameRepeat.name;
-                  await channelNameRepeat.setName(
-                    `${channelNameRepeat.name} (${item.task})`
-                  );
+                  let originalNameRepeat = channelNameRepeat.name;
+                  const searchTermRepeat = '(';
+                  const indexOfFirstRepeat =
+                    originalNameRepeat.indexOf(searchTermRepeat);
+                  if (indexOfFirstRepeat > 0) {
+                    originalNameRepeat = originalNameRepeat.slice(
+                      0,
+                      indexOfFirstRepeat - 1
+                    );
+                    await channelNameRepeat.setName(
+                      `${originalNameRepeat} (${item.task})`
+                    );
+                  } else
+                    await channelNameRepeat.setName(
+                      `${channelNameRepeat.name} (${item.task})`
+                    );
                   const newRoomRepeat = channelNameRepeat.name;
                   await new voiceChannelData({
                     id: channelNameRepeat.id,
@@ -923,7 +970,7 @@ async function dating(client) {
   let datingEmailWoman = [];
   let resCheckUserMan = [];
   let resCheckUserWoman = [];
-  let list = [];
+  let listJoinCall = [];
 
   if (minute === 0) {
     const response = await axios.get(
@@ -963,9 +1010,17 @@ async function dating(client) {
       result.push(item.email);
     });
 
+    const checkJoinCall = await joincallData.find({
+      status: 'joining',
+    });
+    checkJoinCall.map(async (item) => {
+      listJoinCall.push(item.userid);
+    });
+
     const checkUserMan = await userData
       .find({
         email: { $in: emailUserMan, $nin: result },
+        id: { $nin: listJoinCall },
         deactive: { $ne: true },
       })
       .select('id email -_id');
@@ -973,6 +1028,7 @@ async function dating(client) {
     const checkUserWoman = await userData
       .find({
         email: { $in: emailUserWomen, $nin: result },
+        id: { $nin: listJoinCall },
         deactive: { $ne: true },
       })
       .select('id email -_id');
@@ -1077,7 +1133,8 @@ async function dating(client) {
                 `Hãy vào <#${roomMap[0]}> trò chuyện cuối tuần thôi nào <@${datingIdMan[i]}> <@${datingIdWoman[i]}>`
               );
               await new datingData({
-                userid: datingIdMan[i],
+                channelId: roomMap[0],
+                userId: datingIdMan[i],
                 email: datingEmailMAn[i],
                 createdTimestamp: Date.now(),
                 sex: 0,
@@ -1087,7 +1144,8 @@ async function dating(client) {
                 .catch((err) => console.log(err));
 
               await new datingData({
-                userid: datingIdWoman[i],
+                channelId: roomMap[0],
+                userId: datingIdWoman[i],
                 email: datingEmailWoman[i],
                 createdTimestamp: Date.now(),
                 sex: 1,
@@ -1106,6 +1164,7 @@ async function dating(client) {
   if (minute > 0 && minute < 6) {
     let idManPrivate = [];
     let idWomanPrivate = [];
+    let idVoice = [];
 
     const timeNow = new Date();
     const timeStart = timeNow.setHours(0, 0, 0, 0);
@@ -1121,8 +1180,9 @@ async function dating(client) {
 
     findDating.map((item) => {
       if (item.sex === 0) {
-        idManPrivate.push(item.userid);
-      } else idWomanPrivate.push(item.userid);
+        idManPrivate.push(item.userId);
+        idVoice.push(item.channelId);
+      } else idWomanPrivate.push(item.userId);
     });
 
     let fetchGuild = client.guilds.fetch('921239248991055882');
@@ -1145,20 +1205,20 @@ async function dating(client) {
       }
       if (index === voiceChannelPrivate.length - 1) {
         for (i = 0; i < idWomanPrivate.length; i++) {
-          const fetchChannel = await client.channels.fetch(
-            '921239541388554240'
-          );
-
-          fetchChannel.members.map(async (item) => {
-            if (item.user.id === idManPrivate[i]) {
-              if (item.voice) await item.voice.setChannel(roomMapPrivate[0]);
-            }
-
-            if (item.user.id === idWomanPrivate[i]) {
-              if (item.voice) await item.voice.setChannel(roomMapPrivate[0]);
-            }
-            roomMapPrivate.shift(roomMapPrivate[0]);
-          });
+          const fetchVoiceNcc8 = await client.channels.fetch(idVoice[i]);
+          if (fetchVoiceNcc8.guild.members) {
+            const targetMan = await fetchVoiceNcc8.guild.members.fetch(
+              idManPrivate[i]
+            );
+            if (targetMan && targetMan.voice)
+              targetMan.voice.setChannel(roomMapPrivate[0]);
+            const targetWoman = await fetchVoiceNcc8.guild.members.fetch(
+              idWomanPrivate[i]
+            );
+            if (targetWoman && targetWoman.voice)
+              targetWoman.voice.setChannel(roomMapPrivate[0]);
+          }
+          roomMapPrivate.shift(roomMapPrivate[0]);
         }
       }
     });
