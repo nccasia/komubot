@@ -74,10 +74,15 @@ const sendMessageKomuToUser = async (
     return user;
   } catch (error) {
     console.log('error', error);
-    const message = `<@${client.config.komubotrest.admin_user_id}> ơi, KOMU không thể gửi tin nhắn cho ${username}!!!`;
+    const message = `KOMU không thể gửi tin nhắn cho <@${userdb.id}>, hãy ping @thiet.nguyenba để được hỗ trợ nhé!!!`;
     await client.channels.cache
       .get(client.config.komubotrest.machleo_channel_id)
       .send(message)
+      .catch(console.error);
+    const messageItAdmin = `KOMU không thể gửi tin nhắn cho ${username}, hãy ping <@${client.config.komubotrest.admin_user_id}> để được hỗ trợ nhé!!!`;
+    await client.channels.cache
+      .get(client.config.komubotrest.itadmin_channel_id)
+      .send(messageItAdmin)
       .catch(console.error);
     return null;
   }
