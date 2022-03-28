@@ -1165,6 +1165,33 @@ async function dating(client) {
   }
 }
 
+async function sendQuizEnglish(client) {
+  try {
+    let userOff = [];
+    try {
+      const { notSendUser } = await getUserOffWork();
+      userOff = notSendUser;
+    } catch (error) {
+      console.log(error);
+    }
+
+    const userSendQuiz = await userData
+      .find({
+        email: { $nin: userOff },
+        deactive: { $ne: true },
+      })
+      .select('id roles username -_id');
+
+    await Promise.all(
+      userSendQuiz.map((user) =>
+        sendQuizToSingleUser(client, user, false, 'english')
+      )
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 exports.scheduler = {
   run(client) {
     new cron.CronJob(
@@ -1289,6 +1316,13 @@ exports.scheduler = {
     new cron.CronJob(
       '15 14 * * 5',
       () => turnOffBot(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '0 10,15 * * 1-5',
+      () => sendQuizEnglish(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'

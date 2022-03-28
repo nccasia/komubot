@@ -12,14 +12,19 @@ const userData = require('../models/userData');
 const newEmbed = (message, color) =>
   new MessageEmbed().setTitle(message).setColor(color);
 
-async function sendQuizToSingleUser(client, userInput, botPing = false) {
+async function sendQuizToSingleUser(
+  client,
+  userInput,
+  botPing = false,
+  roleSelect = null
+) {
   try {
     // random userid
     if (!userInput) return;
     const userid = userInput.id;
     const username = userInput.username;
 
-    const q = await randomQuiz(userInput, client, 'scheduler');
+    const q = await randomQuiz(userInput, client, 'scheduler', roleSelect);
     if (!q) return;
     const btn = new MessageEmbed()
       .setColor('#e11919')
