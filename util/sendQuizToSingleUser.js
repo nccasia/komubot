@@ -21,33 +21,71 @@ async function sendQuizToSingleUser(client, userInput, botPing = false) {
 
     const q = await randomQuiz(userInput, client, 'scheduler');
     if (!q) return;
-    const Embed = embedQuestion(q);
-
-    const row = new MessageActionRow();
-    for (let i = 0; i < q.options.length; i++) {
-      row.addComponents(
-        new MessageButton()
-          .setCustomId(
-            `question_&id=${q._id}&key=${i + 1}&correct=${
-              q.correct
-            }&userid=${userid}`
-          )
-          .setLabel((i + 1).toString())
-          .setStyle('PRIMARY')
-      );
-    }
     const btn = new MessageEmbed()
       .setColor('#e11919')
       .setTitle('Complain')
       .setURL(`http://quiz.nccsoft.vn/question/update/${q._id}`);
 
-    await sendMessageKomuToUser(
-      client,
-      { embeds: [Embed, btn], components: [row] },
-      username,
-      botPing
-    );
-    await saveQuestion(userid, q._id);
+    const Embed = embedQuestion(q);
+    const LIMIT = 5;
+    const totalRow = Math.ceil(q.options.length / LIMIT);
+    if (totalRow === 1) {
+      const row = new MessageActionRow();
+      for (let i = 0; i < q.options.length; i++) {
+        row.addComponents(
+          new MessageButton()
+            .setCustomId(
+              `question_&id=${q._id}&key=${i + 1}&correct=${
+                q.correct
+              }&userid=${userid}`
+            )
+            .setLabel((i + 1).toString())
+            .setStyle('PRIMARY')
+        );
+      }
+      await sendMessageKomuToUser(
+        client,
+        { embeds: [Embed, btn], components: [row] },
+        username,
+        botPing
+      );
+      await saveQuestion(userid, q._id);
+    } else if (totalRow == 2) {
+      const row1 = new MessageActionRow();
+      const row2 = new MessageActionRow();
+      for (let i = 0; i < q.options.length; i++) {
+        if (i <= 4) {
+          row1.addComponents(
+            new MessageButton()
+              .setCustomId(
+                `question_&id=${q._id}&key=${i + 1}&correct=${
+                  q.correct
+                }&userid=${userid}`
+              )
+              .setLabel((i + 1).toString())
+              .setStyle('PRIMARY')
+          );
+        } else {
+          row2.addComponents(
+            new MessageButton()
+              .setCustomId(
+                `question_&id=${q._id}&key=${i + 1}&correct=${
+                  q.correct
+                }&userid=${userid}`
+              )
+              .setLabel((i + 1).toString())
+              .setStyle('PRIMARY')
+          );
+        }
+      }
+      await sendMessageKomuToUser(
+        client,
+        { embeds: [Embed, btn], components: [row1, row2] },
+        username,
+        botPing
+      );
+      await saveQuestion(userid, q._id);
+    }
   } catch (error) {
     console.log(error);
   }
