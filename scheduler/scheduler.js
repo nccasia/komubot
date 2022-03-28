@@ -923,7 +923,7 @@ async function dating(client) {
   let datingEmailWoman = [];
   let resCheckUserMan = [];
   let resCheckUserWoman = [];
-  let list = [];
+  let listJoinCall = [];
 
   if (minute === 0) {
     const response = await axios.get(
@@ -963,9 +963,17 @@ async function dating(client) {
       result.push(item.email);
     });
 
+    const checkJoinCall = await joincallData.find({
+      status: 'joining',
+    });
+    checkJoinCall.map(async (item) => {
+      listJoinCall.push(item.userid);
+    });
+
     const checkUserMan = await userData
       .find({
         email: { $in: emailUserMan, $nin: result },
+        id: { $nin: listJoinCall },
         deactive: { $ne: true },
       })
       .select('id email -_id');
@@ -973,6 +981,7 @@ async function dating(client) {
     const checkUserWoman = await userData
       .find({
         email: { $in: emailUserWomen, $nin: result },
+        id: { $nin: listJoinCall },
         deactive: { $ne: true },
       })
       .select('id email -_id');
@@ -1077,6 +1086,7 @@ async function dating(client) {
                 `Hãy vào <#${roomMap[0]}> trò chuyện cuối tuần thôi nào <@${datingIdMan[i]}> <@${datingIdWoman[i]}>`
               );
               await new datingData({
+                channelid: roomMap[0],
                 userid: datingIdMan[i],
                 email: datingEmailMAn[i],
                 createdTimestamp: Date.now(),
@@ -1087,6 +1097,7 @@ async function dating(client) {
                 .catch((err) => console.log(err));
 
               await new datingData({
+                channelid: roomMap[0],
                 userid: datingIdWoman[i],
                 email: datingEmailWoman[i],
                 createdTimestamp: Date.now(),
@@ -1106,6 +1117,7 @@ async function dating(client) {
   if (minute > 0 && minute < 6) {
     let idManPrivate = [];
     let idWomanPrivate = [];
+    let idVoice = [];
 
     const timeNow = new Date();
     const timeStart = timeNow.setHours(0, 0, 0, 0);
@@ -1122,6 +1134,7 @@ async function dating(client) {
     findDating.map((item) => {
       if (item.sex === 0) {
         idManPrivate.push(item.userid);
+        idVoice.push(item.channelid);
       } else idWomanPrivate.push(item.userid);
     });
 
@@ -1145,20 +1158,20 @@ async function dating(client) {
       }
       if (index === voiceChannelPrivate.length - 1) {
         for (i = 0; i < idWomanPrivate.length; i++) {
-          const fetchChannel = await client.channels.fetch(
-            '921239541388554240'
-          );
-
-          fetchChannel.members.map(async (item) => {
-            if (item.user.id === idManPrivate[i]) {
-              if (item.voice) await item.voice.setChannel(roomMapPrivate[0]);
-            }
-
-            if (item.user.id === idWomanPrivate[i]) {
-              if (item.voice) await item.voice.setChannel(roomMapPrivate[0]);
-            }
-            roomMapPrivate.shift(roomMapPrivate[0]);
-          });
+          const fetchVoiceNcc8 = await client.channels.fetch(idVoice[i]);
+          if (fetchVoiceNcc8.guild.members) {
+            const targetMan = await fetchVoiceNcc8.guild.members.fetch(
+              idManPrivate[i]
+            );
+            if (targetMan && targetMan.voice)
+              targetMan.voice.setChannel(roomMapPrivate[0]);
+            const targetWoman = await fetchVoiceNcc8.guild.members.fetch(
+              idWomanPrivate[i]
+            );
+            if (targetWoman && targetWoman.voice)
+              targetWoman.voice.setChannel(roomMapPrivate[0]);
+          }
+          roomMapPrivate.shift(roomMapPrivate[0]);
         }
       }
     });
