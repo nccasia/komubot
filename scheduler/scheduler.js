@@ -1133,8 +1133,8 @@ async function dating(client) {
                 `Hãy vào <#${roomMap[0]}> trò chuyện cuối tuần thôi nào <@${datingIdMan[i]}> <@${datingIdWoman[i]}>`
               );
               await new datingData({
-                channelid: roomMap[0],
-                userid: datingIdMan[i],
+                channelId: roomMap[0],
+                userId: datingIdMan[i],
                 email: datingEmailMAn[i],
                 createdTimestamp: Date.now(),
                 sex: 0,
@@ -1144,8 +1144,8 @@ async function dating(client) {
                 .catch((err) => console.log(err));
 
               await new datingData({
-                channelid: roomMap[0],
-                userid: datingIdWoman[i],
+                channelId: roomMap[0],
+                userId: datingIdWoman[i],
                 email: datingEmailWoman[i],
                 createdTimestamp: Date.now(),
                 sex: 1,
@@ -1180,9 +1180,9 @@ async function dating(client) {
 
     findDating.map((item) => {
       if (item.sex === 0) {
-        idManPrivate.push(item.userid);
-        idVoice.push(item.channelid);
-      } else idWomanPrivate.push(item.userid);
+        idManPrivate.push(item.userId);
+        idVoice.push(item.channelId);
+      } else idWomanPrivate.push(item.userId);
     });
 
     let fetchGuild = client.guilds.fetch('921239248991055882');
