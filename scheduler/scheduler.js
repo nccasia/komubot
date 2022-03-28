@@ -517,7 +517,6 @@ async function tagMeeting(client) {
   const now = new Date();
   now.setHours(now.getHours() + 7);
   let day = now.getDay();
-  const dateNowTimestamp = now / 1000 / 60;
   const hourDateNow = now.getHours();
   const dateNow = now.toLocaleDateString('en-US');
   const minuteDateNow = now.getMinutes();
@@ -591,10 +590,22 @@ async function tagMeeting(client) {
                   const channelNameOnce = await client.channels.fetch(
                     onceShift
                   );
-                  const originalNameOnce = channelNameOnce.name;
-                  await channelNameOnce.setName(
-                    `${channelNameOnce.name} (${item.task})`
-                  );
+                  let originalNameOnce = channelNameOnce.name;
+                  const searchTermOnce = '(';
+                  const indexOfFirstOnce =
+                    originalNameOnce.indexOf(searchTermOnce);
+                  if (indexOfFirstOnce > 0) {
+                    originalNameOnce = originalNameOnce.slice(
+                      0,
+                      indexOfFirstOnce - 1
+                    );
+                    await channelNameOnce.setName(
+                      `${originalNameOnce} (${item.task})`
+                    );
+                  } else
+                    await channelNameOnce.setName(
+                      `${channelNameOnce.name} (${item.task})`
+                    );
 
                   const newRoomOnce = channelNameOnce.name;
                   await new voiceChannelData({
@@ -630,10 +641,22 @@ async function tagMeeting(client) {
                   const channelNameDaily = await client.channels.fetch(
                     dailyShift
                   );
-                  const originalNameDaily = channelNameDaily.name;
-                  await channelNameDaily.setName(
-                    `${channelNameDaily.name} (${item.task})`
-                  );
+                  let originalNameDaily = channelNameDaily.name;
+                  const searchTermDaily = '(';
+                  const indexOfFirstDaily =
+                    originalNameDaily.indexOf(searchTermDaily);
+                  if (indexOfFirstDaily > 0) {
+                    originalNameDaily = originalNameDaily.slice(
+                      0,
+                      indexOfFirstDaily - 1
+                    );
+                    await channelNameDaily.setName(
+                      `${originalNameDaily} (${item.task})`
+                    );
+                  } else
+                    await channelNameDaily.setName(
+                      `${channelNameDaily.name} (${item.task})`
+                    );
                   const newRoomDaily = channelNameDaily.name;
                   await new voiceChannelData({
                     id: channelNameDaily.id,
@@ -673,10 +696,22 @@ async function tagMeeting(client) {
                   const channelNameWeekly = await client.channels.fetch(
                     weeklyShift
                   );
-                  const originalNameWeekly = channelNameWeekly.name;
-                  await channelNameWeekly.setName(
-                    `${channelNameWeekly.name} (${item.task})`
-                  );
+                  let originalNameWeekly = channelNameWeekly.name;
+                  const searchTermWeekly = '(';
+                  const indexOfFirstWeekly =
+                    originalNameWeekly.indexOf(searchTermWeekly);
+                  if (indexOfFirstWeekly > 0) {
+                    originalNameWeekly = originalNameWeekly.slice(
+                      0,
+                      indexOfFirstWeekly - 1
+                    );
+                    await channelNameWeekly.setName(
+                      `${originalNameWeekly} (${item.task})`
+                    );
+                  } else
+                    await channelNameWeekly.setName(
+                      `${channelNameWeekly.name} (${item.task})`
+                    );
                   const newRoomWeekly = channelNameWeekly.name;
                   await new voiceChannelData({
                     id: channelNameWeekly.id,
@@ -718,10 +753,22 @@ async function tagMeeting(client) {
                   const channelNameRepeat = await client.channels.fetch(
                     repeatShift
                   );
-                  const originalNameRepeat = channelNameRepeat.name;
-                  await channelNameRepeat.setName(
-                    `${channelNameRepeat.name} (${item.task})`
-                  );
+                  let originalNameRepeat = channelNameRepeat.name;
+                  const searchTermRepeat = '(';
+                  const indexOfFirstRepeat =
+                    originalNameRepeat.indexOf(searchTermRepeat);
+                  if (indexOfFirstRepeat > 0) {
+                    originalNameRepeat = originalNameRepeat.slice(
+                      0,
+                      indexOfFirstRepeat - 1
+                    );
+                    await channelNameRepeat.setName(
+                      `${originalNameRepeat} (${item.task})`
+                    );
+                  } else
+                    await channelNameRepeat.setName(
+                      `${channelNameRepeat.name} (${item.task})`
+                    );
                   const newRoomRepeat = channelNameRepeat.name;
                   await new voiceChannelData({
                     id: channelNameRepeat.id,

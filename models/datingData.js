@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const datingdb = new mongoose.Schema({
+  channelid: { type: String, required: true },
   userid: { type: String, required: true },
   email: { type: String, required: true },
   sex: { type: Number },
