@@ -3,7 +3,7 @@ const questionData = require('../models/quizData');
 const userData = require('../models/userData');
 const userquizData = require('../models/userQuiz');
 
-async function randomQuiz(userInput, context, type) {
+async function randomQuiz(userInput, context, type, roleSelect) {
   // context is message or client
   // message if this is commands
   // client if this is scheduler
@@ -12,12 +12,16 @@ async function randomQuiz(userInput, context, type) {
   try {
     let roles;
     let roleRandom;
-    if (userInput.roles && userInput.roles.length > 0) {
-      roles = [...userInput.roles, 'policy', 'english'];
-      roleRandom =
-        roles[Math.floor(Math.random() * roles.length)].toLowerCase();
+    if (!roleSelect) {
+      if (userInput.roles && userInput.roles.length > 0) {
+        roles = [...userInput.roles, 'policy', 'english'];
+        roleRandom =
+          roles[Math.floor(Math.random() * roles.length)].toLowerCase();
+      } else {
+        roleRandom = 'policy';
+      }
     } else {
-      roleRandom = 'policy';
+      roleRandom = roleSelect;
     }
 
     const questionAnswered = await userquizData.find(
