@@ -1381,7 +1381,7 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '0 10,15 * * 1-5',
+      '0 9,11,14,16 * * 1-5',
       () => sendQuizEnglish(client),
       null,
       false,
