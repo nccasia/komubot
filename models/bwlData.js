@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const bwldb = new mongoose.Schema({
+const bwlDb = new mongoose.Schema({
   channelId: { type: String, required: true },
   messageId: { type: String, required: true },
   guildId: { type: String, required: false },
@@ -9,4 +9,4 @@ const bwldb = new mongoose.Schema({
   createdTimestamp: { type: mongoose.Decimal128, required: true },
 });
 
-module.exports = mongoose.model('komu_bwl', bwldb);
+module.exports = mongoose.model('komu_bwl', bwlDb);

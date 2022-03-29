@@ -23,6 +23,7 @@ const timeVoiceAloneData = require('../models/timeVoiceAloneData');
 const userQuizData = require('../models/userQuiz');
 const { updateRoleProject, updateRoleDiscord } = require('../util/roles');
 const datingData = require('../models/datingData');
+const remindData = require('../models/remindData');
 
 // Deepai
 const deepai = require('deepai');
@@ -1210,12 +1211,12 @@ async function dating(client) {
             const targetMan = await fetchVoiceNcc8.guild.members.fetch(
               idManPrivate[i]
             );
-            if (targetMan && targetMan.voice)
+            if (targetMan && targetMan.voice && targetMan.voice.channelId)
               targetMan.voice.setChannel(roomMapPrivate[0]);
             const targetWoman = await fetchVoiceNcc8.guild.members.fetch(
               idWomanPrivate[i]
             );
-            if (targetWoman && targetWoman.voice)
+            if (targetWoman && targetWoman.voice && targetWoman.voice.channelId)
               targetWoman.voice.setChannel(roomMapPrivate[0]);
           }
           roomMapPrivate.shift(roomMapPrivate[0]);
@@ -1252,32 +1253,74 @@ async function sendQuizEnglish(client) {
   }
 }
 
+async function sendMesageRemind(client) {
+  try {
+    const data = await remindData.find({ cancel: false });
+
+    const now = new Date();
+    now.setHours(now.getHours() + 7);
+    const hourDateNow = now.getHours();
+    const dateNow = now.toLocaleDateString('en-US');
+    const minuteDateNow = now.getMinutes();
+
+    data.map(async (item) => {
+      let checkFiveMinute;
+      let hourTimestamp;
+
+      const dateScheduler = new Date(+item.createdTimestamp);
+      const minuteDb = dateScheduler.getMinutes();
+
+      if (minuteDb >= 0 && minuteDb <= 4) {
+        checkFiveMinute = minuteDb + 60 - minuteDateNow;
+        const hourDb = dateScheduler;
+        setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+        hourTimestamp = new Date(setHourTimestamp).getHours();
+      } else {
+        checkFiveMinute = minuteDb - minuteDateNow;
+        hourTimestamp = dateScheduler.getHours();
+      }
+
+      const dateCreatedTimestamp = new Date(
+        +item.createdTimestamp.toString()
+      ).toLocaleDateString('en-US');
+
+      if (
+        hourDateNow === hourTimestamp &&
+        0 <= checkFiveMinute &&
+        checkFiveMinute <= 5 &&
+        dateCreatedTimestamp === dateNow
+      ) {
+        const fetchChannel = await client.channels.fetch(item.channelId);
+        fetchChannel.send(
+          `<@${item.mentionUserId}>, due today ${item.content} of <@${item.authorId}>`
+        );
+        await remindData.updateOne({ _id: item._id }, { cancel: true });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function cronJobOneMinute(client) {
+  sendMesageRemind(client);
+  kickMemberVoiceChannel(client);
+  updateReminderMeeting(client);
+  tagMeeting(client);
+}
+
 exports.scheduler = {
   run(client) {
     new cron.CronJob(
+      '*/1 * * * *',
+      () => cronJobOneMinute(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
       '0-5/1 17 * * 5',
       () => dating(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 * * * *',
-      () => kickMemberVoiceChannel(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 * * * *',
-      () => updateReminderMeeting(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 * * * *',
-      () => tagMeeting(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
@@ -1381,7 +1424,7 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '0 10,15 * * 1-5',
+      '0 9,11,14,16 * * 1-5',
       () => sendQuizEnglish(client),
       null,
       false,

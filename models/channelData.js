@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const channeldb = new mongoose.Schema({
+const channelDb = new mongoose.Schema({
   id: { type: String, required: true },
   name: { type: String, required: false },
   type: { type: String, required: true },
@@ -10,4 +10,4 @@ const channeldb = new mongoose.Schema({
   rateLimitPerUser: { type: Number, required: false },
 });
 
-module.exports = mongoose.model('komu_channel', channeldb);
+module.exports = mongoose.model('komu_channel', channelDb);

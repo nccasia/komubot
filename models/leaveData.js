@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const leavedb = new mongoose.Schema({
+const leaveDb = new mongoose.Schema({
   channelId: { type: String, required: true },
   userId: { type: String, required: true },
   reason: { type: String, required: true },
@@ -8,4 +8,4 @@ const leavedb = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('komu_leave', leavedb);
+module.exports = mongoose.model('komu_leave', leaveDb);

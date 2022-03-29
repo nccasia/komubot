@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const meetingdb = new mongoose.Schema({
+const meetingDb = new mongoose.Schema({
   channelId: { type: String, required: false },
   createdTimestamp: { type: mongoose.Decimal128, required: false },
   task: { type: String, required: false },
@@ -10,4 +10,4 @@ const meetingdb = new mongoose.Schema({
   reminder: { type: Boolean, default: false },
 });
 
-module.exports = mongoose.model('komu_meeting', meetingdb);
+module.exports = mongoose.model('komu_meeting', meetingDb);

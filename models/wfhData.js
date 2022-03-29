@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const wfhdb = new mongoose.Schema({
+const wfhDb = new mongoose.Schema({
   userid: { type: String, required: true },
   messageid: { type: String, required: false },
   wfhMsg: { type: String, required: true },
@@ -12,4 +12,4 @@ const wfhdb = new mongoose.Schema({
   type: { type: String, default: 'wfh' },
 });
 
-module.exports = mongoose.model('komu_wfh', wfhdb);
+module.exports = mongoose.model('komu_wfh', wfhDb);

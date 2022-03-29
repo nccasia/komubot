@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const tx8db = new mongoose.Schema({
+const tx8Db = new mongoose.Schema({
   messageId: { type: String, required: true },
   userId: { type: String, required: true },
   tx8number: { type: Number, required: true },
@@ -8,4 +8,4 @@ const tx8db = new mongoose.Schema({
   createdTimestamp: { type: mongoose.Decimal128, required: true },
 });
 
-module.exports = mongoose.model('komu_tx8', tx8db);
+module.exports = mongoose.model('komu_tx8', tx8Db);

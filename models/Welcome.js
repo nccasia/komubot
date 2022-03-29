@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const channeldb = new mongoose.Schema({
+const channelDb = new mongoose.Schema({
   serverID: { type: String, required: true },
   channelID: { type: String, required: true },
   image: { type: String, required: false },
@@ -11,4 +11,4 @@ const channeldb = new mongoose.Schema({
   color: { type: String, required: false },
 });
 
-module.exports = mongoose.model('welcome', channeldb);
+module.exports = mongoose.model('welcome', channelDb);
