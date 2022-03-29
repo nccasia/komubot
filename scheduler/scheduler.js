@@ -23,6 +23,7 @@ const timeVoiceAloneData = require('../models/timeVoiceAloneData');
 const userQuizData = require('../models/userQuiz');
 const { updateRoleProject, updateRoleDiscord } = require('../util/roles');
 const datingData = require('../models/datingData');
+const remindData = require('../models/remindData');
 
 // Deepai
 const deepai = require('deepai');
@@ -1252,8 +1253,64 @@ async function sendQuizEnglish(client) {
   }
 }
 
+async function sendMesageRemind(client) {
+  try {
+    const data = await remindData.find({ cancel: false });
+
+    const now = new Date();
+    now.setHours(now.getHours() + 7);
+    const hourDateNow = now.getHours();
+    const dateNow = now.toLocaleDateString('en-US');
+    const minuteDateNow = now.getMinutes();
+
+    data.map(async (item) => {
+      let checkFiveMinute;
+      let hourTimestamp;
+
+      const dateScheduler = new Date(+item.createdTimestamp);
+      const minuteDb = dateScheduler.getMinutes();
+
+      if (minuteDb >= 0 && minuteDb <= 4) {
+        checkFiveMinute = minuteDb + 60 - minuteDateNow;
+        const hourDb = dateScheduler;
+        setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+        hourTimestamp = new Date(setHourTimestamp).getHours();
+      } else {
+        checkFiveMinute = minuteDb - minuteDateNow;
+        hourTimestamp = dateScheduler.getHours();
+      }
+
+      const dateCreatedTimestamp = new Date(
+        +item.createdTimestamp.toString()
+      ).toLocaleDateString('en-US');
+
+      if (
+        hourDateNow === hourTimestamp &&
+        0 <= checkFiveMinute &&
+        checkFiveMinute <= 5 &&
+        dateCreatedTimestamp === dateNow
+      ) {
+        const fetchChannel = await client.channels.fetch(item.channelId);
+        fetchChannel.send(
+          `<@${item.mentionUserId}>, due today ${item.content} of <@${item.authorId}>`
+        );
+        await remindData.updateOne({ _id: item._id }, { cancel: true });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '*/1 * * * *',
+      () => sendMesageRemind(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     new cron.CronJob(
       '0-5/1 17 * * 5',
       () => dating(client),
