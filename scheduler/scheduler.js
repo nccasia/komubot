@@ -1302,11 +1302,18 @@ async function sendMesageRemind(client) {
   }
 }
 
+function cronJobOneMinute(client) {
+  sendMesageRemind(client);
+  kickMemberVoiceChannel(client);
+  updateReminderMeeting(client);
+  tagMeeting(client);
+}
+
 exports.scheduler = {
   run(client) {
     new cron.CronJob(
       '*/1 * * * *',
-      () => sendMesageRemind(client),
+      () => cronJobOneMinute(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
@@ -1314,27 +1321,6 @@ exports.scheduler = {
     new cron.CronJob(
       '0-5/1 17 * * 5',
       () => dating(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 * * * *',
-      () => kickMemberVoiceChannel(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 * * * *',
-      () => updateReminderMeeting(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 * * * *',
-      () => tagMeeting(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
