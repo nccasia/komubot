@@ -1211,12 +1211,12 @@ async function dating(client) {
             const targetMan = await fetchVoiceNcc8.guild.members.fetch(
               idManPrivate[i]
             );
-            if (targetMan.voice && targetMan.voice.channelId)
+            if (targetMan && targetMan.voice && targetMan.voice.channelId)
               targetMan.voice.setChannel(roomMapPrivate[0]);
             const targetWoman = await fetchVoiceNcc8.guild.members.fetch(
               idWomanPrivate[i]
             );
-            if (targetWoman.voice && targetWoman.voice.channelId)
+            if (targetWoman && targetWoman.voice && targetWoman.voice.channelId)
               targetWoman.voice.setChannel(roomMapPrivate[0]);
           }
           roomMapPrivate.shift(roomMapPrivate[0]);

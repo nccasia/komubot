@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const ticketdb = new mongoose.Schema({
+const ticketDb = new mongoose.Schema({
   title: { type: String, required: true },
   desc: { type: String, required: false },
   asignee: { type: String, required: true },
@@ -10,4 +10,4 @@ const ticketdb = new mongoose.Schema({
   note: { type: String, required: false },
 });
 
-module.exports = mongoose.model('komu_ticket', ticketdb);
+module.exports = mongoose.model('komu_ticket', ticketDb);

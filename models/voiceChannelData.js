@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const voicechanneldb = new mongoose.Schema({
+const voiceChannelDb = new mongoose.Schema({
   id: { type: String, required: true },
   originalName: { type: String, required: true },
   newRoomName: { type: String, required: true },
@@ -9,4 +9,4 @@ const voicechanneldb = new mongoose.Schema({
   createdTimestamp: { type: mongoose.Decimal128, required: false },
 });
 
-module.exports = mongoose.model('komu_voicechannels', voicechanneldb);
+module.exports = mongoose.model('komu_voicechannels', voiceChannelDb);

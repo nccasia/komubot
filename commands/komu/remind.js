@@ -1,6 +1,6 @@
 const remindData = require('../../models/remindData.js');
 
-const messHelp = '```' + '*remind @username dd/mm/yyyy 00:00 content' + '```';
+const messHelp = '```' + '*remind @username dd/MM/YYYY HH:mm content' + '```';
 
 const transArgs = (userArgs) => {
   if (userArgs.includes('<@!')) {

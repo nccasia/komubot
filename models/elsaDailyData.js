@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const elsaDailydb = new mongoose.Schema({
+const elsaDailyDb = new mongoose.Schema({
   userid: { type: String, required: true },
   email: { type: String, required: true },
   daily: { type: String, required: true },
@@ -9,4 +9,4 @@ const elsaDailydb = new mongoose.Schema({
   channelid: { type: String, required: true },
 });
 
-module.exports = mongoose.model('komu_elsaDaily', elsaDailydb);
+module.exports = mongoose.model('komu_elsaDaily', elsaDailyDb);

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const penatlydb = new mongoose.Schema({
+const penatlyDb = new mongoose.Schema({
   user_id: { type: String, require: true },
   username: { type: String, require: true },
   ammount: { type: Number, require: true },
@@ -11,4 +11,4 @@ const penatlydb = new mongoose.Schema({
   delete: { type: Boolean, require: false },
 });
 
-module.exports = mongoose.model('komu_penatly', penatlydb);
+module.exports = mongoose.model('komu_penatly', penatlyDb);

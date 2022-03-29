@@ -4,13 +4,13 @@ const messHelp =
   '```' +
   '*meeting now' +
   '\n' +
-  '*meeting task dd/mm/yyyy 00:00 repeat timerepeat' +
+  '*meeting task dd/MM/YYYY HH:mm repeat timerepeat' +
   '\n' +
-  '*meeting task dd/mm/yyyy 00:00 once' +
+  '*meeting task dd/MM/YYYY HH:mm once' +
   '\n' +
-  '*meeting task dd/mm/yyyy 00:00 daily' +
+  '*meeting task dd/MM/YYYY HH:mm daily' +
   '\n' +
-  '*meeting task dd/mm/yyyy 00:00 weekly' +
+  '*meeting task dd/MM/YYYY HH:mm weekly' +
   '```';
 
 module.exports = {

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const userdb = new mongoose.Schema({
+const userDb = new mongoose.Schema({
   id: { type: String, required: false },
   username: { type: String, required: false },
   discriminator: { type: String, required: false },
@@ -27,4 +27,4 @@ const userdb = new mongoose.Schema({
   botPing: { type: Boolean, default: false },
 });
 
-module.exports = mongoose.model('komu_user', userdb);
+module.exports = mongoose.model('komu_user', userDb);

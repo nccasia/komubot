@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const wikidb = new mongoose.Schema({
+const wikiDb = new mongoose.Schema({
   name: { type: String, required: true },
   value: { type: String, required: false },
   type: { type: String, required: true },
@@ -10,4 +10,4 @@ const wikidb = new mongoose.Schema({
   note: { type: String, required: false },
 });
 
-module.exports = mongoose.model('komu_wiki', wikidb);
+module.exports = mongoose.model('komu_wiki', wikiDb);

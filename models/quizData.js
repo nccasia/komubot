@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const questiondb = new mongoose.Schema({
+const questionDb = new mongoose.Schema({
   title: String,
   options: [String],
   correct: String,
@@ -11,4 +11,4 @@ const questiondb = new mongoose.Schema({
   topic: String,
 });
 
-module.exports = mongoose.model('komu_question', questiondb);
+module.exports = mongoose.model('komu_question', questionDb);
