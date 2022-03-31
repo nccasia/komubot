@@ -678,13 +678,12 @@ async function tagMeeting(client) {
               const dateTimeWeekly = new Date(
                 +item.createdTimestamp.toString()
               );
-              dateTimeWeekly.setDate(dateTimeWeekly.getDate() + 7);
-              const weeklyCreatedTimestamp = new Date(dateTimeWeekly).valueOf();
+              const dateWeekly = dateTimeWeekly.getDay();
               if (
                 hourDateNow === hourTimestamp &&
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
-                dateCreatedTimestamp === dateNow
+                dateWeekly === day
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -725,7 +724,7 @@ async function tagMeeting(client) {
                 } else weeklyFetchChannel.send(`@here voice channel full`);
                 await meetingData.updateOne(
                   { _id: item._id },
-                  { createdTimestamp: weeklyCreatedTimestamp, reminder: true }
+                  { reminder: true }
                 );
               }
               return;
