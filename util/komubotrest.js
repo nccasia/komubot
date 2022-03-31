@@ -410,17 +410,18 @@ const sendEmbedMessage = async (client, req, res) => {
         .setImage(image);
 
     const { title, description, image } = req.body;
-    let isSendChannel = true;
+    let isSendChannel = false;
     let isSendAllUser = false;
     let isSendUserAndChannel = false;
+    let isSendUser = false;
     if (!req.body.channelId && !req.body.userId) {
       isSendAllUser = true;
     } else if (req.body.channelId && req.body.userId) {
       isSendUserAndChannel = true;
     } else if (!req.body.channelId) {
-      isSendChannel = false;
+      isSendUser = true;
     } else if (!req.body.userId) {
-      isSendAllUser = true;
+      isSendChannel = true;
     }
     if (isSendUserAndChannel) {
       const channelId = req.body.channelId;
@@ -436,11 +437,13 @@ const sendEmbedMessage = async (client, req, res) => {
         { embeds: [embed(title, description, image)] },
         user.username
       );
+      res.send({ message: 'Send message to user and channel successfully!' });
     } else if (isSendChannel) {
       const channelId = req.body.channelId;
       await sendMessageToChannelById(client, channelId, {
         embeds: [embed(title, description, image)],
       });
+      res.send({ message: 'Send message to channel success!' });
     } else if (isSendAllUser) {
       const users = await userData.find({}).select('username -_id');
       await Promise.all(
@@ -452,7 +455,8 @@ const sendEmbedMessage = async (client, req, res) => {
           )
         )
       );
-    } else if (!isSendAllUser) {
+      res.send({ message: 'Send message to all user successfully!' });
+    } else if (isSendUser) {
       const userId = req.body.userId;
       const user = await userData
         .findOne({ id: userId })
@@ -462,6 +466,7 @@ const sendEmbedMessage = async (client, req, res) => {
         { embeds: [embed(title, description, image)] },
         user.username
       );
+      res.send({ message: 'Send message to user successfully!' });
     }
   } catch (error) {
     console.log(error);
