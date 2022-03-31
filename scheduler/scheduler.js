@@ -678,12 +678,18 @@ async function tagMeeting(client) {
               const dateTimeWeekly = new Date(
                 +item.createdTimestamp.toString()
               );
-              const dateWeekly = dateTimeWeekly.getDay();
+              now.setHours(0, 0, 0, 0);
+              newDateTimestamp.setHours(0, 0, 0, 0);
+              const diffTimeWeekly = Math.abs(now - dateTimeWeekly);
+              const diffDaysWeekly = Math.ceil(
+                diffTimeWeekly / (1000 * 60 * 60 * 24)
+              );
               if (
                 hourDateNow === hourTimestamp &&
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
-                dateWeekly === day
+                diffDaysWeekly % 7 === 0 &&
+                now - dateTimeWeekly > 0
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
                   item.channelId
