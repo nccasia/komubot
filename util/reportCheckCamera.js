@@ -1,6 +1,8 @@
 const checkCameraData = require('../models/checkCameraData');
 const userData = require('../models/userData');
 const getUserOffWork = require('../util/getUserOffWork');
+const { MessageEmbed } = require('discord.js');
+
 function withoutFirstTime(dateTime) {
   const date = new Date(dateTime);
   date.setHours(0, 0, 0, 0);
@@ -62,15 +64,15 @@ async function reportCheckCamera(message) {
   } else {
     for (let i = 0; i <= Math.ceil(checkCameraFullday.length / 50); i += 1) {
       if (checkCameraFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
-      mess =
-        '```' +
-        'Những người không bật camera trong ngày hôm nay' +
-        '```' +
-        checkCameraFullday
-          .slice(i * 50, (i + 1) * 50)
-          .map((checkCamera) => `<@${checkCamera.id}>`)
-          .join('\n');
-      await message.reply(mess).catch(console.error);
+      mess = checkCameraFullday
+        .slice(i * 50, (i + 1) * 50)
+        .map((checkCamera) => `<@${checkCamera.id}>`)
+        .join('\n');
+      const Embed = new MessageEmbed()
+        .setTitle('Những người không bật camera trong ngày hôm nay')
+        .setColor('RED')
+        .setDescription(`${mess}`);
+      await message.reply({ embeds: [Embed] }).catch(console.error);
     }
   }
 }

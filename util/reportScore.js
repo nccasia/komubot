@@ -1,4 +1,5 @@
 const userData = require('../models/userData');
+const { MessageEmbed } = require('discord.js');
 
 async function reportScore(message) {
   try {
@@ -38,9 +39,11 @@ async function reportScore(message) {
         .join('\n');
     }
 
-    return message
-      .reply('```' + 'Top 10 quiz points :' + '\n' + '```' + '\n' + mess)
-      .catch(console.error);
+    const Embed = new MessageEmbed()
+      .setTitle('Top 10 quiz points')
+      .setColor('RED')
+      .setDescription(`${mess}`);
+    return message.reply({ embeds: [Embed] }).catch(console.error);
   } catch (error) {
     console.log(error);
   }

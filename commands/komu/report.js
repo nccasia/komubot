@@ -5,6 +5,7 @@ const reportScore = require('../../util/reportScore');
 const { reportMention } = require('../../util/reportMention');
 const { reportCheckCamera } = require('../../util/reportCheckCamera');
 const reportWomenDay = require('../../util/reportWomenDay');
+const reportOrder = require('../../util/reportOrder');
 function getTimeWeekMondayToFriday(dayNow) {
   const curr = new Date();
   // current date of week
@@ -52,6 +53,8 @@ module.exports = {
         await reportScore(message, args, client, guildDB);
       } else if (args[0] === 'womenday') {
         await reportWomenDay(message);
+      } else if (args[0] === 'order') {
+        await reportOrder(message);
       } else if (args[0] === 'help') {
         return message
           .reply(

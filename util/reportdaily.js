@@ -26,27 +26,28 @@ async function reportDaily(date, message, args, client, guildDB) {
     } else {
       for (let i = 0; i <= Math.ceil(userNotDaily.length / 50); i += 1) {
         if (userNotDaily.slice(i * 50, (i + 1) * 50).length === 0) break;
-        mess =
-          '```' +
-          dateString +
-          '\n' +
-          dailyString +
-          '\n' +
-          '```' +
-          userNotDaily
-            .slice(i * 50, (i + 1) * 50)
-            .map((user) => {
-              if (user.id) {
-                return `<@${user.id}> (${findCountNotDaily(
-                  notDaily,
-                  user.username
-                )})`;
-              } else {
-                return `${user.email} (${user.countnotdaily})`;
-              }
-            })
-            .join('\n');
-        await message.reply(mess).catch(console.error);
+        mess = userNotDaily
+          .slice(i * 50, (i + 1) * 50)
+          .map((user) => {
+            if (user.id) {
+              return `<@${user.id}> (${findCountNotDaily(
+                notDaily,
+                user.username
+              )})`;
+            } else {
+              return `${user.email} (${user.countnotdaily})`;
+            }
+          })
+          .join('\n');
+        const Embed = new MessageEmbed()
+          .setTitle(
+            `${dateString} +
+            '\n' +
+            ${dailyString}`
+          )
+          .setColor('RED')
+          .setDescription(`${mess}`);
+        await message.reply({ embeds: [Embed] }).catch(console.error);
       }
     }
   } catch (error) {

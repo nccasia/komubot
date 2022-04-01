@@ -678,13 +678,18 @@ async function tagMeeting(client) {
               const dateTimeWeekly = new Date(
                 +item.createdTimestamp.toString()
               );
-              dateTimeWeekly.setDate(dateTimeWeekly.getDate() + 7);
-              const weeklyCreatedTimestamp = new Date(dateTimeWeekly).valueOf();
+              now.setHours(0, 0, 0, 0);
+              newDateTimestamp.setHours(0, 0, 0, 0);
+              const diffTimeWeekly = Math.abs(now - dateTimeWeekly);
+              const diffDaysWeekly = Math.ceil(
+                diffTimeWeekly / (1000 * 60 * 60 * 24)
+              );
               if (
                 hourDateNow === hourTimestamp &&
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
-                dateCreatedTimestamp === dateNow
+                diffDaysWeekly % 7 === 0 &&
+                now - dateTimeWeekly > 0
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -725,23 +730,24 @@ async function tagMeeting(client) {
                 } else weeklyFetchChannel.send(`@here voice channel full`);
                 await meetingData.updateOne(
                   { _id: item._id },
-                  { createdTimestamp: weeklyCreatedTimestamp, reminder: true }
+                  { reminder: true }
                 );
               }
               return;
             case 'repeat':
-              const dateTimeRepeat = new Date(
+              const newDateTimestamp = new Date(
                 +item.createdTimestamp.toString()
               );
-              dateTimeRepeat.setDate(
-                dateTimeRepeat.getDate() + item.repeatTime
-              );
-              const repeatCreatedTimestamp = new Date(dateTimeRepeat).valueOf();
+              now.setHours(0, 0, 0, 0);
+              newDateTimestamp.setHours(0, 0, 0, 0);
+              const diffTime = Math.abs(now - newDateTimestamp);
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
               if (
                 hourDateNow === hourTimestamp &&
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
-                dateCreatedTimestamp === dateNow
+                diffDays % item.repeatTime === 0 &&
+                now - newDateTimestamp > 0
               ) {
                 const repeatFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -782,7 +788,7 @@ async function tagMeeting(client) {
                 } else repeatFetchChannel.send(`@here voice channel full`);
                 await meetingData.updateOne(
                   { _id: item._id },
-                  { createdTimestamp: repeatCreatedTimestamp, reminder: true }
+                  { reminder: true }
                 );
               }
               return;
