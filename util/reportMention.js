@@ -1,5 +1,6 @@
 const axios = require('axios');
 const wfhData = require('../models/wfhData');
+const { MessageEmbed } = require('discord.js');
 
 function withoutTime(dateTime) {
   const date = new Date(dateTime);
@@ -57,15 +58,15 @@ async function reportMention(message) {
   } else {
     for (let i = 0; i <= Math.ceil(mentionFullday.length / 50); i += 1) {
       if (mentionFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
-      mess =
-        '```' +
-        'Những người không trả lời mention trong ngày hôm nay' +
-        '```' +
-        mentionFullday
-          .slice(i * 50, (i + 1) * 50)
-          .map((mention) => `<@${mention._id}> (${mention.total})`)
-          .join('\n');
-      await message.reply(mess).catch(console.error);
+      mess = mentionFullday
+        .slice(i * 50, (i + 1) * 50)
+        .map((mention) => `<@${mention._id}> (${mention.total})`)
+        .join('\n');
+      const Embed = new MessageEmbed()
+        .setTitle('Những người không trả lời mention trong ngày hôm nay')
+        .setColor('RED')
+        .setDescription(`${mess}`);
+      await message.reply({ embeds: [Embed] }).catch(console.error);
     }
   }
 }

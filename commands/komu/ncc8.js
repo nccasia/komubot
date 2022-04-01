@@ -1,5 +1,6 @@
 const audioPlayer = require('../../util/audioPlayer');
 const uploadFileData = require('../../models/uploadFileData');
+const { MessageEmbed } = require('discord.js');
 
 const checkNumber = (string) =>
   !isNaN(parseFloat(string)) && !isNaN(string - 0) && parseInt(string);
@@ -20,16 +21,16 @@ module.exports = {
         } else {
           for (let i = 0; i <= Math.ceil(dataMp3.length / 50); i += 1) {
             if (dataMp3.slice(i * 50, (i + 1) * 50).length === 0) break;
-            mess =
-              '```' +
-              `Danh sách NCC8` +
-              '```' +
-              dataMp3
-                .slice(i * 50, (i + 1) * 50)
-                .filter((item) => item.episode)
-                .map((list) => `NCC8 số ${list.episode}`)
-                .join('\n');
-            await message.reply(mess).catch(console.error);
+            mess = dataMp3
+              .slice(i * 50, (i + 1) * 50)
+              .filter((item) => item.episode)
+              .map((list) => `NCC8 số ${list.episode}`)
+              .join('\n');
+            const Embed = new MessageEmbed()
+              .setTitle('Danh sách NCC8')
+              .setColor('RED')
+              .setDescription(`${mess}`);
+            await message.reply({ embeds: [Embed] }).catch(console.error);
           }
         }
       } else if (args[0] === 'play') {

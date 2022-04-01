@@ -1,4 +1,5 @@
 const orderData = require('../models/orderData');
+const { MessageEmbed } = require('discord.js');
 
 function withoutFirstTime(dateTime) {
   const date = new Date(dateTime);
@@ -60,20 +61,22 @@ async function reportOrder(message) {
     if (!listOrder) {
       return;
     } else if (Array.isArray(listOrder) && listOrder.length === 0) {
-      mess = '```' + 'Không có ai oder' + '```';
+      mess = '```' + 'Không có ai order' + '```';
       return message.reply(mess).catch(console.error);
     } else {
       for (let i = 0; i <= Math.ceil(listOrder.length / 50); i += 1) {
         if (listOrder.slice(i * 50, (i + 1) * 50).length === 0) break;
-        mess =
-          '```' +
-          `Danh sách oder ngày hôm nay tổng là ${listOrder.length} người` +
-          '```' +
-          listOrder
-            .slice(i * 50, (i + 1) * 50)
-            .map((list) => `<@${list.userId}> order ${list.menu}`)
-            .join('\n');
-        await message.reply(mess).catch(console.error);
+        mess = listOrder
+          .slice(i * 50, (i + 1) * 50)
+          .map((list) => `<@${list.userId}> order ${list.menu}`)
+          .join('\n');
+        const Embed = new MessageEmbed()
+          .setTitle(
+            `Danh sách oder ngày hôm nay tổng là ${listOrder.length} người`
+          )
+          .setColor('RED')
+          .setDescription(`${mess}`);
+        await message.reply({ embeds: [Embed] }).catch(console.error);
       }
     }
   } catch (error) {

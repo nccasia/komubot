@@ -1,5 +1,6 @@
 const axios = require('axios');
 const wfhData = require('../models/wfhData');
+const { MessageEmbed } = require('discord.js');
 
 function withoutTime(dateTime) {
   const date = new Date(dateTime);
@@ -74,15 +75,15 @@ async function reportWfh(message, args, client) {
   } else {
     for (let i = 0; i <= Math.ceil(wfhFullday.length / 50); i += 1) {
       if (wfhFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
-      mess =
-        '```' +
-        'Những người bị phạt vì không trả lời wfh trong ngày hôm nay' +
-        '```' +
-        wfhFullday
-          .slice(i * 50, (i + 1) * 50)
-          .map((wfh) => `<@${wfh._id}> - (${wfh.total})`)
-          .join('\n');
-      return message.reply(mess).catch(console.error);
+      mess = wfhFullday
+        .slice(i * 50, (i + 1) * 50)
+        .map((wfh) => `<@${wfh._id}> - (${wfh.total})`)
+        .join('\n');
+      const Embed = new MessageEmbed()
+        .setTitle('Những người bị phạt vì không trả lời wfh trong ngày hôm nay')
+        .setColor('RED')
+        .setDescription(`${mess}`);
+      return message.reply({ embeds: [Embed] }).catch(console.error);
     }
   }
 }
@@ -121,15 +122,15 @@ async function reportCompalinWfh(message, args, client) {
   } else {
     for (let i = 0; i <= Math.ceil(wfhFullday.length / 50); i += 1) {
       if (wfhFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
-      mess =
-        '```' +
-        'Những người được approved trong ngày hôm nay' +
-        '```' +
-        wfhFullday
-          .slice(i * 50, (i + 1) * 50)
-          .map((wfh) => `<@${wfh.userid}> `)
-          .join('\n');
-      return message.reply(mess).catch(console.error);
+      mess = wfhFullday
+        .slice(i * 50, (i + 1) * 50)
+        .map((wfh) => `<@${wfh.userid}> `)
+        .join('\n');
+      const Embed = new MessageEmbed()
+        .setTitle('Những người được approved trong ngày hôm nay')
+        .setColor('RED')
+        .setDescription(`${mess}`);
+      return message.reply({ embeds: [Embed] }).catch(console.error);
     }
   }
 }

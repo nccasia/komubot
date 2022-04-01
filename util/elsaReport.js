@@ -41,15 +41,15 @@ async function elsaReport(message) {
   } else {
     for (let i = 0; i <= Math.ceil(report.length / 50); i += 1) {
       if (report.slice(i * 50, (i + 1) * 50).length === 0) break;
-      mess =
-        '```' +
-        "Those who haven't submitted their homework today" +
-        '```' +
-        report
-          .slice(i * 50, (i + 1) * 50)
-          .map((elsa) => `<@${elsa.userid}> `)
-          .join('\n');
-      return message.channel.send(mess).catch(console.error);
+      mess = report
+        .slice(i * 50, (i + 1) * 50)
+        .map((elsa) => `<@${elsa.userid}> `)
+        .join('\n');
+      const Embed = new MessageEmbed()
+        .setTitle(`Those who haven't submitted their homework today`)
+        .setColor('RED')
+        .setDescription(`${mess}`);
+      return message.reply({ embeds: [Embed] }).catch(console.error);
     }
   }
 }

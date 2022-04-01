@@ -2,7 +2,7 @@ const axios = require('axios');
 const orderData = require('../../models/orderData');
 
 module.exports = {
-  name: '1',
+  name: 'order',
   description: 'order',
   cat: 'komu',
   async execute(message, args) {
