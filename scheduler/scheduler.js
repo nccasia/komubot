@@ -679,7 +679,7 @@ async function tagMeeting(client) {
                 +item.createdTimestamp.toString()
               );
               now.setHours(0, 0, 0, 0);
-              newDateTimestamp.setHours(0, 0, 0, 0);
+              dateTimeWeekly.setHours(0, 0, 0, 0);
               const diffTimeWeekly = Math.abs(now - dateTimeWeekly);
               const diffDaysWeekly = Math.ceil(
                 diffTimeWeekly / (1000 * 60 * 60 * 24)

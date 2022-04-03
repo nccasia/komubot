@@ -4,10 +4,11 @@ const { MessageEmbed } = require('discord.js');
 const transArgs = (userArgs) => {
   if (userArgs.includes('<@!')) {
     return {
-      id: userArgs.slice(3, userArgs.length - 1),
+      userId: userArgs.slice(3, userArgs.length - 1),
+      year: '2022',
     };
   } else {
-    return { username: userArgs };
+    return { email: userArgs, year: '2022' };
   }
 };
 
@@ -18,11 +19,8 @@ module.exports = {
   async execute(message, args) {
     try {
       if (args[0]) {
-        const userArgs = transArgs(args[0]);
-        const userMention = await companyTripData.find({
-          userId: userArgs.id,
-          year: '2022',
-        });
+        const filter = transArgs(args[0]);
+        const userMention = await companyTripData.find(filter);
 
         if (userMention.length === 0) {
           message.reply({
