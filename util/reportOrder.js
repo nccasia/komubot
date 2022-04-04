@@ -72,7 +72,7 @@ async function reportOrder(message) {
           .join('\n');
         const Embed = new MessageEmbed()
           .setTitle(
-            `Danh sách oder ngày hôm nay tổng là ${listOrder.length} người`
+            `Danh sách order ngày hôm nay tổng là ${listOrder.length} người`
           )
           .setColor('RED')
           .setDescription(`${mess}`);
