@@ -26,10 +26,10 @@ async function sendQuizToSingleUser(
 
     const q = await randomQuiz(userInput, client, 'scheduler', roleSelect);
     if (!q) return;
-    const btn = new MessageEmbed()
-      .setColor('#e11919')
-      .setTitle('Complain')
-      .setURL(`http://quiz.nccsoft.vn/question/update/${q._id}`);
+    // const btn = new MessageEmbed()
+    //   .setColor('#e11919')
+    //   .setTitle('Complain')
+    //   .setURL(`http://quiz.nccsoft.vn/question/update/${q._id}`);
 
     const Embed = embedQuestion(q);
     const LIMIT = 5;
@@ -50,7 +50,7 @@ async function sendQuizToSingleUser(
       }
       await sendMessageKomuToUser(
         client,
-        { embeds: [Embed, btn], components: [row] },
+        { embeds: [Embed], components: [row] },
         username,
         botPing
       );
@@ -85,7 +85,7 @@ async function sendQuizToSingleUser(
       }
       await sendMessageKomuToUser(
         client,
-        { embeds: [Embed, btn], components: [row1, row2] },
+        { embeds: [Embed], components: [row1, row2] },
         username,
         botPing
       );
