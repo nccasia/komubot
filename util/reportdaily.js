@@ -42,8 +42,7 @@ async function reportDaily(date, message, args, client, guildDB) {
           .join('\n');
         const Embed = new MessageEmbed()
           .setTitle(
-            `${dateString} +
-            '\n' +
+            `${dateString} 
             ${dailyString}`
           )
           .setColor('RED')
