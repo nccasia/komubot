@@ -1,4 +1,5 @@
 const getUserNotDaily = require('../util/getUserNotDaily');
+const { MessageEmbed } = require('discord.js');
 
 function findCountNotDaily(arr, email) {
   return arr.filter((item) => item.email === email)[0].countnotdaily;
