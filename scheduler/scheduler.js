@@ -689,7 +689,7 @@ async function tagMeeting(client) {
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
                 diffDaysWeekly % 7 === 0 &&
-                now - dateTimeWeekly > 0
+                now - dateTimeWeekly > -5
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -747,7 +747,7 @@ async function tagMeeting(client) {
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
                 diffDays % item.repeatTime === 0 &&
-                now - newDateTimestamp > 0
+                now - newDateTimestamp > -5
               ) {
                 const repeatFetchChannel = await client.channels.fetch(
                   item.channelId
