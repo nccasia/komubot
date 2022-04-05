@@ -57,7 +57,7 @@ module.exports = {
             `Incorrect!!!, The correct answer is ${correct}`,
             'RED'
           );
-          const btn = new MessageEmbed()
+          const btnInCorrect = new MessageEmbed()
             .setColor('#e11919')
             .setTitle('Complain')
             .setURL(`http://quiz.nccsoft.vn/question/update/${id}`);
