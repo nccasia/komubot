@@ -515,12 +515,13 @@ async function tagMeeting(client) {
 
   const voiceChannel = getAllVoice.map((item) => item.id);
 
-  const now = new Date();
-  now.setHours(now.getHours() + 7);
-  let day = now.getDay();
-  const hourDateNow = now.getHours();
-  const dateNow = now.toLocaleDateString('en-US');
-  const minuteDateNow = now.getMinutes();
+  const dateTimeNow = new Date();
+  dateTimeNow.setHours(dateTimeNow.getHours() + 7);
+  let day = dateTimeNow.getDay();
+  const hourDateNow = dateTimeNow.getHours();
+  const dateNow = dateTimeNow.toLocaleDateString('en-US');
+  const minuteDateNow = dateTimeNow.getMinutes();
+  dateTimeNow.setHours(0, 0, 0, 0);
 
   let countVoice = 0;
   let roomMap = [];
@@ -572,6 +573,11 @@ async function tagMeeting(client) {
           const fetchChannelFull = await client.channels.fetch(item.channelId);
           fetchChannelFull.send(`@here voice channel full`);
         } else {
+          const newDateTimestamp = new Date(+item.createdTimestamp.toString());
+
+          newDateTimestamp.setHours(0, 0, 0, 0);
+          const diffTime = Math.abs(dateTimeNow - newDateTimestamp);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           switch (item.repeat) {
             case 'once':
               if (
@@ -675,21 +681,12 @@ async function tagMeeting(client) {
               }
               return;
             case 'weekly':
-              const dateTimeWeekly = new Date(
-                +item.createdTimestamp.toString()
-              );
-              now.setHours(0, 0, 0, 0);
-              dateTimeWeekly.setHours(0, 0, 0, 0);
-              const diffTimeWeekly = Math.abs(now - dateTimeWeekly);
-              const diffDaysWeekly = Math.ceil(
-                diffTimeWeekly / (1000 * 60 * 60 * 24)
-              );
               if (
                 hourDateNow === hourTimestamp &&
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
-                diffDaysWeekly % 7 === 0 &&
-                now - dateTimeWeekly >= 0
+                diffDays % 7 === 0 &&
+                dateTimeNow - newDateTimestamp >= 0
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -735,19 +732,12 @@ async function tagMeeting(client) {
               }
               return;
             case 'repeat':
-              const newDateTimestamp = new Date(
-                +item.createdTimestamp.toString()
-              );
-              now.setHours(0, 0, 0, 0);
-              newDateTimestamp.setHours(0, 0, 0, 0);
-              const diffTime = Math.abs(now - newDateTimestamp);
-              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
               if (
                 hourDateNow === hourTimestamp &&
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
                 diffDays % item.repeatTime === 0 &&
-                now - newDateTimestamp >= 0
+                dateTimeNow - newDateTimestamp >= 0
               ) {
                 const repeatFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -806,10 +796,10 @@ async function updateReminderMeeting(client) {
     reminder: true,
   });
 
-  const now = new Date();
-  now.setHours(now.getHours() + 7);
-  const hourDateNow = now.getHours();
-  const minuteDateNow = now.getMinutes();
+  const dateTimeNow = new Date();
+  dateTimeNow.setHours(dateTimeNow.getHours() + 7);
+  const hourDateNow = dateTimeNow.getHours();
+  const minuteDateNow = dateTimeNow.getMinutes();
 
   const timeCheck = repeatMeet.map(async (item) => {
     let checkFiveMinute;
