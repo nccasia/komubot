@@ -689,7 +689,7 @@ async function tagMeeting(client) {
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
                 diffDaysWeekly % 7 === 0 &&
-                now - dateTimeWeekly > 0
+                now - dateTimeWeekly >= 0
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -747,7 +747,7 @@ async function tagMeeting(client) {
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
                 diffDays % item.repeatTime === 0 &&
-                now - newDateTimestamp > 0
+                now - newDateTimestamp >= 0
               ) {
                 const repeatFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -1168,7 +1168,7 @@ async function dating(client) {
     });
   }
 
-  if (minute > 0 && minute < 6) {
+  if (minute > 0 && minute < 15) {
     let idManPrivate = [];
     let idWomanPrivate = [];
     let idVoice = [];
@@ -1199,17 +1199,11 @@ async function dating(client) {
     );
     const voiceChannelPrivate = getAllVoicePrivate.map((item) => item.id);
     let roomMapPrivate = [];
-    let countVoicePrivate = 0;
 
     voiceChannelPrivate.map(async (voice, index) => {
       const userDiscordPrivate = await client.channels.fetch(voice);
 
-      if (userDiscordPrivate.members.size > 0) {
-        countVoicePrivate++;
-      }
-      if (userDiscordPrivate.members.size === 0) {
-        roomMapPrivate.push(userDiscordPrivate.id);
-      }
+      roomMapPrivate.push(userDiscordPrivate.id);
       if (index === voiceChannelPrivate.length - 1) {
         for (i = 0; i < idWomanPrivate.length; i++) {
           const fetchVoiceNcc8 = await client.channels.fetch(idVoice[i]);
@@ -1217,15 +1211,24 @@ async function dating(client) {
             const targetMan = await fetchVoiceNcc8.guild.members.fetch(
               idManPrivate[i]
             );
-            if (targetMan && targetMan.voice && targetMan.voice.channelId)
-              targetMan.voice.setChannel(roomMapPrivate[0]);
+            if (
+              targetMan &&
+              targetMan.voice &&
+              targetWoman.voice.channelId &&
+              targetMan.voice.channelId !== roomMapPrivate[i]
+            )
+              targetMan.voice.setChannel(roomMapPrivate[i]);
             const targetWoman = await fetchVoiceNcc8.guild.members.fetch(
               idWomanPrivate[i]
             );
-            if (targetWoman && targetWoman.voice && targetWoman.voice.channelId)
-              targetWoman.voice.setChannel(roomMapPrivate[0]);
+            if (
+              targetWoman &&
+              targetWoman.voice &&
+              targetWoman.voice.channelId &&
+              targetWoman.voice.channelId !== roomMapPrivate[i]
+            )
+              targetWoman.voice.setChannel(roomMapPrivate[i]);
           }
-          roomMapPrivate.shift(roomMapPrivate[0]);
         }
       }
     });
@@ -1325,7 +1328,7 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '0-5/1 17 * * 5',
+      '0-15/1 17 * * 5',
       () => dating(client),
       null,
       false,
