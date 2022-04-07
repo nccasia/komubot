@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const { startOfWeek, format } = require('date-fns');
 const path = require('path');
 const fs = require('fs');
+const { MessageEmbed, MessageAttachment } = require('discord.js');
 
 function delay(time) {
   return new Promise(function (resolve) {
@@ -68,8 +69,39 @@ async function getKomuWeeklyReport(options) {
 }
 
 async function handleKomuWeeklyReport(message, args, client, guildDB) {
-  // TODO: implement report handle
-  message.reply('To be implemented.');
+  if (!args[1]) {
+    const dateObject = startOfWeek(new Date());
+    const reportDateStr = format(dateObject, 'yyyy-mm-dd');
+
+    const attachment = new MessageAttachment(
+      `../komubot/assets/odin-reports/komu-weekly-${reportDateStr}.png`
+    );
+    const embed = new MessageEmbed().setTitle('odin-reports weekly');
+    await message.channel.send({ files: [attachment], embed: embed });
+  } else {
+    if (
+      !/^(((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((19|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((19|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((19|[2-9]\d)\d{2}))|(29\/02\/((1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|(([1][26]|[2468][048]|[3579][26])00))))$/.test(
+        args[1]
+      )
+    ) {
+      return message.channel
+        .send('```' + '*report help' + '```')
+        .catch(console.error);
+    }
+    const day = args[1].slice(0, 2);
+    const month = args[1].slice(3, 5);
+    const year = args[1].slice(6);
+    const fomat = `${month}/${day}/${year}`;
+    const dateTime = new Date(fomat);
+    const dateTimeObject = startOfWeek(dateTime);
+    const reportDateTimeStr = format(dateTimeObject, 'yyyy-mm-dd');
+
+    const attachment = new MessageAttachment(
+      `../komubot/assets/odin-reports/komu-weekly-${reportDateTimeStr}.png`
+    );
+    const embed = new MessageEmbed().setTitle('odin-reports weekly');
+    await message.channel.send({ files: [attachment], embed: embed });
+  }
 }
 
 module.exports = {
