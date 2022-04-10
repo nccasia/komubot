@@ -7,6 +7,8 @@ const { reportCheckCamera } = require('../../util/reportCheckCamera');
 const reportWomenDay = require('../../util/reportWomenDay');
 const reportOrder = require('../../util/reportOrder');
 const { handleKomuWeeklyReport } = require('../../util/odin-report');
+const { reportTracker } = require('../../util/reportTracker');
+
 function getTimeWeekMondayToFriday(dayNow) {
   const curr = new Date();
   // current date of week
@@ -58,6 +60,8 @@ module.exports = {
         await reportOrder(message);
       } else if (args[0] === 'komuweekly') {
         await handleKomuWeeklyReport(message, args, client, guildDB);
+      } else if (args[0] === 'tracker') {
+        await reportTracker(message, args, client);
       } else if (args[0] === 'help') {
         return message
           .reply(
@@ -90,6 +94,10 @@ module.exports = {
                 {
                   name: 'komuweekly',
                   des: 'show Komu weekly report',
+                },
+                {
+                  name: 'tracker',
+                  des: 'show report tracker today',
                 },
               ]
                 .map((item) => `- ${item.name} : ${item.des}`)
