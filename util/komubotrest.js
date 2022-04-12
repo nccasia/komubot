@@ -74,12 +74,20 @@ const sendMessageKomuToUser = async (
     return user;
   } catch (error) {
     console.log('error', error);
-    const message = `KOMU không gửi được tin nhắn cho <@${userdb.id}>. Hãy ping <@${client.config.komubotrest.admin_user_id}> để được hỗ trợ nhé!!!`;
+    const userDb = await userData
+      .findOne({
+        $or: [
+          { email: username, deactive: { $ne: true } },
+          { username: username, deactive: { $ne: true } },
+        ],
+      })
+      .catch(console.error);
+    const message = `KOMU không gửi được tin nhắn cho <@${userDb.id}>. Hãy ping <@${client.config.komubotrest.admin_user_id}> để được hỗ trợ nhé!!!`;
     await client.channels.cache
       .get(client.config.komubotrest.machleo_channel_id)
       .send(message)
       .catch(console.error);
-    const messageItAdmin = `KOMU không gửi được tin nhắn cho <@${userdb.id}>. <@${client.config.komubotrest.admin_user_id}> hỗ trợ nhé!!!`;
+    const messageItAdmin = `KOMU không gửi được tin nhắn cho <@${userDb.id}>. <@${client.config.komubotrest.admin_user_id}> hỗ trợ nhé!!!`;
     await client.channels.cache
       .get(client.config.komubotrest.itadmin_channel_id)
       .send(messageItAdmin)
@@ -373,6 +381,13 @@ const sendMessageToNhaCuaChung = async (client, msg) => {
     .catch(console.error);
   return null;
 };
+const sendErrorToMachLeo = async (client, msg) => {
+  await client.channels.cache
+    .get(client.config.komubotrest.machleo_channel_id)
+    .send(msg)
+    .catch(console.error);
+  return null;
+};
 const sendMessageToChannelById = async (client, channelId, msg) => {
   try {
     const channel = await client.channels.fetch(channelId);
@@ -573,6 +588,7 @@ const init = async (client) => {
 module.exports = {
   init,
   sendMessageToNhaCuaChung,
+  sendErrorToMachLeo,
   sendMessageKomuToUser,
   getWFHWarninghMessage,
 };

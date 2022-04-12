@@ -8,6 +8,7 @@ const reportWomenDay = require('../../util/reportWomenDay');
 const reportOrder = require('../../util/reportOrder');
 const { handleKomuWeeklyReport } = require('../../util/odin-report');
 const { reportTracker } = require('../../util/reportTracker');
+const { reportHoliday } = require('../../util/reportHoliday');
 
 function getTimeWeekMondayToFriday(dayNow) {
   const curr = new Date();
@@ -62,6 +63,8 @@ module.exports = {
         await handleKomuWeeklyReport(message, args, client, guildDB);
       } else if (args[0] === 'tracker') {
         await reportTracker(message, args, client);
+      } else if (args[0] === 'holiday') {
+        await reportHoliday(message, args, client);
       } else if (args[0] === 'help') {
         return message
           .reply(
@@ -98,6 +101,10 @@ module.exports = {
                 {
                   name: 'tracker',
                   des: 'show report tracker today',
+                },
+                {
+                  name: 'holiday',
+                  des: 'show report holiday',
                 },
               ]
                 .map((item) => `- ${item.name} : ${item.des}`)

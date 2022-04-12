@@ -2,16 +2,6 @@ const remindData = require('../../models/remindData.js');
 
 const messHelp = '```' + '*remind @username dd/MM/YYYY HH:mm content' + '```';
 
-const transArgs = (userArgs) => {
-  if (userArgs.includes('<@!')) {
-    return {
-      id: userArgs.slice(3, userArgs.length - 1),
-    };
-  } else {
-    return { username: userArgs };
-  }
-};
-
 module.exports = {
   name: 'remind',
   description: 'Remind',
@@ -22,7 +12,7 @@ module.exports = {
         return message.channel.send(messHelp);
       }
 
-      const user = transArgs(args[0]);
+      const checkMention = message.mentions.members.first();
       const author = message.author.id;
       const channel = message.channelId;
       const datetime = args.slice(1, 3).join(' ');
@@ -50,7 +40,7 @@ module.exports = {
 
       await new remindData({
         channelId: channel,
-        mentionUserId: user.id,
+        mentionUserId: checkMention.user.id,
         authorId: author,
         content: messageRemind,
         cancel: false,
