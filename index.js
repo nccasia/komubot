@@ -23,7 +23,10 @@ const fs = require('fs'),
   util = require('util'),
   { Player } = require('discord-player'),
   readdir = util.promisify(fs.readdir),
-  mongoose = require('mongoose');
+  mongoose = require('mongoose'),
+  env = require('./env');
+
+env.config();
 client.config = require('./config.js');
 client.footer = client.config.footer;
 client.owners = [''];
