@@ -50,7 +50,9 @@ module.exports = {
             .setColor('#e11919')
             .setTitle('Complain')
             .setURL(`http://quiz.nccsoft.vn/question/update/${id}`);
-          await interaction.reply({ embeds: [EmbedCorrect, btnCorrect] });
+          await interaction
+            .reply({ embeds: [EmbedCorrect, btnCorrect] })
+            .catch((err) => console.log(err));
         } else {
           await saveQuestionInCorrect(userid, id, key);
           const EmbedInCorrect = newEmbed(
@@ -62,7 +64,9 @@ module.exports = {
             .setTitle('Complain')
             .setURL(`http://quiz.nccsoft.vn/question/update/${id}`);
 
-          await interaction.reply({ embeds: [EmbedInCorrect, btnInCorrect] });
+          await interaction
+            .reply({ embeds: [EmbedInCorrect, btnInCorrect] })
+            .catch((err) => console.log(err));
         }
       }
       if (interaction.customId.startsWith('8/3_')) {
