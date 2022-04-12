@@ -1,24 +1,14 @@
 const userData = require('../../models/userData');
 
-const transArgs = (userArgs) => {
-  if (userArgs.includes('<@')) {
-    return {
-      id: userArgs.slice(2, userArgs.length - 1),
-    };
-  } else {
-    return { username: userArgs };
-  }
-};
-
 module.exports = {
   name: 'toggleactivation',
   description: 'Toggle Activation',
   cat: 'komu',
   async execute(message, args) {
     try {
-      const user = transArgs(args[0]);
+      const checkMention = message.mentions.members.first();
       const findUserId = await userData.find({
-        id: user.id,
+        id: checkMention.user.id,
       });
       findUserId.map(async (item) => {
         if (item.deactive !== true) {

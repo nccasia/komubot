@@ -20,15 +20,7 @@ const transAmmount = (ammout) => {
     return checkNumber(ammout);
   }
 };
-const transArgs = (userArgs) => {
-  if (userArgs.includes('<@')) {
-    return {
-      id: userArgs.slice(2, userArgs.length - 1),
-    };
-  } else {
-    return { username: userArgs };
-  }
-};
+
 const messHelp =
   '```' +
   '*penalty @username ammount<50k> reason' +
@@ -85,18 +77,18 @@ module.exports = {
           .catch(console.error);
       } else if (args[0] === 'detail') {
         // detail
-        const user = transArgs(args[1]);
+        const checkMention = message.mentions.members.first();
 
-        if (!user) return message.channel.send(messHelp);
+        if (!checkMention) return message.channel.send(messHelp);
         let dataPen;
-        if (user.id) {
+        if (checkMention.user.id) {
           dataPen = await penatlyData.find({
-            user_id: user.id,
+            user_id: checkMention.user.id,
             channel_id: message.channel.id,
           });
         } else {
           dataPen = await penatlyData.find({
-            username: user.username,
+            username: checkMention.user.username,
             channel_id: message.channel.id,
           });
         }
@@ -127,7 +119,7 @@ module.exports = {
         if (!args[0] || !args[1] || !args[2]) {
           return message.channel.send(messHelp);
         }
-        const userArgs = transArgs(args[0]);
+        const userArgs = message.mentions.members.first();
         const ammount = transAmmount(args[1]);
         if (!ammount || !userArgs) {
           return message.channel.send(messHelp);
@@ -135,14 +127,14 @@ module.exports = {
         const reason = args.slice(2, args.length).join(' ');
 
         let user;
-        if (userArgs?.id) {
+        if (userArgs?.user.id) {
           user = await userData.findOne({
-            id: userArgs.id,
+            id: userArgs.user.id,
             deactive: { $ne: true },
           });
         } else {
           user = await userData.findOne({
-            username: userArgs.username,
+            username: userArgs.user.username,
             deactive: { $ne: true },
           });
         }
