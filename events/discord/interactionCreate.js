@@ -9,7 +9,10 @@ const userData = require('../../models/userData');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 const userQuizData = require('../../models/userQuiz');
 const womenDayData = require('../../models/womenDayData');
-const { sendMessageToNhaCuaChung } = require('../../util/komubotrest');
+const {
+  sendMessageToNhaCuaChung,
+  sendErrorToMachLeo,
+} = require('../../util/komubotrest');
 const newEmbed = (message, color) =>
   new MessageEmbed().setTitle(message).setColor(color);
 
@@ -52,7 +55,10 @@ module.exports = {
             .setURL(`http://quiz.nccsoft.vn/question/update/${id}`);
           await interaction
             .reply({ embeds: [EmbedCorrect, btnCorrect] })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+              const msgCorrect = `KOMU không gửi được tin nhắn cho <@${userid}>.`;
+              sendErrorToMachLeo(client, msgCorrect);
+            });
         } else {
           await saveQuestionInCorrect(userid, id, key);
           const EmbedInCorrect = newEmbed(
@@ -66,7 +72,10 @@ module.exports = {
 
           await interaction
             .reply({ embeds: [EmbedInCorrect, btnInCorrect] })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+              const msgInCorrect = `KOMU không gửi được tin nhắn cho <@${userid}>.`;
+              sendErrorToMachLeo(client, msgInCorrect);
+            });
         }
       }
       if (interaction.customId.startsWith('8/3_')) {

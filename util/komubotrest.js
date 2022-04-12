@@ -381,6 +381,13 @@ const sendMessageToNhaCuaChung = async (client, msg) => {
     .catch(console.error);
   return null;
 };
+const sendErrorToMachLeo = async (client, msg) => {
+  await client.channels.cache
+    .get(client.config.komubotrest.machleo_channel_id)
+    .send(msg)
+    .catch(console.error);
+  return null;
+};
 const sendMessageToChannelById = async (client, channelId, msg) => {
   try {
     const channel = await client.channels.fetch(channelId);
@@ -581,6 +588,7 @@ const init = async (client) => {
 module.exports = {
   init,
   sendMessageToNhaCuaChung,
+  sendErrorToMachLeo,
   sendMessageKomuToUser,
   getWFHWarninghMessage,
 };
