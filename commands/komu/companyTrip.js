@@ -2,9 +2,9 @@ const companyTripData = require('../../models/companyTripData');
 const { MessageEmbed } = require('discord.js');
 
 const transArgs = (userArgs) => {
-  if (userArgs.includes('<@!')) {
+  if (userArgs.includes('<@')) {
     return {
-      userId: userArgs.slice(3, userArgs.length - 1),
+      userId: userArgs.slice(2, userArgs.length - 1),
       year: '2022',
     };
   } else {

@@ -1,9 +1,9 @@
 const userData = require('../../models/userData');
 
 const transArgs = (userArgs) => {
-  if (userArgs.includes('<@!')) {
+  if (userArgs.includes('<@')) {
     return {
-      id: userArgs.slice(3, userArgs.length - 1),
+      id: userArgs.slice(2, userArgs.length - 1),
     };
   } else {
     return { username: userArgs };
