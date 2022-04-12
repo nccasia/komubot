@@ -78,7 +78,7 @@ async function getKomuWeeklyReport(options) {
 async function handleKomuWeeklyReport(message, args) {
   try {
     if (args[1] && args[1] == 'help') {
-      message.reply({
+      return message.reply({
         content:
           'View komu weekly report\n*report komuweekly [date]\n*note: date format dd/mm/yyyy',
         ephemeral: true,

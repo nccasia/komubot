@@ -46,14 +46,23 @@ module.exports = {
             `Correct!!!, you have ${newUser.scores_quiz} points`,
             'GREEN'
           );
-          await interaction.reply({ embeds: [EmbedCorrect] });
+          const btnCorrect = new MessageEmbed()
+            .setColor('#e11919')
+            .setTitle('Complain')
+            .setURL(`http://quiz.nccsoft.vn/question/update/${id}`);
+          await interaction.reply({ embeds: [EmbedCorrect, btnCorrect] });
         } else {
           await saveQuestionInCorrect(userid, id, key);
           const EmbedInCorrect = newEmbed(
             `Incorrect!!!, The correct answer is ${correct}`,
             'RED'
           );
-          await interaction.reply({ embeds: [EmbedInCorrect] });
+          const btnInCorrect = new MessageEmbed()
+            .setColor('#e11919')
+            .setTitle('Complain')
+            .setURL(`http://quiz.nccsoft.vn/question/update/${id}`);
+
+          await interaction.reply({ embeds: [EmbedInCorrect, btnInCorrect] });
         }
       }
       if (interaction.customId.startsWith('8/3_')) {

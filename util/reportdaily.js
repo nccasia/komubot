@@ -1,4 +1,5 @@
 const getUserNotDaily = require('../util/getUserNotDaily');
+const { MessageEmbed } = require('discord.js');
 
 function findCountNotDaily(arr, email) {
   return arr.filter((item) => item.email === email)[0].countnotdaily;
@@ -41,8 +42,7 @@ async function reportDaily(date, message, args, client, guildDB) {
           .join('\n');
         const Embed = new MessageEmbed()
           .setTitle(
-            `${dateString} +
-            '\n' +
+            `${dateString} 
             ${dailyString}`
           )
           .setColor('RED')

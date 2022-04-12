@@ -95,13 +95,13 @@ module.exports = {
   name: 'wol',
   description: 'Turn on an pc on LAN (WoL)',
   aliases: ['pcon'],
-  usages: ['wol <mac|ip>'],
+  usages: ['wol <mac> [ip]'],
   cat: 'utilities',
   async execute(message, args) {
     try {
       if (args[0] === 'help') {
         return message.reply(
-          'Using WoL to turn on an pc on LAN using mac address.\n*wol <your mac address>'
+          'Using WoL to turn on an pc on LAN using mac address.\n*wol <your mac> [your ip]\n*tips: you can you *keep command to save your mac and ip'
         );
       }
       return handleWoL(message, args);

@@ -515,12 +515,13 @@ async function tagMeeting(client) {
 
   const voiceChannel = getAllVoice.map((item) => item.id);
 
-  const now = new Date();
-  now.setHours(now.getHours() + 7);
-  let day = now.getDay();
-  const hourDateNow = now.getHours();
-  const dateNow = now.toLocaleDateString('en-US');
-  const minuteDateNow = now.getMinutes();
+  const dateTimeNow = new Date();
+  dateTimeNow.setHours(dateTimeNow.getHours() + 7);
+  let day = dateTimeNow.getDay();
+  const hourDateNow = dateTimeNow.getHours();
+  const dateNow = dateTimeNow.toLocaleDateString('en-US');
+  const minuteDateNow = dateTimeNow.getMinutes();
+  dateTimeNow.setHours(0, 0, 0, 0);
 
   let countVoice = 0;
   let roomMap = [];
@@ -572,6 +573,11 @@ async function tagMeeting(client) {
           const fetchChannelFull = await client.channels.fetch(item.channelId);
           fetchChannelFull.send(`@here voice channel full`);
         } else {
+          const newDateTimestamp = new Date(+item.createdTimestamp.toString());
+
+          newDateTimestamp.setHours(0, 0, 0, 0);
+          const diffTime = Math.abs(dateTimeNow - newDateTimestamp);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           switch (item.repeat) {
             case 'once':
               if (
@@ -675,21 +681,12 @@ async function tagMeeting(client) {
               }
               return;
             case 'weekly':
-              const dateTimeWeekly = new Date(
-                +item.createdTimestamp.toString()
-              );
-              now.setHours(0, 0, 0, 0);
-              dateTimeWeekly.setHours(0, 0, 0, 0);
-              const diffTimeWeekly = Math.abs(now - dateTimeWeekly);
-              const diffDaysWeekly = Math.ceil(
-                diffTimeWeekly / (1000 * 60 * 60 * 24)
-              );
               if (
                 hourDateNow === hourTimestamp &&
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
-                diffDaysWeekly % 7 === 0 &&
-                now - dateTimeWeekly > 0
+                diffDays % 7 === 0 &&
+                dateTimeNow - newDateTimestamp >= 0
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -735,19 +732,12 @@ async function tagMeeting(client) {
               }
               return;
             case 'repeat':
-              const newDateTimestamp = new Date(
-                +item.createdTimestamp.toString()
-              );
-              now.setHours(0, 0, 0, 0);
-              newDateTimestamp.setHours(0, 0, 0, 0);
-              const diffTime = Math.abs(now - newDateTimestamp);
-              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
               if (
                 hourDateNow === hourTimestamp &&
                 0 <= checkFiveMinute &&
                 checkFiveMinute <= 5 &&
                 diffDays % item.repeatTime === 0 &&
-                now - newDateTimestamp > 0
+                dateTimeNow - newDateTimestamp >= 0
               ) {
                 const repeatFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -806,10 +796,10 @@ async function updateReminderMeeting(client) {
     reminder: true,
   });
 
-  const now = new Date();
-  now.setHours(now.getHours() + 7);
-  const hourDateNow = now.getHours();
-  const minuteDateNow = now.getMinutes();
+  const dateTimeNow = new Date();
+  dateTimeNow.setHours(dateTimeNow.getHours() + 7);
+  const hourDateNow = dateTimeNow.getHours();
+  const minuteDateNow = dateTimeNow.getMinutes();
 
   const timeCheck = repeatMeet.map(async (item) => {
     let checkFiveMinute;
@@ -1168,7 +1158,7 @@ async function dating(client) {
     });
   }
 
-  if (minute > 0 && minute < 6) {
+  if (minute > 0 && minute < 15) {
     let idManPrivate = [];
     let idWomanPrivate = [];
     let idVoice = [];
@@ -1199,17 +1189,11 @@ async function dating(client) {
     );
     const voiceChannelPrivate = getAllVoicePrivate.map((item) => item.id);
     let roomMapPrivate = [];
-    let countVoicePrivate = 0;
 
     voiceChannelPrivate.map(async (voice, index) => {
       const userDiscordPrivate = await client.channels.fetch(voice);
 
-      if (userDiscordPrivate.members.size > 0) {
-        countVoicePrivate++;
-      }
-      if (userDiscordPrivate.members.size === 0) {
-        roomMapPrivate.push(userDiscordPrivate.id);
-      }
+      roomMapPrivate.push(userDiscordPrivate.id);
       if (index === voiceChannelPrivate.length - 1) {
         for (i = 0; i < idWomanPrivate.length; i++) {
           const fetchVoiceNcc8 = await client.channels.fetch(idVoice[i]);
@@ -1217,15 +1201,24 @@ async function dating(client) {
             const targetMan = await fetchVoiceNcc8.guild.members.fetch(
               idManPrivate[i]
             );
-            if (targetMan && targetMan.voice && targetMan.voice.channelId)
-              targetMan.voice.setChannel(roomMapPrivate[0]);
+            if (
+              targetMan &&
+              targetMan.voice &&
+              targetWoman.voice.channelId &&
+              targetMan.voice.channelId !== roomMapPrivate[i]
+            )
+              targetMan.voice.setChannel(roomMapPrivate[i]);
             const targetWoman = await fetchVoiceNcc8.guild.members.fetch(
               idWomanPrivate[i]
             );
-            if (targetWoman && targetWoman.voice && targetWoman.voice.channelId)
-              targetWoman.voice.setChannel(roomMapPrivate[0]);
+            if (
+              targetWoman &&
+              targetWoman.voice &&
+              targetWoman.voice.channelId &&
+              targetWoman.voice.channelId !== roomMapPrivate[i]
+            )
+              targetWoman.voice.setChannel(roomMapPrivate[i]);
           }
-          roomMapPrivate.shift(roomMapPrivate[0]);
         }
       }
     });
@@ -1325,7 +1318,7 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '0-5/1 17 * * 5',
+      '0-15/1 17 * * 5',
       () => dating(client),
       null,
       false,
