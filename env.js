@@ -47,7 +47,6 @@ const { envRules, envDefault } = example.split('\n').reduce(
  */
 function config(options) {
   const envParsed = dotenv.config(options).parsed;
-  console.log(envParsed);
   validate({ envParsed, envDefault, envRules });
 
   return envParsed;

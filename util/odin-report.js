@@ -17,7 +17,7 @@ async function downloadKomuWeeklyReport({
   reportPath,
   screenUrl,
 }) {
-  if (!url || !username || !password || reportPath || screenUrl) {
+  if (!url || !username || !password || !reportPath || !screenUrl) {
     throw new Error('missing odin credentials.');
   }
 
