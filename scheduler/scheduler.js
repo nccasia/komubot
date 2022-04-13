@@ -24,6 +24,7 @@ const userQuizData = require('../models/userQuiz');
 const { updateRoleProject, updateRoleDiscord } = require('../util/roles');
 const datingData = require('../models/datingData');
 const remindData = require('../models/remindData');
+const holidayData = require('../models/holidayData');
 
 // Deepai
 const deepai = require('deepai');
@@ -58,6 +59,29 @@ function checkTime(time) {
   return result;
 }
 
+async function checkHoliday() {
+  let data = [];
+  let result = false;
+  const today = new Date();
+  const time =
+    today.getDate().toString().padStart(2, '0') +
+    '/' +
+    (today.getMonth() + 1).toString().padStart(2, '0') +
+    '/' +
+    today.getFullYear();
+  const holiday = await holidayData.find();
+
+  await Promise.all(
+    holiday.map((item) => {
+      data.push(item.dateTime);
+    })
+  );
+  if (data.includes(time) === true) {
+    result = true;
+  }
+  return result;
+}
+
 function withoutTime(dateTime) {
   const date = new Date(dateTime);
   const curDate = new Date();
@@ -78,6 +102,7 @@ function getTimeToDay() {
 }
 
 async function showDaily(client) {
+  if (await checkHoliday()) return;
   console.log('[Scheduler] Run');
   try {
     const { notDailyMorning } = await getUserNotDaily(null, null, null, client);
@@ -104,6 +129,7 @@ function getUserNameByEmail(string) {
 }
 async function pingWfh(client) {
   try {
+    if (await checkHoliday()) return;
     console.log('[Scheduler run]');
     if (checkTime(new Date())) return;
     let userOff = [];
@@ -255,6 +281,7 @@ async function happyBirthday(client) {
 }
 
 async function punish(client) {
+  if (await checkHoliday()) return;
   if (checkTime(new Date())) return;
   let wfhGetApi;
   try {
@@ -338,6 +365,7 @@ async function punish(client) {
 }
 
 async function checkMention(client) {
+  if (await checkHoliday()) return;
   if (checkTime(new Date())) return;
   const now = Date.now();
   try {
@@ -414,6 +442,7 @@ async function checkMention(client) {
 }
 
 async function topTracker(client) {
+  if (await checkHoliday()) return;
   const userTracker = [
     '856211913456877608',
     '922416220056199198',
@@ -435,6 +464,7 @@ async function topTracker(client) {
 
 async function sendQuiz(client) {
   try {
+    if (await checkHoliday()) return;
     let userOff = [];
     try {
       const { notSendUser } = await getUserOffWork();
@@ -503,6 +533,7 @@ async function sendQuiz(client) {
 }
 
 async function tagMeeting(client) {
+  if (await checkHoliday()) return;
   let guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
@@ -792,6 +823,7 @@ async function tagMeeting(client) {
 }
 
 async function updateReminderMeeting(client) {
+  if (await checkHoliday()) return;
   const repeatMeet = await meetingData.find({
     reminder: true,
   });
@@ -824,6 +856,7 @@ async function updateReminderMeeting(client) {
 }
 
 async function sendMessTurnOffPc(client) {
+  if (await checkHoliday()) return;
   const staffRoleId = '921328149927690251';
   const channel = await client.channels.fetch('921239541388554240');
   const roles = await channel.guild.roles.fetch(staffRoleId);
@@ -870,6 +903,7 @@ async function sendSubmitTimesheet(client) {
 }
 
 async function checkJoinCall(client) {
+  if (await checkHoliday()) return;
   console.log(['Schulder run']);
   const now = new Date();
   const HOURS = 2;
@@ -897,6 +931,7 @@ async function turnOffBot(client) {
 }
 
 async function kickMemberVoiceChannel(client) {
+  if (await checkHoliday()) return;
   let guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
@@ -958,6 +993,7 @@ async function kickMemberVoiceChannel(client) {
 }
 
 async function dating(client) {
+  if (await checkHoliday()) return;
   const now = new Date();
   let minute = now.getMinutes();
   let dating = [];
@@ -1227,6 +1263,7 @@ async function dating(client) {
 
 async function sendQuizEnglish(client) {
   try {
+    if (await checkHoliday()) return;
     let userOff = [];
     try {
       const { notSendUser } = await getUserOffWork();
@@ -1254,6 +1291,7 @@ async function sendQuizEnglish(client) {
 
 async function sendMesageRemind(client) {
   try {
+    if (await checkHoliday()) return;
     const data = await remindData.find({ cancel: false });
 
     const now = new Date();
