@@ -69,14 +69,11 @@ async function checkHoliday() {
     (today.getMonth() + 1).toString().padStart(2, '0') +
     '/' +
     today.getFullYear();
-  const holiday = await holidayData.find();
+  const holiday = await holidayData.find({
+    dateTime: time,
+  });
 
-  await Promise.all(
-    holiday.map((item) => {
-      data.push(item.dateTime);
-    })
-  );
-  if (data.includes(time) === true) {
+  if (holiday.length > 0) {
     result = true;
   }
   return result;
