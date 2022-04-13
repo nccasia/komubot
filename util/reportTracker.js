@@ -45,7 +45,6 @@ async function reportTracker(message, args, client) {
           $group: {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
-            wfh: { $last: '$wfh' },
           },
         },
         {
@@ -53,7 +52,6 @@ async function reportTracker(message, args, client) {
             _id: 0,
             email: '$_id',
             spent_time: 1,
-            wfh: 1,
           },
         },
       ]);
@@ -76,7 +74,6 @@ async function reportTracker(message, args, client) {
                 id: user.id,
                 email: user.email,
                 spent_time: item.spent_time / HOURS_IN_SECONDS,
-                wfh: item.wfh,
               });
           });
         })
@@ -112,13 +109,13 @@ async function reportTracker(message, args, client) {
           $match: {
             spent_time: { $lt: hours },
             date: date,
+            wfh: true,
           },
         },
         {
           $group: {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
-            wfh: { $last: '$wfh' },
           },
         },
         {
@@ -126,7 +123,6 @@ async function reportTracker(message, args, client) {
             _id: 0,
             email: '$_id',
             spent_time: 1,
-            wfh: 1,
           },
         },
       ]);
@@ -147,7 +143,6 @@ async function reportTracker(message, args, client) {
                 id: user.id,
                 email: user.email,
                 spent_time: item.spent_time / HOURS_IN_SECONDS,
-                wfh: item.wfh,
               });
           });
         })
@@ -168,13 +163,7 @@ async function reportTracker(message, args, client) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
           mess = userTracker
             .slice(i * 50, (i + 1) * 50)
-            .map((check) => {
-              if (check.wfh) {
-                return `${check.email} ${check.spent_time.toFixed(
-                  2
-                )} giờ. WFH: ${check.wfh}`;
-              } else return `${check.email} ${check.spent_time.toFixed(2)} giờ`;
-            })
+            .map((check) => `${check.email} ${check.spent_time.toFixed(2)} giờ`)
             .join('\n');
           const Embed = new MessageEmbed()
             .setTitle(
@@ -213,7 +202,6 @@ async function reportTracker(message, args, client) {
           $group: {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
-            wfh: { $last: '$wfh' },
           },
         },
         {
@@ -221,7 +209,6 @@ async function reportTracker(message, args, client) {
             _id: 0,
             email: '$_id',
             spent_time: 1,
-            wfh: 1,
           },
         },
       ]);
@@ -245,7 +232,6 @@ async function reportTracker(message, args, client) {
                 email: user.email,
                 spent_time: item.spent_time / HOURS_IN_SECONDS,
                 date: item.date,
-                wfh: item.wfh,
               });
           });
         })
@@ -292,6 +278,7 @@ async function reportTracker(message, args, client) {
           $match: {
             spent_time: { $lt: hours },
             date: { $in: dateMondayToSFriday },
+            wfh: true,
           },
         },
         {
@@ -299,7 +286,6 @@ async function reportTracker(message, args, client) {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
             date: { $last: '$date' },
-            wfh: { $last: '$wfh' },
           },
         },
         {
@@ -308,7 +294,6 @@ async function reportTracker(message, args, client) {
             email: '$_id',
             spent_time: 1,
             date: 1,
-            wfh: 1,
           },
         },
       ]);
@@ -330,7 +315,6 @@ async function reportTracker(message, args, client) {
                 email: user.email,
                 spent_time: item.spent_time / HOURS_IN_SECONDS,
                 date: item.date,
-                wfh: item.wfh,
               });
           });
         })
@@ -354,14 +338,9 @@ async function reportTracker(message, args, client) {
             mess = dataTracker
               .slice(i * 50, (i + 1) * 50)
               .filter((item) => item.date === dateWeekly)
-              .map((check) => {
-                if (check.wfh) {
-                  return `${check.email} ${check.spent_time.toFixed(
-                    2
-                  )} giờ. WFH: ${check.wfh}`;
-                } else
-                  return `${check.email} ${check.spent_time.toFixed(2)} giờ`;
-              })
+              .map(
+                (check) => `${check.email} ${check.spent_time.toFixed(2)} giờ`
+              )
               .join('\n');
             const day = dateWeekly.slice(0, 2);
             const month = dateWeekly.slice(3, 5);
@@ -404,7 +383,6 @@ async function reportTracker(message, args, client) {
           $group: {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
-            wfh: { $last: '$wfh' },
           },
         },
         {
@@ -412,7 +390,6 @@ async function reportTracker(message, args, client) {
             _id: 0,
             email: '$_id',
             spent_time: 1,
-            wfh: 1,
           },
         },
       ]);
@@ -435,7 +412,6 @@ async function reportTracker(message, args, client) {
                 id: user.id,
                 email: user.email,
                 spent_time: item.spent_time / HOURS_IN_SECONDS,
-                wfh: item.wfh,
               });
           });
         })
@@ -471,13 +447,13 @@ async function reportTracker(message, args, client) {
           $match: {
             spent_time: { $lt: hours },
             date: fomat,
+            wfh: true,
           },
         },
         {
           $group: {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
-            wfh: { $last: '$wfh' },
           },
         },
         {
@@ -485,7 +461,6 @@ async function reportTracker(message, args, client) {
             _id: 0,
             email: '$_id',
             spent_time: 1,
-            wfh: 1,
           },
         },
       ]);
@@ -506,7 +481,6 @@ async function reportTracker(message, args, client) {
                 id: user.id,
                 email: user.email,
                 spent_time: item.spent_time / HOURS_IN_SECONDS,
-                wfh: item.wfh,
               });
           });
         })
@@ -527,13 +501,7 @@ async function reportTracker(message, args, client) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
           mess = userTracker
             .slice(i * 50, (i + 1) * 50)
-            .map((check) => {
-              if (check.wfh) {
-                return `${check.email} ${check.spent_time.toFixed(
-                  2
-                )} giờ. WFH: ${check.wfh}`;
-              } else return `${check.email} ${check.spent_time.toFixed(2)} giờ`;
-            })
+            .map((check) => `${check.email} ${check.spent_time.toFixed(2)} giờ`)
             .join('\n');
           const Embed = new MessageEmbed()
             .setTitle(
