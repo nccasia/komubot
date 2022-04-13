@@ -1,20 +1,9 @@
 const trackerSpentTimeData = require('../models/trackerSpentTimeData');
 const userData = require('../models/userData');
 const { MessageEmbed } = require('discord.js');
+
 const messHelp =
-  '```' +
-  '*report tracker daily' +
-  '\n' +
-  '*report tracker daily a.nguyenvan' +
-  '\n' +
-  '*report tracker weekly' +
-  '\n' +
-  '*report tracker weekly a.nguyenvan' +
-  '\n' +
-  '*report tracker dd/MM/YYYY' +
-  '\n' +
-  '*meeting tracker dd/MM/YYYY a.nguyenvan' +
-  '```';
+  '```' + 'Người này hiện không sử dụng tracker trong tuần' + '```';
 async function reportTracker(message, args, client) {
   let hours = Math.floor(3600 * 7);
   if (args[1] === 'daily') {
@@ -27,7 +16,7 @@ async function reportTracker(message, args, client) {
     });
     if (args[2]) {
       const tracker = await trackerSpentTimeData.find({
-        email: args[3],
+        email: args[2],
         date: date,
       });
       if (tracker.length === 0) return message.channel.send(messHelp);
