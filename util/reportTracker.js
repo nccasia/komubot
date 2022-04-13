@@ -19,8 +19,10 @@ const messTrackerHelp =
   '*report tracker dd/MM/YYYY a.nguyenvan' +
   '```';
 
-const messHelp =
-  '```' + 'Người này hiện không sử dụng tracker trong tuần' + '```';
+const messHelpDaily = '```' + 'Không có bản ghi nào trong ngày hôm qua' + '```';
+const messHelpWeekly = '```' + 'Không có bản ghi nào trong tuần qua' + '```';
+const messHelpDate = '```' + 'Không có bản ghi nào trong ngày này' + '```';
+
 async function reportTracker(message, args, client) {
   if (!args[0] || !args[1])
     return message.reply({ content: messTrackerHelp, ephemeral: true });
@@ -56,7 +58,7 @@ async function reportTracker(message, args, client) {
         },
       ]);
       if (tracker.length === 0)
-        return message.reply({ content: messHelp, ephemeral: true });
+        return message.reply({ content: messHelpDaily, ephemeral: true });
 
       let userTracker = [];
       await Promise.all(
@@ -213,7 +215,7 @@ async function reportTracker(message, args, client) {
         },
       ]);
       if (tracker.length === 0)
-        return message.reply({ content: messHelp, ephemeral: true });
+        return message.reply({ content: messHelpWeekly, ephemeral: true });
 
       let userTracker = [];
       await Promise.all(
@@ -394,7 +396,7 @@ async function reportTracker(message, args, client) {
         },
       ]);
       if (tracker.length === 0)
-        return message.reply({ content: messHelp, ephemeral: true });
+        return message.reply({ content: messHelpDate, ephemeral: true });
 
       let userTracker = [];
       await Promise.all(
