@@ -21,12 +21,14 @@ async function reportTracker(message, args, client) {
     {
       $group: {
         _id: '$email',
-        amount: { $sum: '$spent_time' },
+        spent_time: { $last: '$spent_time' },
       },
     },
     {
-      $sort: {
-        amount: 1,
+      $project: {
+        _id: 0,
+        email: '$_id',
+        spent_time: 1,
       },
     },
   ]);
@@ -36,14 +38,14 @@ async function reportTracker(message, args, client) {
     tracker.map(async (item) => {
       const findUser = await userData
         .find({
-          email: item._id,
+          email: item.email,
           deactive: { $ne: true },
         })
         .select('id email -_id');
 
       findUser.map((user) => {
-        if (user.email === item._id)
-          userTracker.push({ id: user.id, spent_time: item.amount });
+        if (user.email === item.email)
+          userTracker.push({ id: user.id, spent_time: item.spent_time / 60 });
       });
     })
   );
