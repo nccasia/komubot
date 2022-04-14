@@ -2,12 +2,14 @@ const trackerSpentTimeData = require('../models/trackerSpentTimeData');
 const userData = require('../models/userData');
 const { MessageEmbed } = require('discord.js');
 
+const HOURS_IN_SECONDS = 60 * 60;
+
 const messHelp =
   '```' + 'Người này hiện không sử dụng tracker trong tuần' + '```';
 async function reportTracker(message, args, client) {
   let hours = Math.floor(3600 * 7);
   if (args[1] === 'daily') {
-    setDateToday = new Date();
+    let setDateToday = new Date();
     setDateToday.setDate(setDateToday.getDate() - 1);
     const date = new Date(setDateToday).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -36,7 +38,7 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / 60,
+                spent_time: item.spent_time / HOURS_IN_SECONDS,
               });
           });
         })
@@ -57,9 +59,7 @@ async function reportTracker(message, args, client) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
           mess = userTracker
             .slice(i * 50, (i + 1) * 50)
-            .map(
-              (check) => `${check.email} ${check.spent_time.toFixed(0)} phút`
-            )
+            .map((check) => `${check.email} ${check.spent_time.toFixed(2)} giờ`)
             .join('\n');
           const Embed = new MessageEmbed()
             .setTitle('Thời gian sử dụng tracker của bạn trong ngày hôm qua')
@@ -106,7 +106,7 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / 60,
+                spent_time: item.spent_time / HOURS_IN_SECONDS,
               });
           });
         })
@@ -127,9 +127,7 @@ async function reportTracker(message, args, client) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
           mess = userTracker
             .slice(i * 50, (i + 1) * 50)
-            .map(
-              (check) => `${check.email} ${check.spent_time.toFixed(0)} phút`
-            )
+            .map((check) => `${check.email} ${check.spent_time.toFixed(2)} giờ`)
             .join('\n');
           const Embed = new MessageEmbed()
             .setTitle(
@@ -178,7 +176,7 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / 60,
+                spent_time: item.spent_time / HOURS_IN_SECONDS,
                 date: item.date,
               });
           });
@@ -204,7 +202,7 @@ async function reportTracker(message, args, client) {
               .slice(i * 50, (i + 1) * 50)
               .filter((item) => item.date === dateWeekly)
               .map(
-                (check) => `${check.email} ${check.spent_time.toFixed(0)} phút`
+                (check) => `${check.email} ${check.spent_time.toFixed(2)} giờ`
               )
               .join('\n');
             const day = dateWeekly.slice(0, 2);
@@ -260,7 +258,7 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / 60,
+                spent_time: item.spent_time / HOURS_IN_SECONDS,
                 date: item.date,
               });
           });
@@ -286,7 +284,7 @@ async function reportTracker(message, args, client) {
               .slice(i * 50, (i + 1) * 50)
               .filter((item) => item.date === dateWeekly)
               .map(
-                (check) => `${check.email} ${check.spent_time.toFixed(0)} phút`
+                (check) => `${check.email} ${check.spent_time.toFixed(2)} giờ`
               )
               .join('\n');
             const day = dateWeekly.slice(0, 2);
@@ -333,7 +331,7 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / 60,
+                spent_time: item.spent_time / HOURS_IN_SECONDS,
               });
           });
         })
@@ -354,9 +352,7 @@ async function reportTracker(message, args, client) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
           mess = userTracker
             .slice(i * 50, (i + 1) * 50)
-            .map(
-              (check) => `${check.email} ${check.spent_time.toFixed(0)} phút`
-            )
+            .map((check) => `${check.email} ${check.spent_time.toFixed(2)} giờ`)
             .join('\n');
           const Embed = new MessageEmbed()
             .setTitle(`Thời gian sử dụng tracker của bạn trong ngày ${args[1]}`)
@@ -403,7 +399,7 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / 60,
+                spent_time: item.spent_time / HOURS_IN_SECONDS,
               });
           });
         })
@@ -424,9 +420,7 @@ async function reportTracker(message, args, client) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
           mess = userTracker
             .slice(i * 50, (i + 1) * 50)
-            .map(
-              (check) => `${check.email} ${check.spent_time.toFixed(0)} phút`
-            )
+            .map((check) => `${check.email} ${check.spent_time.toFixed(2)} giờ`)
             .join('\n');
           const Embed = new MessageEmbed()
             .setTitle(
