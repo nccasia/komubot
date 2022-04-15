@@ -5,6 +5,7 @@ const trackerSpentTimeDb = new mongoose.Schema({
   email: { type: String, required: true },
   spent_time: { type: Double, required: true },
   date: { type: String, required: true },
+  wfh: { type: Boolean, required: true },
 });
 
 module.exports = mongoose.model(

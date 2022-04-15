@@ -4,9 +4,28 @@ const { MessageEmbed } = require('discord.js');
 
 const HOURS_IN_SECONDS = 60 * 60;
 
-const messHelp =
-  '```' + 'Người này hiện không sử dụng tracker trong tuần' + '```';
+const messTrackerHelp =
+  '```' +
+  '*report tracker daily' +
+  '\n' +
+  '*report tracker daily a.nguyenvan' +
+  '\n' +
+  '*report tracker weekly' +
+  '\n' +
+  '*report tracker weekly a.nguyenvan' +
+  '\n' +
+  '*report tracker dd/MM/YYYY' +
+  '\n' +
+  '*report tracker dd/MM/YYYY a.nguyenvan' +
+  '```';
+
+const messHelpDaily = '```' + 'Không có bản ghi nào trong ngày hôm qua' + '```';
+const messHelpWeekly = '```' + 'Không có bản ghi nào trong tuần qua' + '```';
+const messHelpDate = '```' + 'Không có bản ghi nào trong ngày này' + '```';
+
 async function reportTracker(message, args, client) {
+  if (!args[0] || !args[1])
+    return message.reply({ content: messTrackerHelp, ephemeral: true });
   let hours = Math.floor(3600 * 7);
   if (args[1] === 'daily') {
     let setDateToday = new Date();
@@ -17,11 +36,29 @@ async function reportTracker(message, args, client) {
       day: '2-digit',
     });
     if (args[2]) {
-      const tracker = await trackerSpentTimeData.find({
-        email: args[2],
-        date: date,
-      });
-      if (tracker.length === 0) return message.channel.send(messHelp);
+      const tracker = await trackerSpentTimeData.aggregate([
+        {
+          $match: {
+            email: args[2],
+            date: date,
+          },
+        },
+        {
+          $group: {
+            _id: '$email',
+            spent_time: { $last: '$spent_time' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            email: '$_id',
+            spent_time: 1,
+          },
+        },
+      ]);
+      if (tracker.length === 0)
+        return message.reply({ content: messHelpDaily, ephemeral: true });
 
       let userTracker = [];
       await Promise.all(
@@ -74,6 +111,7 @@ async function reportTracker(message, args, client) {
           $match: {
             spent_time: { $lt: hours },
             date: date,
+            wfh: true,
           },
         },
         {
@@ -155,11 +193,29 @@ async function reportTracker(message, args, client) {
       dateMondayToSFriday.push(date);
     }
     if (args[2]) {
-      const tracker = await trackerSpentTimeData.find({
-        email: args[2],
-        date: { $in: dateMondayToSFriday },
-      });
-      if (tracker.length === 0) return message.channel.send(messHelp);
+      const tracker = await trackerSpentTimeData.aggregate([
+        {
+          $match: {
+            email: args[2],
+            date: { $in: dateMondayToSFriday },
+          },
+        },
+        {
+          $group: {
+            _id: '$email',
+            spent_time: { $last: '$spent_time' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            email: '$_id',
+            spent_time: 1,
+          },
+        },
+      ]);
+      if (tracker.length === 0)
+        return message.reply({ content: messHelpWeekly, ephemeral: true });
 
       let userTracker = [];
       await Promise.all(
@@ -224,6 +280,7 @@ async function reportTracker(message, args, client) {
           $match: {
             spent_time: { $lt: hours },
             date: { $in: dateMondayToSFriday },
+            wfh: true,
           },
         },
         {
@@ -305,16 +362,41 @@ async function reportTracker(message, args, client) {
     }
   }
   if (args[1] !== 'daily' && args[1] !== 'weekly') {
+    if (
+      !/^(((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((19|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((19|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((19|[2-9]\d)\d{2}))|(29\/02\/((1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|(([1][26]|[2468][048]|[3579][26])00))))$/.test(
+        args[1]
+      )
+    ) {
+      return message.reply({ content: messTrackerHelp, ephemeral: true });
+    }
     const day = args[1].slice(0, 2);
     const month = args[1].slice(3, 5);
     const year = args[1].slice(6);
     const fomat = `${month}/${day}/${year}`;
     if (args[2]) {
-      const tracker = await trackerSpentTimeData.find({
-        email: args[2],
-        date: fomat,
-      });
-      if (tracker.length === 0) return message.channel.send(messHelp);
+      const tracker = await trackerSpentTimeData.aggregate([
+        {
+          $match: {
+            email: args[2],
+            date: fomat,
+          },
+        },
+        {
+          $group: {
+            _id: '$email',
+            spent_time: { $last: '$spent_time' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            email: '$_id',
+            spent_time: 1,
+          },
+        },
+      ]);
+      if (tracker.length === 0)
+        return message.reply({ content: messHelpDate, ephemeral: true });
 
       let userTracker = [];
       await Promise.all(
@@ -367,6 +449,7 @@ async function reportTracker(message, args, client) {
           $match: {
             spent_time: { $lt: hours },
             date: fomat,
+            wfh: true,
           },
         },
         {
