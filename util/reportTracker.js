@@ -63,7 +63,7 @@ async function reportTracker(message, args, client) {
           },
         },
       ]);
-      if (tracker.length === 0)
+      if (userTracker.length === 0)
         return message.reply({ content: messHelpDaily, ephemeral: true });
 
       userTracker.sort(
@@ -85,7 +85,7 @@ async function reportTracker(message, args, client) {
               (check) =>
                 `${check.email} ${showTrackerTime(
                   check.spent_time
-                )}, call time: ${showTrackerTime(check.call_time)}`
+                )}, call time: ${showTrackerTime(check.call_time || 0)}`
             )
             .join('\n');
           const Embed = new MessageEmbed()
@@ -139,7 +139,7 @@ async function reportTracker(message, args, client) {
               (check) =>
                 `${check.email} ${showTrackerTime(
                   check.spent_time
-                )}, call time: ${showTrackerTime(check.call_time)}`
+                )}, call time: ${showTrackerTime(check.call_time || 0)}`
             )
             .join('\n');
           const Embed = new MessageEmbed()
@@ -216,7 +216,7 @@ async function reportTracker(message, args, client) {
                 (check) =>
                   `${check.email} ${showTrackerTime(
                     check.spent_time
-                  )}, call time: ${showTrackerTime(check.call_time)}`
+                  )}, call time: ${showTrackerTime(check.call_time || 0)}`
               )
               .join('\n');
             const day = dateWeekly.slice(0, 2);
@@ -281,7 +281,7 @@ async function reportTracker(message, args, client) {
                 (check) =>
                   `${check.email} ${showTrackerTime(
                     check.spent_time
-                  )}, call time: ${showTrackerTime(check.call_time)}`
+                  )}, call time: ${showTrackerTime(check.call_time || 0)}`
               )
               .join('\n');
             const day = dateWeekly.slice(0, 2);
@@ -435,7 +435,7 @@ async function reportTracker(message, args, client) {
               (check) =>
                 `${check.email} ${showTrackerTime(
                   check.spent_time
-                )}, call time: ${showTrackerTime(check.call_time)}`
+                )}, call time: ${showTrackerTime(check.call_time || 0)}`
             )
             .join('\n');
           const Embed = new MessageEmbed()
@@ -489,7 +489,7 @@ async function reportTracker(message, args, client) {
               (check) =>
                 `${check.email} ${showTrackerTime(
                   check.spent_time
-                )}, call time: ${showTrackerTime(check.call_time)}`
+                )}, call time: ${showTrackerTime(check.call_time || 0)}`
             )
             .join('\n');
           const Embed = new MessageEmbed()
