@@ -453,13 +453,13 @@ async function reportTracker(message, args, client) {
       const spent_time = events.window.duration;
 
       const Embed = new MessageEmbed()
-        .setTitle(`Số giờ sử dụng tracker của ${user.email} hôm nay`)
+        .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
         .setColor('RED')
         .setDescription(`${spent_time / HOURS_IN_SECONDS} giờ`);
       return message.reply({ embeds: [Embed] }).catch(console.error);
     } catch (error) {
       const Embed = new MessageEmbed()
-        .setTitle(`Số giờ sử dụng tracker của ${user.email} hôm nay`)
+        .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
         .setColor('RED')
         .setDescription(messHelpTime);
       return message.reply({ embeds: [Embed] }).catch(console.error);
