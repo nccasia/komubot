@@ -41,7 +41,7 @@ async function reportTracker(message, args, client) {
       day: '2-digit',
     });
     if (args[2]) {
-      const tracker = await trackerSpentTimeData.aggregate([
+      const userTracker = await trackerSpentTimeData.aggregate([
         {
           $match: {
             email: args[2],
@@ -65,28 +65,6 @@ async function reportTracker(message, args, client) {
       ]);
       if (tracker.length === 0)
         return message.reply({ content: messHelpDaily, ephemeral: true });
-
-      let userTracker = [];
-      await Promise.all(
-        tracker.map(async (item) => {
-          const findUser = await userData
-            .find({
-              email: item.email,
-              deactive: { $ne: true },
-            })
-            .select('id email -_id');
-
-          findUser.map((user) => {
-            if (user.email === item.email)
-              userTracker.push({
-                id: user.id,
-                email: user.email,
-                spent_time: item.spent_time,
-                call_time: item.call_time ?? 0,
-              });
-          });
-        })
-      );
 
       userTracker.sort(
         (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
@@ -118,7 +96,7 @@ async function reportTracker(message, args, client) {
         }
       }
     } else {
-      const tracker = await trackerSpentTimeData.aggregate([
+      const userTracker = await trackerSpentTimeData.aggregate([
         {
           $match: {
             spent_time: { $lt: hours },
@@ -141,28 +119,6 @@ async function reportTracker(message, args, client) {
           },
         },
       ]);
-
-      let userTracker = [];
-      await Promise.all(
-        tracker.map(async (item) => {
-          const findUser = await userData
-            .find({
-              email: item.email,
-              deactive: { $ne: true },
-            })
-            .select('id email -_id');
-
-          findUser.map((user) => {
-            if (user.email === item.email)
-              userTracker.push({
-                id: user.id,
-                email: user.email,
-                spent_time: item.spent_time,
-                call_time: item.call_time ?? 0,
-              });
-          });
-        })
-      );
 
       userTracker.sort(
         (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
@@ -212,7 +168,7 @@ async function reportTracker(message, args, client) {
       dateMondayToSFriday.push(date);
     }
     if (args[2]) {
-      const tracker = await trackerSpentTimeData.aggregate([
+      const userTracker = await trackerSpentTimeData.aggregate([
         {
           $match: {
             email: args[2],
@@ -223,6 +179,7 @@ async function reportTracker(message, args, client) {
           $group: {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
+            date: { $last: '$date' },
           },
         },
         {
@@ -234,31 +191,8 @@ async function reportTracker(message, args, client) {
           },
         },
       ]);
-      if (tracker.length === 0)
+      if (userTracker.length === 0)
         return message.reply({ content: messHelpWeekly, ephemeral: true });
-
-      let userTracker = [];
-      await Promise.all(
-        tracker.map(async (item) => {
-          const findUser = await userData
-            .find({
-              email: item.email,
-              deactive: { $ne: true },
-            })
-            .select('id email -_id');
-
-          findUser.map((user) => {
-            if (user.email === item.email)
-              userTracker.push({
-                id: user.id,
-                email: user.email,
-                spent_time: item.spent_time,
-                call_time: item.call_time ?? 0,
-                date: item.date,
-              });
-          });
-        })
-      );
 
       userTracker.sort(
         (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
@@ -299,7 +233,7 @@ async function reportTracker(message, args, client) {
         }
       }
     } else {
-      const tracker = await trackerSpentTimeData.aggregate([
+      const userTracker = await trackerSpentTimeData.aggregate([
         {
           $match: {
             spent_time: { $lt: hours },
@@ -324,29 +258,6 @@ async function reportTracker(message, args, client) {
           },
         },
       ]);
-
-      let userTracker = [];
-      await Promise.all(
-        tracker.map(async (item) => {
-          const findUser = await userData
-            .find({
-              email: item.email,
-              deactive: { $ne: true },
-            })
-            .select('id email -_id');
-
-          findUser.map((user) => {
-            if (user.email === item.email)
-              userTracker.push({
-                id: user.id,
-                email: user.email,
-                spent_time: item.spent_time,
-                call_time: item.call_time ?? 0,
-                date: item.date,
-              });
-          });
-        })
-      );
 
       userTracker.sort(
         (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
@@ -480,7 +391,7 @@ async function reportTracker(message, args, client) {
     const year = args[1].slice(6);
     const fomat = `${month}/${day}/${year}`;
     if (args[2]) {
-      const tracker = await trackerSpentTimeData.aggregate([
+      const userTracker = await trackerSpentTimeData.aggregate([
         {
           $match: {
             email: args[2],
@@ -502,30 +413,8 @@ async function reportTracker(message, args, client) {
           },
         },
       ]);
-      if (tracker.length === 0)
+      if (userTracker.length === 0)
         return message.reply({ content: messHelpDate, ephemeral: true });
-
-      let userTracker = [];
-      await Promise.all(
-        tracker.map(async (item) => {
-          const findUser = await userData
-            .find({
-              email: item.email,
-              deactive: { $ne: true },
-            })
-            .select('id email -_id');
-
-          findUser.map((user) => {
-            if (user.email === item.email)
-              userTracker.push({
-                id: user.id,
-                email: user.email,
-                spent_time: item.spent_time,
-                call_time: item.call_time ?? 0,
-              });
-          });
-        })
-      );
 
       userTracker.sort(
         (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
@@ -557,7 +446,7 @@ async function reportTracker(message, args, client) {
         }
       }
     } else {
-      const tracker = await trackerSpentTimeData.aggregate([
+      const userTracker = await trackerSpentTimeData.aggregate([
         {
           $match: {
             spent_time: { $lt: hours },
@@ -580,28 +469,6 @@ async function reportTracker(message, args, client) {
           },
         },
       ]);
-
-      let userTracker = [];
-      await Promise.all(
-        tracker.map(async (item) => {
-          const findUser = await userData
-            .find({
-              email: item.email,
-              deactive: { $ne: true },
-            })
-            .select('id email -_id');
-
-          findUser.map((user) => {
-            if (user.email === item.email)
-              userTracker.push({
-                id: user.id,
-                email: user.email,
-                spent_time: item.spent_time,
-                call_time: item.call_time ?? 0,
-              });
-          });
-        })
-      );
 
       userTracker.sort(
         (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
