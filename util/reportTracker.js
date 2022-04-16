@@ -385,9 +385,10 @@ async function reportTracker(message, args, client) {
         }
       }
     }
-  } else if (args[0] === 'time') {
+  } else if (args[1] === 'time') {
     const user = await userData.findOne({ id: message.author.id });
     const awc = new AWClient('komubot-client', {
+      baseURL: '172.16.110.8:5600',
       testing: false,
     });
 
