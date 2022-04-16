@@ -176,16 +176,9 @@ async function reportTracker(message, args, client) {
           },
         },
         {
-          $group: {
-            _id: '$email',
-            spent_time: { $last: '$spent_time' },
-            date: { $last: '$date' },
-          },
-        },
-        {
           $project: {
             _id: 0,
-            email: '$_id',
+            email: 1,
             spent_time: 1,
             call_time: 1,
             date: 1,
