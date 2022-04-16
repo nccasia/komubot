@@ -188,6 +188,7 @@ async function reportTracker(message, args, client) {
             email: '$_id',
             spent_time: 1,
             call_time: 1,
+            date: 1,
           },
         },
       ]);
