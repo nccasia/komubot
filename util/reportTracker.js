@@ -396,11 +396,11 @@ async function reportTracker(message, args, client) {
       email = user.email;
     }
     const awc = new AWClient('komubot-client', {
-      baseURL: 'http://172.16.110.8:5600',
+      baseURL: 'http://tracker.komu.vn:5600',
       testing: false,
     });
 
-    const events = await awc.getEvents(`aw-watch-window_${email}.events`, {
+    const events = await awc.getEvents(`aw-watch-window_${email}`, {
       limit: 1,
     });
 
