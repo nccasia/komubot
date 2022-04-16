@@ -1,7 +1,7 @@
 const trackerSpentTimeData = require('../models/trackerSpentTimeData');
 const userData = require('../models/userData');
 const { MessageEmbed } = require('discord.js');
-const { AWClient, IEvent } = require('aw-client');
+const { AWClient } = require('aw-client');
 
 const HOURS_IN_SECONDS = 60 * 60;
 
@@ -14,6 +14,10 @@ const messTrackerHelp =
   '*report tracker weekly' +
   '\n' +
   '*report tracker weekly a.nguyenvan' +
+  '\n' +
+  '*report tracker time' +
+  '\n' +
+  '*report tracker time a.nguyenvan' +
   '\n' +
   '*report tracker dd/MM/YYYY' +
   '\n' +
@@ -386,13 +390,17 @@ async function reportTracker(message, args, client) {
       }
     }
   } else if (args[1] === 'time') {
-    const user = await userData.findOne({ id: message.author.id });
+    let email = args[2] || '';
+    if (!email) {
+      const user = await userData.findOne({ id: message.author.id });
+      email = user.email;
+    }
     const awc = new AWClient('komubot-client', {
-      baseURL: '172.16.110.8:5600',
+      baseURL: 'http://172.16.110.8:5600',
       testing: false,
     });
 
-    const events = await awc.getEvents(`aw-watch-window_${user.email}.events`, {
+    const events = await awc.getEvents(`aw-watch-window_${email}.events`, {
       limit: 1,
     });
 
