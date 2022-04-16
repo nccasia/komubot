@@ -447,15 +447,18 @@ async function reportTracker(message, args, client) {
       ];
       const events = await awc.query(
         [{ start: startTime, end: endTime }],
-        query.join()
+        query
       );
 
-      const spent_time = events.window.duration;
+      const spent_time = events.reduce(
+        (res, event) => res + event.window.duration,
+        0
+      );
 
       const Embed = new MessageEmbed()
         .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
         .setColor('RED')
-        .setDescription(`${spent_time / HOURS_IN_SECONDS} giờ`);
+        .setDescription(`${(spent_time / HOURS_IN_SECONDS).toFixed(2)} giờ`);
       return message.reply({ embeds: [Embed] }).catch(console.error);
     } catch (error) {
       const Embed = new MessageEmbed()
