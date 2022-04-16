@@ -27,6 +27,7 @@ const messTrackerHelp =
 const messHelpDaily = '```' + 'Không có bản ghi nào trong ngày hôm qua' + '```';
 const messHelpWeekly = '```' + 'Không có bản ghi nào trong tuần qua' + '```';
 const messHelpDate = '```' + 'Không có bản ghi nào trong ngày này' + '```';
+const messHelpTime = '```' + 'Không có bản ghi nào' + '```';
 
 async function reportTracker(message, args, client) {
   if (!args[0] || !args[1])
@@ -400,19 +401,69 @@ async function reportTracker(message, args, client) {
       testing: false,
     });
 
-    const events = await awc.getEvents(`aw-watch-window_${email}`, {
-      limit: 1,
-    });
+    const currentDate = new Date();
+    const timezone = currentDate.getTimezoneOffset() / -60;
+    const startTime = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate() - 1,
+      17 + timezone,
+      0,
+      0
+    );
+    const endTime = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate(),
+      17 + timezone,
+      0,
+      0
+    );
+    try {
+      const query = [
+        `events = flood(query_bucket("aw-watcher-window_${email}"));`,
+        `not_afk = flood(query_bucket("aw-watcher-afk_${email}"));`,
+        'not_afk = filter_keyvals(not_afk, "status", ["not-afk"]);',
+        'browser_events = [];',
+        'audible_events = filter_keyvals(browser_events, "audible", [true]);',
+        'not_afk = period_union(not_afk, audible_events);',
+        'events = filter_period_intersect(events, not_afk);',
+        'events = categorize(events, [[["Work"],{"type":"regex","regex":"Google Docs|libreoffice|ReText|xlsx|docx|json|mstsc|Remote Desktop|Terminal"}],[["Work","Programming"],{"type":"regex","regex":"GitHub|Stack Overflow|BitBucket|Gitlab|vim|Spyder|kate|Ghidra|Scite|Jira|Visual Studio|Mongo|cmd"}],[["Work","Programming","IDEs"],{"type":"regex","regex":"deven|code|idea64","ignore_case":true}],[["Work","Programming","Others"],{"type":"regex","regex":"Bitbucket|gitlab|github|mintty|pgadmin","ignore_case":true}],[["Work","3D"],{"type":"regex","regex":"Blender"}],[["Media","Games"],{"type":"regex","regex":"Minecraft|RimWorld"}],[["Media","Video"],{"type":"regex","regex":"YouTube|Plex|VLC"}],[["Media","Social Media"],{"type":"regex","regex":"reddit|Facebook|Twitter|Instagram|devRant","ignore_case":true}],[["Media","Music"],{"type":"regex","regex":"Spotify|Deezer","ignore_case":true}],[["Comms","IM"],{"type":"regex","regex":"Messenger|Telegram|Signal|WhatsApp|Rambox|Slack|Riot|Discord|Nheko|Teams|Skype","ignore_case":true}],[["Comms","Email"],{"type":"regex","regex":"Gmail|Thunderbird|mutt|alpine"}]]);',
+        'title_events = sort_by_duration(merge_events_by_keys(events, ["app", "title"]));',
+        'app_events   = sort_by_duration(merge_events_by_keys(title_events, ["app"]));',
+        'cat_events   = sort_by_duration(merge_events_by_keys(events, ["$category"]));',
+        'app_events  = limit_events(app_events, 100);',
+        'title_events  = limit_events(title_events, 100);',
+        'duration = sum_durations(events);',
+        'browser_events = split_url_events(browser_events);',
+        'browser_urls = merge_events_by_keys(browser_events, ["url"]);',
+        'browser_urls = sort_by_duration(browser_urls);',
+        'browser_urls = limit_events(browser_urls, 100);',
+        'browser_domains = merge_events_by_keys(browser_events, ["$domain"]);',
+        'browser_domains = sort_by_duration(browser_domains);',
+        'browser_domains = limit_events(browser_domains, 100);',
+        'browser_duration = sum_durations(browser_events);',
+        'RETURN = {\n        "window": {\n            "app_events": app_events,\n            "title_events": title_events,\n            "cat_events": cat_events,\n            "active_events": not_afk,\n            "duration": duration\n        },\n        "browser": {\n            "domains": browser_domains,\n            "urls": browser_urls,\n            "duration": browser_duration\n        }\n    };',
+      ];
+      const events = await awc.query(
+        [{ start: startTime, end: endTime }],
+        query.join()
+      );
 
-    const spent_time = events
-      .filter((e) => e.status == 'not_afk')
-      .reduce((res, e) => res + e.duration, 0);
+      const spent_time = events.window.duration;
 
-    const Embed = new MessageEmbed()
-      .setTitle(`Số giờ sử dụng tracker của ${user.email} hôm nay`)
-      .setColor('RED')
-      .setDescription(`${spent_time / HOURS_IN_SECONDS} giờ`);
-    return message.reply({ embeds: [Embed] }).catch(console.error);
+      const Embed = new MessageEmbed()
+        .setTitle(`Số giờ sử dụng tracker của ${user.email} hôm nay`)
+        .setColor('RED')
+        .setDescription(`${spent_time / HOURS_IN_SECONDS} giờ`);
+      return message.reply({ embeds: [Embed] }).catch(console.error);
+    } catch (error) {
+      const Embed = new MessageEmbed()
+        .setTitle(`Số giờ sử dụng tracker của ${user.email} hôm nay`)
+        .setColor('RED')
+        .setDescription(messHelpTime);
+      return message.reply({ embeds: [Embed] }).catch(console.error);
+    }
   }
   if (args[1] !== 'daily' && args[1] !== 'weekly') {
     if (
