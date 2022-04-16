@@ -2,8 +2,7 @@ const trackerSpentTimeData = require('../models/trackerSpentTimeData');
 const userData = require('../models/userData');
 const { MessageEmbed } = require('discord.js');
 const { AWClient } = require('aw-client');
-
-const HOURS_IN_SECONDS = 60 * 60;
+const { intervalToDuration } = require('date-fns');
 
 const messTrackerHelp =
   '```' +
@@ -82,8 +81,8 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / HOURS_IN_SECONDS,
-                call_time: (item.call_time ?? 0) / HOURS_IN_SECONDS,
+                spent_time: item.spent_time,
+                call_time: item.call_time ?? 0,
               });
           });
         })
@@ -106,9 +105,9 @@ async function reportTracker(message, args, client) {
             .slice(i * 50, (i + 1) * 50)
             .map(
               (check) =>
-                `${check.email} ${check.spent_time.toFixed(
-                  2
-                )} giờ, call time: ${check.call_time.toFixed(2)} giờ`
+                `${check.email} ${showTrackerTime(
+                  check.spent_time
+                )}, call time: ${showTrackerTime(check.call_time)}`
             )
             .join('\n');
           const Embed = new MessageEmbed()
@@ -158,8 +157,8 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / HOURS_IN_SECONDS,
-                call_time: (item.call_time ?? 0) / HOURS_IN_SECONDS,
+                spent_time: item.spent_time,
+                call_time: item.call_time ?? 0,
               });
           });
         })
@@ -182,9 +181,9 @@ async function reportTracker(message, args, client) {
             .slice(i * 50, (i + 1) * 50)
             .map(
               (check) =>
-                `${check.email} ${check.spent_time.toFixed(
-                  2
-                )} giờ, call time: ${check.call_time.toFixed(2)} giờ`
+                `${check.email} ${showTrackerTime(
+                  check.spent_time
+                )}, call time: ${showTrackerTime(check.call_time)}`
             )
             .join('\n');
           const Embed = new MessageEmbed()
@@ -253,8 +252,8 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / HOURS_IN_SECONDS,
-                call_time: (item.call_time ?? 0) / HOURS_IN_SECONDS,
+                spent_time: item.spent_time,
+                call_time: item.call_time ?? 0,
                 date: item.date,
               });
           });
@@ -281,9 +280,9 @@ async function reportTracker(message, args, client) {
               .filter((item) => item.date === dateWeekly)
               .map(
                 (check) =>
-                  `${check.email} ${check.spent_time.toFixed(
-                    2
-                  )} giờ, call time: ${check.call_time.toFixed(2)} giờ`
+                  `${check.email} ${showTrackerTime(
+                    check.spent_time
+                  )}, call time: ${showTrackerTime(check.call_time)}`
               )
               .join('\n');
             const day = dateWeekly.slice(0, 2);
@@ -341,8 +340,8 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / HOURS_IN_SECONDS,
-                call_time: (item.call_time ?? 0) / HOURS_IN_SECONDS,
+                spent_time: item.spent_time,
+                call_time: item.call_time ?? 0,
                 date: item.date,
               });
           });
@@ -369,9 +368,9 @@ async function reportTracker(message, args, client) {
               .filter((item) => item.date === dateWeekly)
               .map(
                 (check) =>
-                  `${check.email} ${check.spent_time.toFixed(
-                    2
-                  )} giờ, call time: ${check.call_time.toFixed(2)} giờ`
+                  `${check.email} ${showTrackerTime(
+                    check.spent_time
+                  )}, call time: ${showTrackerTime(check.call_time)}`
               )
               .join('\n');
             const day = dateWeekly.slice(0, 2);
@@ -458,7 +457,7 @@ async function reportTracker(message, args, client) {
       const Embed = new MessageEmbed()
         .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
         .setColor('RED')
-        .setDescription(`${(spent_time / HOURS_IN_SECONDS).toFixed(2)} giờ`);
+        .setDescription(`${showTrackerTime(spent_time)}`);
       return message.reply({ embeds: [Embed] }).catch(console.error);
     } catch (error) {
       const Embed = new MessageEmbed()
@@ -521,8 +520,8 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / HOURS_IN_SECONDS,
-                call_time: (item.call_time ?? 0) / HOURS_IN_SECONDS,
+                spent_time: item.spent_time,
+                call_time: item.call_time ?? 0,
               });
           });
         })
@@ -545,9 +544,9 @@ async function reportTracker(message, args, client) {
             .slice(i * 50, (i + 1) * 50)
             .map(
               (check) =>
-                `${check.email} ${check.spent_time.toFixed(
-                  2
-                )} giờ, call time: ${check.call_time.toFixed(2)} giờ`
+                `${check.email} ${showTrackerTime(
+                  check.spent_time
+                )}, call time: ${showTrackerTime(check.call_time)}`
             )
             .join('\n');
           const Embed = new MessageEmbed()
@@ -597,8 +596,8 @@ async function reportTracker(message, args, client) {
               userTracker.push({
                 id: user.id,
                 email: user.email,
-                spent_time: item.spent_time / HOURS_IN_SECONDS,
-                call_time: (item.call_time ?? 0) / HOURS_IN_SECONDS,
+                spent_time: item.spent_time,
+                call_time: item.call_time ?? 0,
               });
           });
         })
@@ -621,9 +620,9 @@ async function reportTracker(message, args, client) {
             .slice(i * 50, (i + 1) * 50)
             .map(
               (check) =>
-                `${check.email} ${check.spent_time.toFixed(
-                  2
-                )} giờ, call time: ${check.call_time.toFixed(2)} giờ`
+                `${check.email} ${showTrackerTime(
+                  check.spent_time
+                )}, call time: ${showTrackerTime(check.call_time)}`
             )
             .join('\n');
           const Embed = new MessageEmbed()
@@ -637,6 +636,11 @@ async function reportTracker(message, args, client) {
       }
     }
   }
+}
+
+function showTrackerTime(spentTime) {
+  const duration = intervalToDuration({ start: 0, end: spentTime * 1000 });
+  return `${duration.hours}h ${duration.minutes}m ${duration.seconds}s`;
 }
 
 module.exports = { reportTracker };
