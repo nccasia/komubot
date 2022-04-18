@@ -1,4 +1,5 @@
 const holidayData = require('../../models/holidayData.js');
+const { sendErrorToDevTest } = require('../../util/komubotrest.js');
 
 const messHelp = '```' + '*holiday register dd/MM/YYYY' + '```';
 
@@ -8,6 +9,7 @@ module.exports = {
   cat: 'komu',
   async execute(message, args, client) {
     try {
+      let authorId = message.author.id;
       if (!args[0] && !args[1] && !args[2]) {
         return message.channel.send(messHelp);
       }
@@ -28,7 +30,12 @@ module.exports = {
       })
         .save()
         .catch((err) => console.log(err));
-      message.reply({ content: '`✅` holiday saved.', ephemeral: true });
+      message
+        .reply({ content: '`✅` holiday saved.', ephemeral: true })
+        .catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
     } catch (err) {
       console.log(err);
     }

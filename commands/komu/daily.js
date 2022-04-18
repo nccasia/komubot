@@ -1,4 +1,5 @@
 const dailyData = require('../../models/dailyData.js');
+const { sendErrorToDevTest } = require('../../util/komubotrest.js');
 
 module.exports = {
   name: 'daily',
@@ -6,6 +7,7 @@ module.exports = {
   cat: 'komu',
   async execute(message, args) {
     try {
+      let authorId = message.author.id;
       const daily = args.join(' ');
       if (!daily || daily == undefined) {
         return message
@@ -13,7 +15,10 @@ module.exports = {
             content: '```please add your daily text```',
             ephemeral: true,
           })
-          .catch(console.error);
+          .catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
       }
       await new dailyData({
         userid: message.author.id,
@@ -27,7 +32,12 @@ module.exports = {
       })
         .save()
         .catch((err) => console.log(err));
-      message.reply({ content: '`✅` Daily saved.', ephemeral: true });
+      message
+        .reply({ content: '`✅` Daily saved.', ephemeral: true })
+        .catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
     } catch (err) {
       console.log(err);
     }

@@ -1,4 +1,5 @@
 const meetingData = require('../../models/meetingData');
+const { sendErrorToDevTest } = require('../../util/komubotrest');
 
 function padTo2Digits(num) {
   return num.toString().padStart(2, '0');
@@ -25,6 +26,7 @@ module.exports = {
   cat: 'komu',
   async execute(message, args, client) {
     try {
+      let authorId = message.author.id;
       if (message.content === '*calendar') {
         const calendarChannel = message.channelId;
         const list = await meetingData.find({
@@ -36,10 +38,15 @@ module.exports = {
         if (!list) {
           return;
         } else if (Array.isArray(list) && list.length === 0) {
-          return message.reply({
-            content: '`✅` No scheduled meeting.',
-            ephemeral: true,
-          });
+          return message
+            .reply({
+              content: '`✅` No scheduled meeting.',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
         } else {
           for (let i = 0; i <= Math.ceil(list.length / 50); i += 1) {
             if (list.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -61,10 +68,15 @@ module.exports = {
                 })
                 .join('\n') +
               '```';
-            await message.reply({
-              content: mess,
-              ephemeral: true,
-            });
+            await message
+              .reply({
+                content: mess,
+                ephemeral: true,
+              })
+              .catch((err) => {
+                const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+                sendErrorToDevTest(client, msg);
+              });
           }
         }
       } else if (args[0] === 'cancel') {
@@ -78,15 +90,25 @@ module.exports = {
           { cancel: true }
         );
         if (!findId) {
-          return message.reply({
-            content: 'Not found.',
-            ephemeral: true,
-          });
+          return message
+            .reply({
+              content: 'Not found.',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
         } else {
-          return message.reply({
-            content: '`✅` Cancel successfully.',
-            ephemeral: true,
-          });
+          return message
+            .reply({
+              content: '`✅` Cancel successfully.',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
         }
       } else if (args[0] === 'help') {
         return message.channel

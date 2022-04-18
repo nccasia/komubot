@@ -3,6 +3,7 @@ const userData = require('../models/userData');
 const { MessageEmbed } = require('discord.js');
 const { AWClient } = require('aw-client');
 const { intervalToDuration } = require('date-fns');
+const { sendErrorToDevTest } = require('../util/komubotrest');
 
 const messTrackerHelp =
   '```' +
@@ -29,8 +30,14 @@ const messHelpDate = '```' + 'Không có bản ghi nào trong ngày này' + '```
 const messHelpTime = '```' + 'Không có bản ghi nào' + '```';
 
 async function reportTracker(message, args, client) {
+  let authorId = message.author.id;
   if (!args[0] || !args[1])
-    return message.reply({ content: messTrackerHelp, ephemeral: true });
+    return message
+      .reply({ content: messTrackerHelp, ephemeral: true })
+      .catch((err) => {
+        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+        sendErrorToDevTest(client, msg);
+      });
   let hours = Math.floor(3600 * 7);
   if (args[1] === 'daily') {
     let setDateToday = new Date();
@@ -64,7 +71,12 @@ async function reportTracker(message, args, client) {
         },
       ]);
       if (userTracker.length === 0)
-        return message.reply({ content: messHelpDaily, ephemeral: true });
+        return message
+          .reply({ content: messHelpDaily, ephemeral: true })
+          .catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
 
       userTracker.sort(
         (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
@@ -75,7 +87,10 @@ async function reportTracker(message, args, client) {
         return;
       } else if (Array.isArray(userTracker) && userTracker.length === 0) {
         mess = '```' + 'Không có bản ghi nào cho ngày hôm qua' + '```';
-        return message.reply(mess).catch(console.error);
+        return message.reply(mess).catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
       } else {
         for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -92,7 +107,10 @@ async function reportTracker(message, args, client) {
             .setTitle('Thời gian sử dụng tracker của bạn trong ngày hôm qua')
             .setColor('RED')
             .setDescription(`${mess}`);
-          await message.reply({ embeds: [Embed] }).catch(console.error);
+          await message.reply({ embeds: [Embed] }).catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
         }
       }
     } else {
@@ -129,7 +147,10 @@ async function reportTracker(message, args, client) {
         return;
       } else if (Array.isArray(userTracker) && userTracker.length === 0) {
         mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
-        return message.reply(mess).catch(console.error);
+        return message.reply(mess).catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
       } else {
         for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -148,7 +169,10 @@ async function reportTracker(message, args, client) {
             )
             .setColor('RED')
             .setDescription(`${mess}`);
-          await message.reply({ embeds: [Embed] }).catch(console.error);
+          await message.reply({ embeds: [Embed] }).catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
         }
       }
     }
@@ -186,7 +210,12 @@ async function reportTracker(message, args, client) {
         },
       ]);
       if (userTracker.length === 0)
-        return message.reply({ content: messHelpWeekly, ephemeral: true });
+        return message
+          .reply({ content: messHelpWeekly, ephemeral: true })
+          .catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
 
       userTracker.sort(
         (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
@@ -197,7 +226,10 @@ async function reportTracker(message, args, client) {
         return;
       } else if (Array.isArray(userTracker) && userTracker.length === 0) {
         mess = '```' + 'Không có bản ghi nào cho tuần qua' + '```';
-        return message.reply(mess).catch(console.error);
+        return message.reply(mess).catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
       } else {
         for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -222,7 +254,10 @@ async function reportTracker(message, args, client) {
               .setTitle(`Thời gian sử dụng tracker của bạn trong ngày ${fomat}`)
               .setColor('RED')
               .setDescription(`${mess}`);
-            return message.reply({ embeds: [Embed] }).catch(console.error);
+            return message.reply({ embeds: [Embed] }).catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
           });
         }
       }
@@ -262,7 +297,10 @@ async function reportTracker(message, args, client) {
         return;
       } else if (Array.isArray(userTracker) && userTracker.length === 0) {
         mess = '```' + 'Không có ai vi phạm trong tuần' + '```';
-        return message.reply(mess).catch(console.error);
+        return message.reply(mess).catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
       } else {
         for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -289,7 +327,10 @@ async function reportTracker(message, args, client) {
               )
               .setColor('RED')
               .setDescription(`${mess}`);
-            return message.reply({ embeds: [Embed] }).catch(console.error);
+            return message.reply({ embeds: [Embed] }).catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
           });
         }
       }
@@ -363,13 +404,19 @@ async function reportTracker(message, args, client) {
         .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
         .setColor('RED')
         .setDescription(`${showTrackerTime(spent_time)}`);
-      return message.reply({ embeds: [Embed] }).catch(console.error);
+      return message.reply({ embeds: [Embed] }).catch((err) => {
+        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+        sendErrorToDevTest(client, msg);
+      });
     } catch (error) {
       const Embed = new MessageEmbed()
         .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
         .setColor('RED')
         .setDescription(messHelpTime);
-      return message.reply({ embeds: [Embed] }).catch(console.error);
+      return message.reply({ embeds: [Embed] }).catch((err) => {
+        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+        sendErrorToDevTest(client, msg);
+      });
     }
   }
   if (args[1] !== 'daily' && args[1] !== 'weekly') {
@@ -378,7 +425,12 @@ async function reportTracker(message, args, client) {
         args[1]
       )
     ) {
-      return message.reply({ content: messTrackerHelp, ephemeral: true });
+      return message
+        .reply({ content: messTrackerHelp, ephemeral: true })
+        .catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
     }
     const day = args[1].slice(0, 2);
     const month = args[1].slice(3, 5);
@@ -408,7 +460,12 @@ async function reportTracker(message, args, client) {
         },
       ]);
       if (userTracker.length === 0)
-        return message.reply({ content: messHelpDate, ephemeral: true });
+        return message
+          .reply({ content: messHelpDate, ephemeral: true })
+          .catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
 
       userTracker.sort(
         (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
@@ -419,7 +476,10 @@ async function reportTracker(message, args, client) {
         return;
       } else if (Array.isArray(userTracker) && userTracker.length === 0) {
         mess = '```' + `Không có bản ghi nào cho ngày ${args[1]}` + '```';
-        return message.reply(mess).catch(console.error);
+        return message.reply(mess).catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
       } else {
         for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -436,7 +496,10 @@ async function reportTracker(message, args, client) {
             .setTitle(`Thời gian sử dụng tracker của bạn trong ngày ${args[1]}`)
             .setColor('RED')
             .setDescription(`${mess}`);
-          await message.reply({ embeds: [Embed] }).catch(console.error);
+          await message.reply({ embeds: [Embed] }).catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
         }
       }
     } else {
@@ -473,7 +536,10 @@ async function reportTracker(message, args, client) {
         return;
       } else if (Array.isArray(userTracker) && userTracker.length === 0) {
         mess = '```' + `Không có ai vi phạm trong ngày ${args[1]}` + '```';
-        return message.reply(mess).catch(console.error);
+        return message.reply(mess).catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
       } else {
         for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
           if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -492,7 +558,10 @@ async function reportTracker(message, args, client) {
             )
             .setColor('RED')
             .setDescription(`${mess}`);
-          await message.reply({ embeds: [Embed] }).catch(console.error);
+          await message.reply({ embeds: [Embed] }).catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
         }
       }
     }

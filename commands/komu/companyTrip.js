@@ -1,5 +1,6 @@
 const companyTripData = require('../../models/companyTripData');
 const { MessageEmbed } = require('discord.js');
+const { sendErrorToDevTest } = require('../../util/komubotrest');
 
 const transArgs = (userArgs) => {
   if (userArgs.includes('<@')) {
@@ -18,16 +19,22 @@ module.exports = {
   cat: 'komu',
   async execute(message, args) {
     try {
+      let authorId = message.author.id;
       if (args[0]) {
         const filter = transArgs(args[0]);
         const userMention = await companyTripData.find(filter);
 
         if (userMention.length === 0) {
-          message.reply({
-            content:
-              'Người này không có trong danh sách. Hẹn gặp vào NCC COMPANY TRIP 2023',
-            ephemeral: true,
-          });
+          message
+            .reply({
+              content:
+                'Người này không có trong danh sách. Hẹn gặp vào NCC COMPANY TRIP 2023',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
         }
 
         userMention.map(async (item) => {
@@ -49,7 +56,10 @@ module.exports = {
             .setTitle(`Chào mừng bạn đến với NCC COMPANY TRIP 2022`)
             .setColor('RED')
             .setDescription(`${messMention}`);
-          await message.reply({ embeds: [EmbedMention] }).catch(console.error);
+          await message.reply({ embeds: [EmbedMention] }).catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
         });
       } else {
         const author = message.author.id;
@@ -60,10 +70,15 @@ module.exports = {
         });
 
         if (user.length === 0) {
-          message.reply({
-            content: 'Hẹn gặp bạn vào NCC COMPANY TRIP 2023',
-            ephemeral: true,
-          });
+          message
+            .reply({
+              content: 'Hẹn gặp bạn vào NCC COMPANY TRIP 2023',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
         }
 
         user.map(async (item) => {
@@ -85,7 +100,10 @@ module.exports = {
             .setTitle(`Chào mừng bạn đến với NCC COMPANY TRIP 2022`)
             .setColor('RED')
             .setDescription(`${mess}`);
-          await message.reply({ embeds: [Embed] }).catch(console.error);
+          await message.reply({ embeds: [Embed] }).catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
         });
       }
     } catch (error) {

@@ -1,4 +1,5 @@
 const userData = require('../../models/userData');
+const { sendErrorToDevTest } = require('../../util/komubotrest');
 
 module.exports = {
   name: 'toggleactivation',
@@ -6,6 +7,7 @@ module.exports = {
   cat: 'komu',
   async execute(message, args) {
     try {
+      let authorId = message.author.id;
       const checkMention = message.mentions.members.first();
       const findUserId = await userData.find({
         id: checkMention.user.id,
@@ -20,10 +22,15 @@ module.exports = {
               deactive: true,
             }
           );
-          message.reply({
-            content: 'Disable account successfully',
-            ephemeral: true,
-          });
+          message
+            .reply({
+              content: 'Disable account successfully',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
         } else {
           const enableUser = await userData.updateOne(
             {
@@ -33,10 +40,15 @@ module.exports = {
               deactive: false,
             }
           );
-          message.reply({
-            content: 'Enable account successfully',
-            ephemeral: true,
-          });
+          message
+            .reply({
+              content: 'Enable account successfully',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
         }
       });
     } catch (err) {

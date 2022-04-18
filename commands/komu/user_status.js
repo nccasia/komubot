@@ -1,5 +1,6 @@
 const userData = require('../../models/userData');
 const axios = require('axios');
+const { sendErrorToDevTest } = require('../../util/komubotrest');
 
 module.exports = {
   name: 'userstatus',
@@ -7,6 +8,7 @@ module.exports = {
   cat: 'komu',
   async execute(message, args, client) {
     try {
+      let authorId = message.author.id;
       if (args[0] === 'help' || !args[0]) {
         return message.channel.send(
           '```' +
@@ -22,7 +24,11 @@ module.exports = {
         $or: [{ email }, { username: email }],
       });
 
-      if (!user) return message.reply(`Wrong Email!`);
+      if (!user)
+        return message.reply(`Wrong Email!`).catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
       const getUserStatus = await axios.get(
         `${client.config.user_status.api_url_userstatus}?emailAddress=${email}@ncc.asia`
       );
@@ -36,7 +42,10 @@ module.exports = {
         mess = getUserStatus.data.result.message;
       }
 
-      return message.reply(mess);
+      return message.reply(mess).catch((err) => {
+        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+        sendErrorToDevTest(client, msg);
+      });
     } catch (e) {
       console.log(e);
     }
