@@ -1,5 +1,9 @@
 const meetingData = require('../../models/meetingData');
 const voiceChannelData = require('../../models/voiceChannelData');
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const { sendErrorToDevTest } = require('../../util/komubotrest');
+
 const messHelp =
   '```' +
   '*meeting now' +
@@ -19,6 +23,7 @@ module.exports = {
   cat: 'komu',
   async execute(message, args, client) {
     try {
+      let authorId = message.author.id;
       const channel_id = message.channel.id;
       if (!args[0]) {
         return message.channel.send(messHelp);
@@ -80,6 +85,102 @@ module.exports = {
             }
           });
         }
+      } else if (args[0] === 'meet') {
+        puppeteer.use(StealthPlugin());
+        (async () => {
+          const browser = await puppeteer.launch({
+            headless: true,
+            args: [
+              '--disable-notifications',
+              '--mute-audio',
+              '--enable-automation',
+            ],
+            // ignoreDefaultArgs: true,
+          });
+
+          // going to sign-in page
+          const page = await browser.newPage();
+          const navigationPromise = page.waitForNavigation();
+          await page.goto('https://accounts.google.com/');
+
+          const context = browser.defaultBrowserContext();
+          await context.overridePermissions('https://meet.google.com/', [
+            'microphone',
+            'camera',
+            'notifications',
+          ]);
+
+          await navigationPromise;
+
+          // typing out email
+          await page.waitForSelector('input[type="email"]');
+          await page.click('input[type="email"]');
+          await navigationPromise;
+          await page.keyboard.type(`${client.config.komubotrest.gmail}`, {
+            delay: 200,
+          });
+          await page.waitForTimeout(15000);
+
+          await page.waitForSelector('#identifierNext');
+          await page.click('#identifierNext');
+
+          // typing out password
+          await page.waitForTimeout(10000);
+          await page.keyboard.type(`${client.config.komubotrest.password}`, {
+            delay: 200,
+          });
+          await page.waitForTimeout(800);
+          await page.keyboard.press('Enter');
+          await navigationPromise;
+
+          // going to Meet after signing in
+          await page.waitForTimeout(2500);
+          await page.goto('https://meet.google.com/');
+          await page.waitForTimeout(5000);
+          await page.waitForSelector('div[class="VfPpkd-RLmnJb"]');
+          await page.click('div[class="VfPpkd-RLmnJb"]');
+          await page.waitForTimeout(3000);
+          await page.waitForSelector(
+            'li[class="JS1Zae VfPpkd-StrnGf-rymPhb-ibnC6b"]'
+          );
+          await page.click('li[class="JS1Zae VfPpkd-StrnGf-rymPhb-ibnC6b"]');
+          await page.waitForTimeout(5000);
+
+          // turn off cam using Ctrl+E
+          await page.waitForTimeout(2000);
+          await page.keyboard.down('ControlLeft');
+          await page.keyboard.press('KeyE');
+          await page.keyboard.up('ControlLeft');
+          await page.waitForTimeout(2000);
+
+          //turn off mic using Ctrl+D
+          await page.waitForTimeout(1000);
+          await page.keyboard.down('ControlLeft');
+          await page.keyboard.press('KeyD');
+          await page.keyboard.up('ControlLeft');
+          await page.waitForTimeout(2000);
+          const element = await page.waitForSelector('div[class="VA2JSc"]');
+          const value = await element.evaluate((el) => el.textContent);
+          message
+            .reply({ content: `https://${value}`, ephemeral: true })
+            .catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
+
+          await page.evaluate(async () => {
+            await new Promise((resolve, reject) => {
+              const interval = setInterval(() => {
+                const button = document.querySelector(
+                  'button[class="VfPpkd-LgbsSe VfPpkd-LgbsSe-OWXEXe-dgl2Hf ksBjEc lKxP2d qfvgSe AjXHhf"]'
+                );
+                if (button) {
+                  button.click();
+                }
+              }, 3000);
+            });
+          });
+        })();
       } else {
         const task = args.slice(0, 1).join(' ');
         const datetime = args.slice(1, 3).join(' ');
@@ -117,7 +218,12 @@ module.exports = {
           repeat: repeat,
           repeatTime: repeatTime,
         }).save();
-        message.reply({ content: '`✅` Meeting saved.', ephemeral: true });
+        message
+          .reply({ content: '`✅` Meeting saved.', ephemeral: true })
+          .catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
       }
     } catch (err) {
       console.log(err);
