@@ -1,4 +1,5 @@
 const tx8Data = require('../../models/tx8Data.js');
+const { sendErrorToDevTest } = require('../../util/komubotrest.js');
 
 module.exports = {
   name: 'tx8',
@@ -14,7 +15,10 @@ module.exports = {
             content: '```please add your lucky draw number (100 - 999)```',
             ephemeral: true,
           })
-          .catch(console.error);
+          .catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
       }
 
       if (args.length == 1 && args[0] != 'draw') {
@@ -26,10 +30,15 @@ module.exports = {
           tx8Number < 100 ||
           tx8Number > 999
         ) {
-          message.reply({
-            content: 'Please enter a number between 100 and 999',
-            ephemeral: true,
-          });
+          message
+            .reply({
+              content: 'Please enter a number between 100 and 999',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
           return;
         }
 
@@ -40,10 +49,15 @@ module.exports = {
           status: 'pending',
           createdTimestamp: message.createdTimestamp,
         }).save();
-        message.reply({
-          content: '`✅` Lucky number saved.',
-          ephemeral: true,
-        });
+        message
+          .reply({
+            content: '`✅` Lucky number saved.',
+            ephemeral: true,
+          })
+          .catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
         return;
       }
 
@@ -57,7 +71,10 @@ module.exports = {
             content: '```You are not allowed to use this command.```',
             ephemeral: true,
           })
-          .catch(console.error);
+          .catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
         return;
       }
 
@@ -116,10 +133,15 @@ module.exports = {
         ];
         const data = await tx8Data.aggregate(aggregatorOpts).exec();
         if (data.length == 0) {
-          message.reply({
-            content: '```No lucky number found```',
-            ephemeral: true,
-          });
+          message
+            .reply({
+              content: '```No lucky number found```',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+              sendErrorToDevTest(client, msg);
+            });
           return;
         }
         const rndNumber = Math.floor(Math.random() * data.length);
@@ -129,14 +151,24 @@ module.exports = {
           { userId: data[rndNumber].userId },
           { status: 'done' }
         );
-        message.reply({
-          content: `\`🎉\` Lucky number is \`${tx8Number}\` by \`${data[rndNumber].user[0].email}\``,
-          ephemeral: false,
-        });
+        message
+          .reply({
+            content: `\`🎉\` Lucky number is \`${tx8Number}\` by \`${data[rndNumber].user[0].email}\``,
+            ephemeral: false,
+          })
+          .catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
       }
     } catch (err) {
       console.log(err);
-      message.reply({ content: '```Error```', ephemeral: true });
+      message
+        .reply({ content: '```Error```', ephemeral: true })
+        .catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
     }
   },
 };

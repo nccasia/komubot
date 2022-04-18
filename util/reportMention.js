@@ -1,6 +1,7 @@
 const axios = require('axios');
 const wfhData = require('../models/wfhData');
 const { MessageEmbed } = require('discord.js');
+const { sendErrorToDevTest } = require('../util/komubotrest');
 
 function withoutTime(dateTime) {
   const date = new Date(dateTime);
@@ -22,6 +23,7 @@ function getTimeToDay() {
 }
 
 async function reportMention(message) {
+  let authorId = message.author.id;
   const mentionFullday = await wfhData.aggregate([
     {
       $match: {
@@ -54,7 +56,10 @@ async function reportMention(message) {
     return;
   } else if (Array.isArray(mentionFullday) && mentionFullday.length === 0) {
     mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
-    return message.reply(mess).catch(console.error);
+    return message.reply(mess).catch((err) => {
+      const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+      sendErrorToDevTest(client, msg);
+    });
   } else {
     for (let i = 0; i <= Math.ceil(mentionFullday.length / 50); i += 1) {
       if (mentionFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -66,7 +71,10 @@ async function reportMention(message) {
         .setTitle('Những người không trả lời mention trong ngày hôm nay')
         .setColor('RED')
         .setDescription(`${mess}`);
-      await message.reply({ embeds: [Embed] }).catch(console.error);
+      await message.reply({ embeds: [Embed] }).catch((err) => {
+        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+        sendErrorToDevTest(client, msg);
+      });
     }
   }
 }

@@ -1,5 +1,8 @@
 const userData = require('../../models/userData');
-const { sendMessageKomuToUser } = require('../../util/komubotrest');
+const {
+  sendMessageKomuToUser,
+  sendErrorToDevTest,
+} = require('../../util/komubotrest');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 const penatlyData = require('../../models/penatlyData');
 
@@ -37,6 +40,7 @@ module.exports = {
   cat: 'komu',
   async execute(message, args, client) {
     try {
+      let authorId = message.author.id;
       if (args[0] === 'help') {
         return message.channel.send(messHelp);
       } else if (args[0] === 'summary') {
@@ -110,10 +114,15 @@ module.exports = {
           { channel_id: message.channel.id, delete: { $ne: true } },
           { delete: true }
         );
-        message.reply({
-          content: 'Clear penatly successfully',
-          ephemeral: true,
-        });
+        message
+          .reply({
+            content: 'Clear penatly successfully',
+            ephemeral: true,
+          })
+          .catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
       } else {
         const channel_id = message.channel.id;
         if (!args[0] || !args[1] || !args[2]) {
@@ -151,7 +160,12 @@ module.exports = {
           delete: false,
         });
         const newPenatlyData = await newPenatly.save();
-        message.reply({ content: '`✅` Penalty saved.', ephemeral: true });
+        message
+          .reply({ content: '`✅` Penalty saved.', ephemeral: true })
+          .catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
         const embed = new MessageEmbed()
           .setColor('#0099ff')
           .setTitle('PENALTY')
@@ -190,7 +204,10 @@ module.exports = {
 
         if (interaction) {
           message.channel.send(`<@!${user.id}> reject penalty`);
-          await interaction.reply('Rejection sent!!!');
+          await interaction.reply('Rejection sent!!!').catch((err) => {
+            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+            sendErrorToDevTest(client, msg);
+          });
           await penatlyData.updateOne(
             { _id: newPenatlyData._id },
             {

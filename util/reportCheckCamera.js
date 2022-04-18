@@ -2,6 +2,7 @@ const checkCameraData = require('../models/checkCameraData');
 const userData = require('../models/userData');
 const getUserOffWork = require('../util/getUserOffWork');
 const { MessageEmbed } = require('discord.js');
+const { sendErrorToDevTest } = require('../util/komubotrest');
 
 function withoutFirstTime(dateTime) {
   const date = new Date(dateTime);
@@ -30,6 +31,7 @@ function getTomorrowDate() {
 }
 
 async function reportCheckCamera(message) {
+  let authorId = message.author.id;
   const userCheckCamera = await checkCameraData.find({
     createdTimestamp: { $gte: getYesterdayDate(), $lte: getTomorrowDate() },
   });
@@ -60,7 +62,10 @@ async function reportCheckCamera(message) {
     checkCameraFullday.length === 0
   ) {
     mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
-    return message.reply(mess).catch(console.error);
+    return message.reply(mess).catch((err) => {
+      const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+      sendErrorToDevTest(client, msg);
+    });
   } else {
     for (let i = 0; i <= Math.ceil(checkCameraFullday.length / 50); i += 1) {
       if (checkCameraFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -72,7 +77,10 @@ async function reportCheckCamera(message) {
         .setTitle('Những người không bật camera trong ngày hôm nay')
         .setColor('RED')
         .setDescription(`${mess}`);
-      await message.reply({ embeds: [Embed] }).catch(console.error);
+      await message.reply({ embeds: [Embed] }).catch((err) => {
+        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+        sendErrorToDevTest(client, msg);
+      });
     }
   }
 }

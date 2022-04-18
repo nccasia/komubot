@@ -1,4 +1,5 @@
 const remindData = require('../../models/remindData.js');
+const { sendErrorToDevTest } = require('../../util/komubotrest.js');
 
 const messHelp = '```' + '*remind @username dd/MM/YYYY HH:mm content' + '```';
 
@@ -8,6 +9,7 @@ module.exports = {
   cat: 'komu',
   async execute(message, args, client) {
     try {
+      let authorId = message.author.id;
       if (!args[0]) {
         return message.channel.send(messHelp);
       }
@@ -48,7 +50,12 @@ module.exports = {
       })
         .save()
         .catch((err) => console.log(err));
-      message.reply({ content: '`✅` remind saved.', ephemeral: true });
+      message
+        .reply({ content: '`✅` remind saved.', ephemeral: true })
+        .catch((err) => {
+          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+          sendErrorToDevTest(client, msg);
+        });
     } catch (err) {
       console.log(err);
     }

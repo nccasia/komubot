@@ -1,6 +1,7 @@
 const axios = require('axios');
 const wfhData = require('../models/wfhData');
 const { MessageEmbed } = require('discord.js');
+const { sendErrorToDevTest } = require('../util/komubotrest');
 
 function withoutTime(dateTime) {
   const date = new Date(dateTime);
@@ -22,6 +23,7 @@ function getTimeToDay() {
 }
 
 async function reportWfh(message, args, client) {
+  let authorId = message.author.id;
   let wfhGetApi;
   try {
     wfhGetApi = await axios.get(client.config.wfh.api_url, {
@@ -71,7 +73,10 @@ async function reportWfh(message, args, client) {
     return;
   } else if (Array.isArray(wfhFullday) && wfhFullday.length === 0) {
     mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
-    return message.reply(mess).catch(console.error);
+    return message.reply(mess).catch((err) => {
+      const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+      sendErrorToDevTest(client, msg);
+    });
   } else {
     for (let i = 0; i <= Math.ceil(wfhFullday.length / 50); i += 1) {
       if (wfhFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -83,7 +88,10 @@ async function reportWfh(message, args, client) {
         .setTitle('Những người bị phạt vì không trả lời wfh trong ngày hôm nay')
         .setColor('RED')
         .setDescription(`${mess}`);
-      return message.reply({ embeds: [Embed] }).catch(console.error);
+      return message.reply({ embeds: [Embed] }).catch((err) => {
+        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+        sendErrorToDevTest(client, msg);
+      });
     }
   }
 }
@@ -118,7 +126,10 @@ async function reportCompalinWfh(message, args, client) {
     return;
   } else if (Array.isArray(wfhFullday) && wfhFullday.length === 0) {
     mess = '```' + 'Không có ai được approved trong ngày' + '```';
-    return message.reply(mess).catch(console.error);
+    return message.reply(mess).catch((err) => {
+      const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+      sendErrorToDevTest(client, msg);
+    });
   } else {
     for (let i = 0; i <= Math.ceil(wfhFullday.length / 50); i += 1) {
       if (wfhFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
@@ -130,7 +141,10 @@ async function reportCompalinWfh(message, args, client) {
         .setTitle('Những người được approved trong ngày hôm nay')
         .setColor('RED')
         .setDescription(`${mess}`);
-      return message.reply({ embeds: [Embed] }).catch(console.error);
+      return message.reply({ embeds: [Embed] }).catch((err) => {
+        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
+        sendErrorToDevTest(client, msg);
+      });
     }
   }
 }
