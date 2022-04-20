@@ -74,8 +74,7 @@ async function reportWfh(message, args, client) {
   } else if (Array.isArray(wfhFullday) && wfhFullday.length === 0) {
     mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
     return message.reply(mess).catch((err) => {
-      const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-      sendErrorToDevTest(client, msg);
+      sendErrorToDevTest(client, authorId, err);
     });
   } else {
     for (let i = 0; i <= Math.ceil(wfhFullday.length / 50); i += 1) {
@@ -89,8 +88,7 @@ async function reportWfh(message, args, client) {
         .setColor('RED')
         .setDescription(`${mess}`);
       return message.reply({ embeds: [Embed] }).catch((err) => {
-        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-        sendErrorToDevTest(client, msg);
+        sendErrorToDevTest(client, authorId, err);
       });
     }
   }
@@ -127,8 +125,7 @@ async function reportCompalinWfh(message, args, client) {
   } else if (Array.isArray(wfhFullday) && wfhFullday.length === 0) {
     mess = '```' + 'Không có ai được approved trong ngày' + '```';
     return message.reply(mess).catch((err) => {
-      const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-      sendErrorToDevTest(client, msg);
+      sendErrorToDevTest(client, authorId, err);
     });
   } else {
     for (let i = 0; i <= Math.ceil(wfhFullday.length / 50); i += 1) {
@@ -142,8 +139,7 @@ async function reportCompalinWfh(message, args, client) {
         .setColor('RED')
         .setDescription(`${mess}`);
       return message.reply({ embeds: [Embed] }).catch((err) => {
-        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-        sendErrorToDevTest(client, msg);
+        sendErrorToDevTest(client, authorId, err);
       });
     }
   }

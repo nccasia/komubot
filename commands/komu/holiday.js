@@ -33,8 +33,7 @@ module.exports = {
       message
         .reply({ content: '`✅` holiday saved.', ephemeral: true })
         .catch((err) => {
-          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-          sendErrorToDevTest(client, msg);
+          sendErrorToDevTest(client, authorId, err);
         });
     } catch (err) {
       console.log(err);

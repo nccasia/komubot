@@ -11,8 +11,7 @@ module.exports = {
         return message
           .reply('```' + '*leave minute reason ' + '```')
           .catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
       }
       const minute =
@@ -20,8 +19,7 @@ module.exports = {
 
       if (minute === false) {
         return message.reply('Minute must be a number').catch((err) => {
-          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-          sendErrorToDevTest(client, msg);
+          sendErrorToDevTest(client, authorId, err);
         });
       }
       const reason = args.slice(1, args.length).join(' ');
@@ -35,8 +33,7 @@ module.exports = {
       await newLeave.save();
 
       return message.reply('`✅` Leave saved').catch((err) => {
-        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-        sendErrorToDevTest(client, msg);
+        sendErrorToDevTest(client, authorId, err);
       });
     } catch (err) {
       console.log(err);

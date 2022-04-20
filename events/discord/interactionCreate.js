@@ -56,8 +56,7 @@ module.exports = {
           await interaction
             .reply({ embeds: [EmbedCorrect, btnCorrect] })
             .catch((err) => {
-              const msgCorrect = `KOMU không gửi được tin nhắn cho <@${userid}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToMachLeo(client, msgCorrect);
+              sendErrorToMachLeo(client, userid, err);
             });
         } else {
           await saveQuestionInCorrect(userid, id, key);
@@ -73,8 +72,7 @@ module.exports = {
           await interaction
             .reply({ embeds: [EmbedInCorrect, btnInCorrect] })
             .catch((err) => {
-              const msgInCorrect = `KOMU không gửi được tin nhắn cho <@${userid}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToMachLeo(client, msgInCorrect);
+              sendErrorToMachLeo(client, userid, err);
             });
         }
       }

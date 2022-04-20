@@ -8,6 +8,8 @@ const messHelp =
   '```' +
   '*meeting now' +
   '\n' +
+  '*meeting meet' +
+  '\n' +
   '*meeting task dd/MM/YYYY HH:mm repeat timerepeat' +
   '\n' +
   '*meeting task dd/MM/YYYY HH:mm once' +
@@ -86,6 +88,11 @@ module.exports = {
           });
         }
       } else if (args[0] === 'meet') {
+        message
+          .reply({ content: 'Đang tạo phòng họp', ephemeral: true })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
         puppeteer.use(StealthPlugin());
         (async () => {
           const browser = await puppeteer.launch({
@@ -164,8 +171,7 @@ module.exports = {
           message
             .reply({ content: `https://${value}`, ephemeral: true })
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
 
           await page.evaluate(async () => {
@@ -221,8 +227,7 @@ module.exports = {
         message
           .reply({ content: '`✅` Meeting saved.', ephemeral: true })
           .catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
       }
     } catch (err) {

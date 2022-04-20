@@ -381,14 +381,16 @@ const sendMessageToNhaCuaChung = async (client, msg) => {
     .catch(console.error);
   return null;
 };
-const sendErrorToMachLeo = async (client, msg) => {
+const sendErrorToMachLeo = async (client, userid, err) => {
+  const msg = `KOMU không gửi được tin nhắn cho <@${userid}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
   await client.channels.cache
     .get(client.config.komubotrest.machleo_channel_id)
     .send(msg)
     .catch(console.error);
   return null;
 };
-const sendErrorToDevTest = async (client, msg) => {
+const sendErrorToDevTest = async (client, authorId, err) => {
+  const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
   await client.channels.cache
     .get(client.config.komubotrest.devtest_channel_id)
     .send(msg)

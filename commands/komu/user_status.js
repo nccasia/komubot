@@ -26,8 +26,7 @@ module.exports = {
 
       if (!user)
         return message.reply(`Wrong Email!`).catch((err) => {
-          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-          sendErrorToDevTest(client, msg);
+          sendErrorToDevTest(client, authorId, err);
         });
       const getUserStatus = await axios.get(
         `${client.config.user_status.api_url_userstatus}?emailAddress=${email}@ncc.asia`
@@ -43,8 +42,7 @@ module.exports = {
       }
 
       return message.reply(mess).catch((err) => {
-        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-        sendErrorToDevTest(client, msg);
+        sendErrorToDevTest(client, authorId, err);
       });
     } catch (e) {
       console.log(e);
