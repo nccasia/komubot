@@ -63,8 +63,7 @@ async function reportCheckCamera(message) {
   ) {
     mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
     return message.reply(mess).catch((err) => {
-      const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-      sendErrorToDevTest(client, msg);
+      sendErrorToDevTest(client, authorId, err);
     });
   } else {
     for (let i = 0; i <= Math.ceil(checkCameraFullday.length / 50); i += 1) {
@@ -78,8 +77,7 @@ async function reportCheckCamera(message) {
         .setColor('RED')
         .setDescription(`${mess}`);
       await message.reply({ embeds: [Embed] }).catch((err) => {
-        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-        sendErrorToDevTest(client, msg);
+        sendErrorToDevTest(client, authorId, err);
       });
     }
   }

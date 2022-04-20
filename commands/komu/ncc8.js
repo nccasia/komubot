@@ -20,8 +20,7 @@ module.exports = {
         } else if (Array.isArray(dataMp3) && dataMp3.length === 0) {
           mess = '```' + 'Không có NCC nào' + '```';
           return message.reply(mess).catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
         } else {
           for (let i = 0; i <= Math.ceil(dataMp3.length / 50); i += 1) {
@@ -36,8 +35,7 @@ module.exports = {
               .setColor('RED')
               .setDescription(`${mess}`);
             await message.reply({ embeds: [Embed] }).catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
           }
         }
@@ -46,16 +44,14 @@ module.exports = {
           return message
             .reply('```' + '*ncc8 play episode' + '```')
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
         }
         if (!checkNumber(args[1])) {
           return message
             .reply('```' + 'episode must be number' + '```')
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
         }
         await audioPlayer(client, message, args[1]);
@@ -63,8 +59,7 @@ module.exports = {
         return message
           .reply('```' + '*ncc8 play episode' + '```')
           .catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
       }
     } catch (err) {

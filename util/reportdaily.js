@@ -26,8 +26,7 @@ async function reportDaily(date, message, args, client, guildDB) {
     } else if (Array.isArray(userNotDaily) && userNotDaily.length === 0) {
       mess = '```' + dateString + 'Tất Cả Đều Đã Daily' + '```';
       return message.reply(mess).catch((err) => {
-        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-        sendErrorToDevTest(client, msg);
+        sendErrorToDevTest(client, authorId, err);
       });
     } else {
       for (let i = 0; i <= Math.ceil(userNotDaily.length / 50); i += 1) {
@@ -53,8 +52,7 @@ async function reportDaily(date, message, args, client, guildDB) {
           .setColor('RED')
           .setDescription(`${mess}`);
         await message.reply({ embeds: [Embed] }).catch((err) => {
-          const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-          sendErrorToDevTest(client, msg);
+          sendErrorToDevTest(client, authorId, err);
         });
       }
     }

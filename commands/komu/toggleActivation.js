@@ -28,8 +28,7 @@ module.exports = {
               ephemeral: true,
             })
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
         } else {
           const enableUser = await userData.updateOne(
@@ -46,8 +45,7 @@ module.exports = {
               ephemeral: true,
             })
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
         }
       });

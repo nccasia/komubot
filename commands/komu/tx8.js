@@ -16,8 +16,7 @@ module.exports = {
             ephemeral: true,
           })
           .catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
       }
 
@@ -36,8 +35,7 @@ module.exports = {
               ephemeral: true,
             })
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
           return;
         }
@@ -55,8 +53,7 @@ module.exports = {
             ephemeral: true,
           })
           .catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
         return;
       }
@@ -72,8 +69,7 @@ module.exports = {
             ephemeral: true,
           })
           .catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
         return;
       }
@@ -139,8 +135,7 @@ module.exports = {
               ephemeral: true,
             })
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
           return;
         }
@@ -157,8 +152,7 @@ module.exports = {
             ephemeral: false,
           })
           .catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
       }
     } catch (err) {
@@ -166,8 +160,7 @@ module.exports = {
       message
         .reply({ content: '```Error```', ephemeral: true })
         .catch((err) => {
-          const msg = `KOMU không gửi được tin nhắn cho <@${userId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-          sendErrorToDevTest(client, msg);
+          sendErrorToDevTest(client, authorId, err);
         });
     }
   },

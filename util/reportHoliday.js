@@ -14,8 +14,7 @@ async function reportHoliday(message, args, client) {
   } else if (Array.isArray(holiday) && holiday.length === 0) {
     mess = '```' + 'Không có lịch nghỉ lễ nào' + '```';
     return message.reply(mess).catch((err) => {
-      const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-      sendErrorToDevTest(client, msg);
+      sendErrorToDevTest(client, authorId, err);
     });
   } else {
     for (let i = 0; i <= Math.ceil(holiday.length / 50); i += 1) {
@@ -30,8 +29,7 @@ async function reportHoliday(message, args, client) {
         .setColor('RED')
         .setDescription(`${mess}`);
       await message.reply({ embeds: [Embed] }).catch((err) => {
-        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-        sendErrorToDevTest(client, msg);
+        sendErrorToDevTest(client, authorId, err);
       });
     }
   }

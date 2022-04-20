@@ -57,8 +57,7 @@ async function reportMention(message) {
   } else if (Array.isArray(mentionFullday) && mentionFullday.length === 0) {
     mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
     return message.reply(mess).catch((err) => {
-      const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-      sendErrorToDevTest(client, msg);
+      sendErrorToDevTest(client, authorId, err);
     });
   } else {
     for (let i = 0; i <= Math.ceil(mentionFullday.length / 50); i += 1) {
@@ -72,8 +71,7 @@ async function reportMention(message) {
         .setColor('RED')
         .setDescription(`${mess}`);
       await message.reply({ embeds: [Embed] }).catch((err) => {
-        const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-        sendErrorToDevTest(client, msg);
+        sendErrorToDevTest(client, authorId, err);
       });
     }
   }

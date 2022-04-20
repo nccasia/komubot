@@ -32,8 +32,7 @@ module.exports = {
               ephemeral: true,
             })
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
         }
 
@@ -57,8 +56,7 @@ module.exports = {
             .setColor('RED')
             .setDescription(`${messMention}`);
           await message.reply({ embeds: [EmbedMention] }).catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
         });
       } else {
@@ -76,8 +74,7 @@ module.exports = {
               ephemeral: true,
             })
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
         }
 
@@ -101,8 +98,7 @@ module.exports = {
             .setColor('RED')
             .setDescription(`${mess}`);
           await message.reply({ embeds: [Embed] }).catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
         });
       }

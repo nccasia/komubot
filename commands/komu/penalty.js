@@ -120,8 +120,7 @@ module.exports = {
             ephemeral: true,
           })
           .catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
       } else {
         const channel_id = message.channel.id;
@@ -163,8 +162,7 @@ module.exports = {
         message
           .reply({ content: '`✅` Penalty saved.', ephemeral: true })
           .catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
         const embed = new MessageEmbed()
           .setColor('#0099ff')
@@ -205,8 +203,7 @@ module.exports = {
         if (interaction) {
           message.channel.send(`<@!${user.id}> reject penalty`);
           await interaction.reply('Rejection sent!!!').catch((err) => {
-            const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-            sendErrorToDevTest(client, msg);
+            sendErrorToDevTest(client, authorId, err);
           });
           await penatlyData.updateOne(
             { _id: newPenatlyData._id },

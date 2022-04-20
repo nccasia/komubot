@@ -44,8 +44,7 @@ module.exports = {
               ephemeral: true,
             })
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
         } else {
           for (let i = 0; i <= Math.ceil(list.length / 50); i += 1) {
@@ -74,8 +73,7 @@ module.exports = {
                 ephemeral: true,
               })
               .catch((err) => {
-                const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-                sendErrorToDevTest(client, msg);
+                sendErrorToDevTest(client, authorId, err);
               });
           }
         }
@@ -96,8 +94,7 @@ module.exports = {
               ephemeral: true,
             })
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
         } else {
           return message
@@ -106,8 +103,7 @@ module.exports = {
               ephemeral: true,
             })
             .catch((err) => {
-              const msg = `KOMU không gửi được tin nhắn cho <@${authorId}> message: ${err.message} httpStatus: ${err.httpStatus} code: ${err.code}.`;
-              sendErrorToDevTest(client, msg);
+              sendErrorToDevTest(client, authorId, err);
             });
         }
       } else if (args[0] === 'help') {
