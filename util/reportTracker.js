@@ -58,6 +58,7 @@ async function reportTracker(message, args, client) {
           $group: {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
+            call_time: { $last: '$call_time' },
           },
         },
         {
@@ -122,6 +123,7 @@ async function reportTracker(message, args, client) {
           $group: {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
+            call_time: { $last: '$call_time' },
           },
         },
         {
@@ -266,6 +268,7 @@ async function reportTracker(message, args, client) {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
             date: { $last: '$date' },
+            call_time: { $last: '$call_time' },
           },
         },
         {
@@ -434,6 +437,7 @@ async function reportTracker(message, args, client) {
           $group: {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
+            call_time: { $last: '$call_time' },
           },
         },
         {
@@ -498,6 +502,7 @@ async function reportTracker(message, args, client) {
           $group: {
             _id: '$email',
             spent_time: { $last: '$spent_time' },
+            call_time: { $last: '$call_time' },
           },
         },
         {
