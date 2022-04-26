@@ -82,12 +82,12 @@ const sendMessageKomuToUser = async (
         ],
       })
       .catch(console.error);
-    const message = `KOMU không gửi được tin nhắn cho <@${userDb.id}>. Hãy ping <@${client.config.komubotrest.admin_user_id}> để được hỗ trợ nhé!!!`;
+    const message = `KOMU không gửi được tin nhắn cho <@${userDb.id}>(${userDb.email}). Hãy ping <@${client.config.komubotrest.admin_user_id}> để được hỗ trợ nhé!!!`;
     await client.channels.cache
       .get(client.config.komubotrest.machleo_channel_id)
       .send(message)
       .catch(console.error);
-    const messageItAdmin = `KOMU không gửi được tin nhắn cho <@${userDb.id}>. <@${client.config.komubotrest.admin_user_id}> hỗ trợ nhé!!!`;
+    const messageItAdmin = `KOMU không gửi được tin nhắn cho <@${userDb.id}(${userDb.email})>. <@${client.config.komubotrest.admin_user_id}> hỗ trợ nhé!!!`;
     await client.channels.cache
       .get(client.config.komubotrest.itadmin_channel_id)
       .send(messageItAdmin)
