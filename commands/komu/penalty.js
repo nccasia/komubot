@@ -56,6 +56,7 @@ module.exports = {
             $group: {
               _id: '$user_id',
               amount: { $sum: '$ammount' },
+              username: { $first: '$username' },
             },
           },
           {
@@ -72,7 +73,7 @@ module.exports = {
           mess = '```' + 'no result' + '```';
         } else {
           mess = result
-            .map((item) => `<@${item._id}> : ${item.amount}`)
+            .map((item) => `<@${item._id}>(${item.username}) : ${item.amount}`)
             .join('\n');
         }
 
@@ -201,7 +202,9 @@ module.exports = {
         }
 
         if (interaction) {
-          message.channel.send(`<@!${user.id}> reject penalty`);
+          message.channel.send(
+            `<@!${user.id}>(${user.username}) reject penalty`
+          );
           await interaction.reply('Rejection sent!!!').catch((err) => {
             sendErrorToDevTest(client, authorId, err);
           });

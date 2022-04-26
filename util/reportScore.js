@@ -19,6 +19,7 @@ async function reportScore(message) {
           _id: 0,
           id: 1,
           scores_quiz: 1,
+          username: 1,
         },
       },
       {
@@ -35,7 +36,10 @@ async function reportScore(message) {
       mess = '```' + 'no result' + '```';
     } else {
       mess = scoresQuizData
-        .map((item) => `<@${item.id}> - ${item.scores_quiz || 0} points`)
+        .map(
+          (item) =>
+            `<@${item.id}>(${item.username}) - ${item.scores_quiz || 0} points`
+        )
         .join('\n');
     }
 

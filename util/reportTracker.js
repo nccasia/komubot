@@ -4,6 +4,7 @@ const { MessageEmbed } = require('discord.js');
 const { AWClient } = require('aw-client');
 const { intervalToDuration } = require('date-fns');
 const { sendErrorToDevTest } = require('../util/komubotrest');
+const axios = require('axios');
 
 const messTrackerHelp =
   '```' +
@@ -29,8 +30,81 @@ const messHelpWeekly = '```' + 'Không có bản ghi nào trong tuần qua' + '`
 const messHelpDate = '```' + 'Không có bản ghi nào trong ngày này' + '```';
 const messHelpTime = '```' + 'Không có bản ghi nào' + '```';
 
+function getUserNameByEmail(string) {
+  if (string.includes('@ncc.asia')) {
+    return string.slice(0, string.length - 9);
+  }
+}
+
+async function getUserWFH(date, message, args, client) {
+  let wfhGetApi;
+  try {
+    const url = date
+      ? `${client.config.wfh.api_public}?date=${date}`
+      : client.config.wfh.api_public;
+    wfhGetApi = await axios.get(url, {
+      headers: {
+        securitycode: client.config.wfh.api_key_secret,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  if (!wfhGetApi || wfhGetApi.data == undefined) {
+    return;
+  }
+
+  const wfhUserEmail = wfhGetApi.data.result.map((item) =>
+    getUserNameByEmail(item.emailAddress)
+  );
+
+  if (
+    (Array.isArray(wfhUserEmail) && wfhUserEmail.length === 0) ||
+    !wfhUserEmail
+  ) {
+    return;
+  }
+
+  return wfhUserEmail;
+}
+
+function queryTracker(email) {
+  const query = [
+    `events = flood(query_bucket("aw-watcher-window_${email}"));`,
+    `not_afk = flood(query_bucket("aw-watcher-afk_${email}"));`,
+    'not_afk = filter_keyvals(not_afk, "status", ["not-afk"]);',
+    'browser_events = [];',
+    'audible_events = filter_keyvals(browser_events, "audible", [true]);',
+    'not_afk = period_union(not_afk, audible_events);',
+    'events = filter_period_intersect(events, not_afk);',
+    'events = categorize(events, [[["Work"],{"type":"regex","regex":"Google Docs|libreoffice|ReText|xlsx|docx|json|mstsc|Remote Desktop|Terminal"}],[["Work","Programming"],{"type":"regex","regex":"GitHub|Stack Overflow|BitBucket|Gitlab|vim|Spyder|kate|Ghidra|Scite|Jira|Visual Studio|Mongo|cmd"}],[["Work","Programming","IDEs"],{"type":"regex","regex":"deven|code|idea64","ignore_case":true}],[["Work","Programming","Others"],{"type":"regex","regex":"Bitbucket|gitlab|github|mintty|pgadmin","ignore_case":true}],[["Work","3D"],{"type":"regex","regex":"Blender"}],[["Media","Games"],{"type":"regex","regex":"Minecraft|RimWorld"}],[["Media","Video"],{"type":"regex","regex":"YouTube|Plex|VLC"}],[["Media","Social Media"],{"type":"regex","regex":"reddit|Facebook|Twitter|Instagram|devRant","ignore_case":true}],[["Media","Music"],{"type":"regex","regex":"Spotify|Deezer","ignore_case":true}],[["Comms","IM"],{"type":"regex","regex":"Messenger|Telegram|Signal|WhatsApp|Rambox|Slack|Riot|Discord|Nheko|Teams|Skype","ignore_case":true}],[["Comms","Email"],{"type":"regex","regex":"Gmail|Thunderbird|mutt|alpine"}]]);',
+    'title_events = sort_by_duration(merge_events_by_keys(events, ["app", "title"]));',
+    'app_events   = sort_by_duration(merge_events_by_keys(title_events, ["app"]));',
+    'cat_events   = sort_by_duration(merge_events_by_keys(events, ["$category"]));',
+    'app_events  = limit_events(app_events, 100);',
+    'title_events  = limit_events(title_events, 100);',
+    'duration = sum_durations(events);',
+    'browser_events = split_url_events(browser_events);',
+    'browser_urls = merge_events_by_keys(browser_events, ["url"]);',
+    'browser_urls = sort_by_duration(browser_urls);',
+    'browser_urls = limit_events(browser_urls, 100);',
+    'browser_domains = merge_events_by_keys(browser_events, ["$domain"]);',
+    'browser_domains = sort_by_duration(browser_domains);',
+    'browser_domains = limit_events(browser_domains, 100);',
+    'browser_duration = sum_durations(browser_events);',
+    'RETURN = {\n        "window": {\n            "app_events": app_events,\n            "title_events": title_events,\n            "cat_events": cat_events,\n            "active_events": not_afk,\n            "duration": duration\n        },\n        "browser": {\n            "domains": browser_domains,\n            "urls": browser_urls,\n            "duration": browser_duration\n        }\n    };',
+  ];
+  return query;
+}
+
 async function reportTracker(message, args, client) {
   let authorId = message.author.id;
+
+  let awc = new AWClient('komubot-client', {
+    baseURL: 'http://tracker.komu.vn:5600',
+    testing: false,
+  });
   if (!args[0] || !args[1])
     return message
       .reply({ content: messTrackerHelp, ephemeral: true })
@@ -39,18 +113,42 @@ async function reportTracker(message, args, client) {
       });
   let hours = Math.floor(3600 * 7);
   if (args[1] === 'daily') {
-    let setDateToday = new Date();
-    setDateToday.setDate(setDateToday.getDate() - 1);
-    const date = new Date(setDateToday).toLocaleDateString('en-US', {
+    let currentDate = new Date();
+    let timezone = currentDate.getTimezoneOffset() / -60;
+    let startTime = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate() - 2,
+      17 + timezone,
+      0,
+      0
+    );
+    let endTime = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate() - 1,
+      17 + timezone,
+      0,
+      0
+    );
+    currentDate.setDate(currentDate.getDate() - 1);
+    let date = new Date(currentDate).toLocaleDateString('en-US', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
     });
+
     if (args[2]) {
+      let email = args[2] || '';
+      if (!email) {
+        const user = await userData.findOne({ id: message.author.id });
+        email = user.email;
+      }
+
       const userTracker = await trackerSpentTimeData.aggregate([
         {
           $match: {
-            email: args[2],
+            email: email,
             date: date,
           },
         },
@@ -70,103 +168,147 @@ async function reportTracker(message, args, client) {
           },
         },
       ]);
-      if (userTracker.length === 0)
-        return message
-          .reply({ content: messHelpDaily, ephemeral: true })
-          .catch((err) => {
-            sendErrorToDevTest(client, authorId, err);
-          });
 
       userTracker.sort(
         (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
       );
 
-      let mess;
-      if (!userTracker) {
-        return;
-      } else if (Array.isArray(userTracker) && userTracker.length === 0) {
-        mess = '```' + 'Không có bản ghi nào cho ngày hôm qua' + '```';
-        return message.reply(mess).catch((err) => {
-          sendErrorToDevTest(client, authorId, err);
-        });
-      } else {
-        for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
-          if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
-          mess = userTracker
-            .slice(i * 50, (i + 1) * 50)
-            .map(
-              (check) =>
-                `${check.email} ${showTrackerTime(
-                  check.spent_time
-                )}, call time: ${showTrackerTime(check.call_time || 0)}`
-            )
-            .join('\n');
+      try {
+        const events = await awc.query(
+          [{ start: startTime, end: endTime }],
+          queryTracker(email)
+        );
+
+        const spent_time = events.reduce(
+          (res, event) => res + event.window.duration,
+          0
+        );
+
+        if (userTracker.length > 0) {
+          userTracker.map(async (check) => {
+            const Embed = new MessageEmbed()
+              .setTitle(`Số giờ sử dụng tracker của ${email} hôm qua`)
+              .setColor('RED')
+              .setDescription(
+                `${showTrackerTime(spent_time)}, call time: ${showTrackerTime(
+                  check.call_time || 0
+                )}`
+              );
+            await message.reply({ embeds: [Embed] }).catch((err) => {
+              sendErrorToDevTest(client, authorId, err);
+            });
+          });
+        } else {
           const Embed = new MessageEmbed()
-            .setTitle('Thời gian sử dụng tracker của bạn trong ngày hôm qua')
+            .setTitle(`Số giờ sử dụng tracker của ${email} hôm qua`)
             .setColor('RED')
-            .setDescription(`${mess}`);
+            .setDescription(`${showTrackerTime(spent_time)}`);
           await message.reply({ embeds: [Embed] }).catch((err) => {
             sendErrorToDevTest(client, authorId, err);
           });
         }
+      } catch (error) {
+        const Embed = new MessageEmbed()
+          .setTitle(`Số giờ sử dụng tracker của ${email} hôm qua`)
+          .setColor('RED')
+          .setDescription(messHelpDaily);
+        return message.reply({ embeds: [Embed] }).catch((err) => {
+          sendErrorToDevTest(client, authorId, err);
+        });
       }
     } else {
-      const userTracker = await trackerSpentTimeData.aggregate([
-        {
-          $match: {
-            spent_time: { $lt: hours },
-            date: date,
-            wfh: true,
-          },
-        },
-        {
-          $group: {
-            _id: '$email',
-            spent_time: { $last: '$spent_time' },
-            call_time: { $last: '$call_time' },
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            email: '$_id',
-            spent_time: 1,
-            call_time: 1,
-          },
-        },
-      ]);
+      let listUser = [];
+      const userWFH = await getUserWFH(date, message, args, client);
+      if (!userWFH) {
+        mess = '```' + 'Không có ai đăng kí WFH trong ngày' + '```';
+        return message.reply(mess).catch((err) => {
+          sendErrorToDevTest(client, authorId, err);
+        });
+      }
 
-      userTracker.sort(
-        (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
+      await Promise.all(
+        userWFH.map(async (item) => {
+          const userTracker = await trackerSpentTimeData.aggregate([
+            {
+              $match: {
+                spent_time: { $lt: hours },
+                email: item,
+                date: date,
+              },
+            },
+            {
+              $group: {
+                _id: '$email',
+                spent_time: { $last: '$spent_time' },
+                call_time: { $last: '$call_time' },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                email: '$_id',
+                spent_time: 1,
+                call_time: 1,
+              },
+            },
+          ]);
+
+          userTracker.sort(
+            (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
+          );
+
+          try {
+            const events = await awc.query(
+              [{ start: startTime, end: endTime }],
+              queryTracker(item)
+            );
+
+            const spent_time = events.reduce(
+              (res, event) => res + event.window.duration,
+              0
+            );
+
+            userTracker.map(async (check) => {
+              if (spent_time < hours) {
+                listUser.push({
+                  email: item,
+                  spent_time: showTrackerTime(spent_time),
+                  call_time: showTrackerTime(check.call_time || 0),
+                });
+              }
+            });
+          } catch (error) {
+            console.error;
+          }
+        })
       );
 
       let mess;
-      if (!userTracker) {
+      if (!listUser) {
         return;
-      } else if (Array.isArray(userTracker) && userTracker.length === 0) {
+      } else if (Array.isArray(listUser) && listUser.length === 0) {
         mess = '```' + 'Không có ai vi phạm trong ngày' + '```';
         return message.reply(mess).catch((err) => {
           sendErrorToDevTest(client, authorId, err);
         });
       } else {
-        for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
-          if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
-          mess = userTracker
+        for (let i = 0; i <= Math.ceil(listUser.length / 50); i += 1) {
+          if (listUser.slice(i * 50, (i + 1) * 50).length === 0) break;
+          mess = listUser
             .slice(i * 50, (i + 1) * 50)
             .map(
-              (check) =>
-                `${check.email} ${showTrackerTime(
-                  check.spent_time
-                )}, call time: ${showTrackerTime(check.call_time || 0)}`
+              (list) =>
+                `${list.email}:
+              ${list.spent_time}, call time: ${list.call_time || 0}`
             )
             .join('\n');
           const Embed = new MessageEmbed()
             .setTitle(
-              'Những người không bật đủ thời gian tracker trong ngày hôm qua'
+              `Những người không bật đủ thời gian tracker trong ngày hôm qua`
             )
             .setColor('RED')
             .setDescription(`${mess}`);
-          await message.reply({ embeds: [Embed] }).catch((err) => {
+          return message.reply({ embeds: [Embed] }).catch((err) => {
             sendErrorToDevTest(client, authorId, err);
           });
         }
@@ -188,142 +330,224 @@ async function reportTracker(message, args, client) {
       dateMondayToSFriday.push(date);
     }
     if (args[2]) {
-      const userTracker = await trackerSpentTimeData.aggregate([
-        {
-          $match: {
-            email: args[2],
-            date: { $in: dateMondayToSFriday },
+      let email = args[2] || '';
+      if (!email) {
+        const user = await userData.findOne({ id: message.author.id });
+        email = user.email;
+      }
+
+      for (const itemDay of dateMondayToSFriday) {
+        const month = itemDay.slice(0, 2);
+        const day = itemDay.slice(3, 5);
+        const year = itemDay.slice(6);
+
+        const fomat = `${day}/${month}/${year}`;
+        const currentDate = new Date(itemDay);
+        const timezone = currentDate.getTimezoneOffset() / -60;
+        const startTime = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate()
+        );
+        const endTime = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 1
+        );
+
+        const userTracker = await trackerSpentTimeData.aggregate([
+          {
+            $match: {
+              spent_time: { $lt: hours },
+              email: email,
+              date: itemDay,
+              wfh: true,
+            },
           },
-        },
-        {
-          $project: {
-            _id: 0,
-            email: 1,
-            spent_time: 1,
-            call_time: 1,
-            date: 1,
+          {
+            $group: {
+              _id: '$email',
+              spent_time: { $last: '$spent_time' },
+              date: { $last: '$date' },
+              call_time: { $last: '$call_time' },
+            },
           },
-        },
-      ]);
-      if (userTracker.length === 0)
-        return message
-          .reply({ content: messHelpWeekly, ephemeral: true })
-          .catch((err) => {
-            sendErrorToDevTest(client, authorId, err);
-          });
+          {
+            $project: {
+              _id: 0,
+              email: '$_id',
+              spent_time: 1,
+              call_time: 1,
+              date: 1,
+            },
+          },
+        ]);
 
-      userTracker.sort(
-        (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
-      );
+        userTracker.sort(
+          (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
+        );
 
-      let mess;
-      if (!userTracker) {
-        return;
-      } else if (Array.isArray(userTracker) && userTracker.length === 0) {
-        mess = '```' + 'Không có bản ghi nào cho tuần qua' + '```';
-        return message.reply(mess).catch((err) => {
-          sendErrorToDevTest(client, authorId, err);
-        });
-      } else {
-        for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
-          if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
-          dateMondayToSFriday.map((dateWeekly) => {
-            let dataTracker = userTracker;
-            mess = dataTracker
-              .slice(i * 50, (i + 1) * 50)
-              .filter((item) => item.date === dateWeekly)
-              .map(
-                (check) =>
-                  `${check.email} ${showTrackerTime(
-                    check.spent_time
-                  )}, call time: ${showTrackerTime(check.call_time || 0)}`
-              )
-              .join('\n');
-            const day = dateWeekly.slice(0, 2);
-            const month = dateWeekly.slice(3, 5);
-            const year = dateWeekly.slice(6);
+        try {
+          const events = await awc.query(
+            [{ start: startTime, end: endTime }],
+            queryTracker(email)
+          );
 
-            const fomat = `${month}/${day}/${year}`;
+          const spent_time = events.reduce(
+            (res, event) => res + event.window.duration,
+            0
+          );
+
+          if (userTracker.length > 0) {
+            userTracker.map(async (check) => {
+              const Embed = new MessageEmbed()
+                .setTitle(`Số giờ sử dụng tracker của ${email} ngày ${fomat}`)
+                .setColor('RED')
+                .setDescription(
+                  `${showTrackerTime(spent_time)}, call time: ${showTrackerTime(
+                    check.call_time || 0
+                  )}`
+                );
+              await message.reply({ embeds: [Embed] }).catch((err) => {
+                sendErrorToDevTest(client, authorId, err);
+              });
+            });
+          } else {
             const Embed = new MessageEmbed()
-              .setTitle(`Thời gian sử dụng tracker của bạn trong ngày ${fomat}`)
+              .setTitle(`Số giờ sử dụng tracker của ${email} ngày ${fomat}`)
               .setColor('RED')
-              .setDescription(`${mess}`);
-            return message.reply({ embeds: [Embed] }).catch((err) => {
+              .setDescription(`${showTrackerTime(spent_time)}`);
+            await message.reply({ embeds: [Embed] }).catch((err) => {
               sendErrorToDevTest(client, authorId, err);
             });
+          }
+        } catch (error) {
+          const Embed = new MessageEmbed()
+            .setTitle(`Số giờ sử dụng tracker của ${email} ngày ${fomat}`)
+            .setColor('RED')
+            .setDescription(messHelpWeekly);
+          await message.reply({ embeds: [Embed] }).catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
           });
         }
       }
     } else {
-      const userTracker = await trackerSpentTimeData.aggregate([
-        {
-          $match: {
-            spent_time: { $lt: hours },
-            date: { $in: dateMondayToSFriday },
-            wfh: true,
-          },
-        },
-        {
-          $group: {
-            _id: '$email',
-            spent_time: { $last: '$spent_time' },
-            date: { $last: '$date' },
-            call_time: { $last: '$call_time' },
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            email: '$_id',
-            spent_time: 1,
-            call_time: 1,
-            date: 1,
-          },
-        },
-      ]);
+      for (const itemDay of dateMondayToSFriday) {
+        const month = itemDay.slice(0, 2);
+        const day = itemDay.slice(3, 5);
+        const year = itemDay.slice(6);
 
-      userTracker.sort(
-        (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
-      );
+        const fomat = `${day}/${month}/${year}`;
+        const currentDate = new Date(itemDay);
+        const timezone = currentDate.getTimezoneOffset() / -60;
+        const startTime = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate()
+        );
+        const endTime = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 1
+        );
 
-      let mess;
-      if (!userTracker) {
-        return;
-      } else if (Array.isArray(userTracker) && userTracker.length === 0) {
-        mess = '```' + 'Không có ai vi phạm trong tuần' + '```';
-        return message.reply(mess).catch((err) => {
-          sendErrorToDevTest(client, authorId, err);
-        });
-      } else {
-        for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
-          if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
-          dateMondayToSFriday.map((dateWeekly) => {
-            let dataTracker = userTracker;
+        let listUser = [];
+        const userWFH = await getUserWFH(itemDay, message, args, client);
+        if (!userWFH) {
+          mess = '```' + `Không có ai đăng kí WFH trong ngày ${fomat}` + '```';
+          return message.reply(mess).catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
+        }
+
+        await Promise.all(
+          userWFH.map(async (item) => {
+            const userTracker = await trackerSpentTimeData.aggregate([
+              {
+                $match: {
+                  spent_time: { $lt: hours },
+                  email: item,
+                  date: itemDay,
+                },
+              },
+              {
+                $group: {
+                  _id: '$email',
+                  spent_time: { $last: '$spent_time' },
+                  call_time: { $last: '$call_time' },
+                },
+              },
+              {
+                $project: {
+                  _id: 0,
+                  email: '$_id',
+                  spent_time: 1,
+                  call_time: 1,
+                },
+              },
+            ]);
+
+            userTracker.sort(
+              (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
+            );
+
+            try {
+              const events = await awc.query(
+                [{ start: startTime, end: endTime }],
+                queryTracker(item)
+              );
+
+              const spent_time = events.reduce(
+                (res, event) => res + event.window.duration,
+                0
+              );
+
+              userTracker.map(async (check) => {
+                if (spent_time < hours) {
+                  listUser.push({
+                    email: item,
+                    spent_time: showTrackerTime(spent_time),
+                    call_time: showTrackerTime(check.call_time || 0),
+                  });
+                }
+              });
+            } catch (error) {
+              console.error;
+            }
+          })
+        );
+
+        let mess;
+        if (!listUser) {
+          return;
+        } else if (Array.isArray(listUser) && listUser.length === 0) {
+          mess = '```' + `Không có ai vi phạm trong ngày ${fomat}` + '```';
+          await message.reply(mess).catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
+        } else {
+          for (let i = 0; i <= Math.ceil(listUser.length / 50); i += 1) {
+            if (listUser.slice(i * 50, (i + 1) * 50).length === 0) break;
+            let dataTracker = listUser;
             mess = dataTracker
               .slice(i * 50, (i + 1) * 50)
-              .filter((item) => item.date === dateWeekly)
               .map(
-                (check) =>
-                  `${check.email} ${showTrackerTime(
-                    check.spent_time
-                  )}, call time: ${showTrackerTime(check.call_time || 0)}`
+                (list) =>
+                  `${list.email}:
+              ${list.spent_time}, call time: ${list.call_time || 0}`
               )
               .join('\n');
-            const day = dateWeekly.slice(0, 2);
-            const month = dateWeekly.slice(3, 5);
-            const year = dateWeekly.slice(6);
 
-            const fomat = `${month}/${day}/${year}`;
-            let Embed = new MessageEmbed()
+            const Embed = new MessageEmbed()
               .setTitle(
-                `Những người không bật đủ thời gian tracker trong ngày ${fomat}`
+                `Những người không bật đủ thời gian tracker trong ngày ${itemDay}`
               )
               .setColor('RED')
               .setDescription(`${mess}`);
-            return message.reply({ embeds: [Embed] }).catch((err) => {
+            await message.reply({ embeds: [Embed] }).catch((err) => {
               sendErrorToDevTest(client, authorId, err);
             });
-          });
+          }
         }
       }
     }
@@ -333,10 +557,6 @@ async function reportTracker(message, args, client) {
       const user = await userData.findOne({ id: message.author.id });
       email = user.email;
     }
-    const awc = new AWClient('komubot-client', {
-      baseURL: 'http://tracker.komu.vn:5600',
-      testing: false,
-    });
 
     const currentDate = new Date();
     const timezone = currentDate.getTimezoneOffset() / -60;
@@ -356,35 +576,41 @@ async function reportTracker(message, args, client) {
       0,
       0
     );
+
+    const date = new Date(currentDate).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+
+    const userTracker = await trackerSpentTimeData.aggregate([
+      {
+        $match: {
+          email: email,
+          date: date,
+        },
+      },
+      {
+        $group: {
+          _id: '$email',
+          spent_time: { $last: '$spent_time' },
+          call_time: { $last: '$call_time' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          email: '$_id',
+          spent_time: 1,
+          call_time: 1,
+        },
+      },
+    ]);
+
     try {
-      const query = [
-        `events = flood(query_bucket("aw-watcher-window_${email}"));`,
-        `not_afk = flood(query_bucket("aw-watcher-afk_${email}"));`,
-        'not_afk = filter_keyvals(not_afk, "status", ["not-afk"]);',
-        'browser_events = [];',
-        'audible_events = filter_keyvals(browser_events, "audible", [true]);',
-        'not_afk = period_union(not_afk, audible_events);',
-        'events = filter_period_intersect(events, not_afk);',
-        'events = categorize(events, [[["Work"],{"type":"regex","regex":"Google Docs|libreoffice|ReText|xlsx|docx|json|mstsc|Remote Desktop|Terminal"}],[["Work","Programming"],{"type":"regex","regex":"GitHub|Stack Overflow|BitBucket|Gitlab|vim|Spyder|kate|Ghidra|Scite|Jira|Visual Studio|Mongo|cmd"}],[["Work","Programming","IDEs"],{"type":"regex","regex":"deven|code|idea64","ignore_case":true}],[["Work","Programming","Others"],{"type":"regex","regex":"Bitbucket|gitlab|github|mintty|pgadmin","ignore_case":true}],[["Work","3D"],{"type":"regex","regex":"Blender"}],[["Media","Games"],{"type":"regex","regex":"Minecraft|RimWorld"}],[["Media","Video"],{"type":"regex","regex":"YouTube|Plex|VLC"}],[["Media","Social Media"],{"type":"regex","regex":"reddit|Facebook|Twitter|Instagram|devRant","ignore_case":true}],[["Media","Music"],{"type":"regex","regex":"Spotify|Deezer","ignore_case":true}],[["Comms","IM"],{"type":"regex","regex":"Messenger|Telegram|Signal|WhatsApp|Rambox|Slack|Riot|Discord|Nheko|Teams|Skype","ignore_case":true}],[["Comms","Email"],{"type":"regex","regex":"Gmail|Thunderbird|mutt|alpine"}]]);',
-        'title_events = sort_by_duration(merge_events_by_keys(events, ["app", "title"]));',
-        'app_events   = sort_by_duration(merge_events_by_keys(title_events, ["app"]));',
-        'cat_events   = sort_by_duration(merge_events_by_keys(events, ["$category"]));',
-        'app_events  = limit_events(app_events, 100);',
-        'title_events  = limit_events(title_events, 100);',
-        'duration = sum_durations(events);',
-        'browser_events = split_url_events(browser_events);',
-        'browser_urls = merge_events_by_keys(browser_events, ["url"]);',
-        'browser_urls = sort_by_duration(browser_urls);',
-        'browser_urls = limit_events(browser_urls, 100);',
-        'browser_domains = merge_events_by_keys(browser_events, ["$domain"]);',
-        'browser_domains = sort_by_duration(browser_domains);',
-        'browser_domains = limit_events(browser_domains, 100);',
-        'browser_duration = sum_durations(browser_events);',
-        'RETURN = {\n        "window": {\n            "app_events": app_events,\n            "title_events": title_events,\n            "cat_events": cat_events,\n            "active_events": not_afk,\n            "duration": duration\n        },\n        "browser": {\n            "domains": browser_domains,\n            "urls": browser_urls,\n            "duration": browser_duration\n        }\n    };',
-      ];
       const events = await awc.query(
         [{ start: startTime, end: endTime }],
-        query
+        queryTracker(email)
       );
 
       const spent_time = events.reduce(
@@ -392,13 +618,29 @@ async function reportTracker(message, args, client) {
         0
       );
 
-      const Embed = new MessageEmbed()
-        .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
-        .setColor('RED')
-        .setDescription(`${showTrackerTime(spent_time)}`);
-      return message.reply({ embeds: [Embed] }).catch((err) => {
-        sendErrorToDevTest(client, authorId, err);
-      });
+      if (userTracker.length > 0) {
+        userTracker.map(async (check) => {
+          const Embed = new MessageEmbed()
+            .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
+            .setColor('RED')
+            .setDescription(
+              `${showTrackerTime(spent_time)}, call time: ${showTrackerTime(
+                check.call_time || 0
+              )}`
+            );
+          await message.reply({ embeds: [Embed] }).catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
+        });
+      } else {
+        const Embed = new MessageEmbed()
+          .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
+          .setColor('RED')
+          .setDescription(`${showTrackerTime(spent_time)}`);
+        await message.reply({ embeds: [Embed] }).catch((err) => {
+          sendErrorToDevTest(client, authorId, err);
+        });
+      }
     } catch (error) {
       const Embed = new MessageEmbed()
         .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
@@ -409,7 +651,7 @@ async function reportTracker(message, args, client) {
       });
     }
   }
-  if (args[1] !== 'daily' && args[1] !== 'weekly') {
+  if (args[1] !== 'daily' && args[1] !== 'weekly' && args[1] !== 'time') {
     if (
       !/^(((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((19|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((19|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((19|[2-9]\d)\d{2}))|(29\/02\/((1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|(([1][26]|[2468][048]|[3579][26])00))))$/.test(
         args[1]
@@ -421,15 +663,36 @@ async function reportTracker(message, args, client) {
           sendErrorToDevTest(client, authorId, err);
         });
     }
-    const day = args[1].slice(0, 2);
-    const month = args[1].slice(3, 5);
+    const month = args[1].slice(0, 2);
+    const day = args[1].slice(3, 5);
     const year = args[1].slice(6);
-    const fomat = `${month}/${day}/${year}`;
+
+    const fomat = `${day}/${month}/${year}`;
+
+    const currentDate = new Date(fomat);
+    const timezone = currentDate.getTimezoneOffset() / -60;
+    let startTime = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate()
+    );
+    let endTime = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate() + 1
+    );
+
     if (args[2]) {
+      let email = args[2] || '';
+      if (!email) {
+        const user = await userData.findOne({ id: message.author.id });
+        email = user.email;
+      }
+
       const userTracker = await trackerSpentTimeData.aggregate([
         {
           $match: {
-            email: args[2],
+            email: email,
             date: fomat,
           },
         },
@@ -449,94 +712,137 @@ async function reportTracker(message, args, client) {
           },
         },
       ]);
-      if (userTracker.length === 0)
-        return message
-          .reply({ content: messHelpDate, ephemeral: true })
-          .catch((err) => {
-            sendErrorToDevTest(client, authorId, err);
-          });
 
       userTracker.sort(
         (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
       );
 
-      let mess;
-      if (!userTracker) {
-        return;
-      } else if (Array.isArray(userTracker) && userTracker.length === 0) {
-        mess = '```' + `Không có bản ghi nào cho ngày ${args[1]}` + '```';
-        return message.reply(mess).catch((err) => {
-          sendErrorToDevTest(client, authorId, err);
-        });
-      } else {
-        for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
-          if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
-          mess = userTracker
-            .slice(i * 50, (i + 1) * 50)
-            .map(
-              (check) =>
-                `${check.email} ${showTrackerTime(
-                  check.spent_time
-                )}, call time: ${showTrackerTime(check.call_time || 0)}`
-            )
-            .join('\n');
+      try {
+        const events = await awc.query(
+          [{ start: startTime, end: endTime }],
+          queryTracker(email)
+        );
+
+        const spent_time = events.reduce(
+          (res, event) => res + event.window.duration,
+          0
+        );
+
+        if (userTracker.length > 0) {
+          userTracker.map(async (check) => {
+            const Embed = new MessageEmbed()
+              .setTitle(`Số giờ sử dụng tracker của ${email} ngày ${args[1]}`)
+              .setColor('RED')
+              .setDescription(
+                `${showTrackerTime(spent_time)}, call time: ${showTrackerTime(
+                  check.call_time || 0
+                )}`
+              );
+            await message.reply({ embeds: [Embed] }).catch((err) => {
+              sendErrorToDevTest(client, authorId, err);
+            });
+          });
+        } else {
           const Embed = new MessageEmbed()
-            .setTitle(`Thời gian sử dụng tracker của bạn trong ngày ${args[1]}`)
+            .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
             .setColor('RED')
-            .setDescription(`${mess}`);
+            .setDescription(`${showTrackerTime(spent_time)}`);
           await message.reply({ embeds: [Embed] }).catch((err) => {
             sendErrorToDevTest(client, authorId, err);
           });
         }
+      } catch (error) {
+        const Embed = new MessageEmbed()
+          .setTitle(`Số giờ sử dụng tracker của ${email} ngày ${args[1]}`)
+          .setColor('RED')
+          .setDescription(messHelpDate);
+        return message.reply({ embeds: [Embed] }).catch((err) => {
+          sendErrorToDevTest(client, authorId, err);
+        });
       }
     } else {
-      const userTracker = await trackerSpentTimeData.aggregate([
-        {
-          $match: {
-            spent_time: { $lt: hours },
-            date: fomat,
-            wfh: true,
-          },
-        },
-        {
-          $group: {
-            _id: '$email',
-            spent_time: { $last: '$spent_time' },
-            call_time: { $last: '$call_time' },
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            email: '$_id',
-            spent_time: 1,
-            call_time: 1,
-          },
-        },
-      ]);
+      let listUser = [];
+      const userWFH = await getUserWFH(fomat, message, args, client);
+      if (!userWFH) {
+        mess = '```' + 'Không có ai đăng kí WFH trong ngày' + '```';
+        return message.reply(mess).catch((err) => {
+          sendErrorToDevTest(client, authorId, err);
+        });
+      }
 
-      userTracker.sort(
-        (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
+      await Promise.all(
+        userWFH.map(async (item) => {
+          const userTracker = await trackerSpentTimeData.aggregate([
+            {
+              $match: {
+                email: item,
+                date: fomat,
+              },
+            },
+            {
+              $group: {
+                _id: '$email',
+                spent_time: { $last: '$spent_time' },
+                call_time: { $last: '$call_time' },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                email: '$_id',
+                spent_time: 1,
+                call_time: 1,
+              },
+            },
+          ]);
+
+          userTracker.sort(
+            (a, b) => parseFloat(a.spent_time) - parseFloat(b.spent_time)
+          );
+
+          try {
+            const events = await awc.query(
+              [{ start: startTime, end: endTime }],
+              queryTracker(item)
+            );
+
+            const spent_time = events.reduce(
+              (res, event) => res + event.window.duration,
+              0
+            );
+
+            userTracker.map(async (check) => {
+              if (spent_time < hours) {
+                listUser.push({
+                  email: item,
+                  spent_time: showTrackerTime(spent_time),
+                  call_time: showTrackerTime(check.call_time || 0),
+                });
+              }
+            });
+          } catch (error) {
+            console.error;
+          }
+        })
       );
 
       let mess;
-      if (!userTracker) {
+      if (!listUser) {
         return;
-      } else if (Array.isArray(userTracker) && userTracker.length === 0) {
+      } else if (Array.isArray(listUser) && listUser.length === 0) {
         mess = '```' + `Không có ai vi phạm trong ngày ${args[1]}` + '```';
         return message.reply(mess).catch((err) => {
           sendErrorToDevTest(client, authorId, err);
         });
       } else {
-        for (let i = 0; i <= Math.ceil(userTracker.length / 50); i += 1) {
-          if (userTracker.slice(i * 50, (i + 1) * 50).length === 0) break;
-          mess = userTracker
+        for (let i = 0; i <= Math.ceil(listUser.length / 50); i += 1) {
+          if (listUser.slice(i * 50, (i + 1) * 50).length === 0) break;
+          mess = listUser
             .slice(i * 50, (i + 1) * 50)
             .map(
-              (check) =>
-                `${check.email} ${showTrackerTime(
-                  check.spent_time
-                )}, call time: ${showTrackerTime(check.call_time || 0)}`
+              (list) =>
+                `${list.email}:
+              ${list.spent_time}, call time: ${list.call_time || 0}`
             )
             .join('\n');
           const Embed = new MessageEmbed()
@@ -545,7 +851,7 @@ async function reportTracker(message, args, client) {
             )
             .setColor('RED')
             .setDescription(`${mess}`);
-          await message.reply({ embeds: [Embed] }).catch((err) => {
+          return message.reply({ embeds: [Embed] }).catch((err) => {
             sendErrorToDevTest(client, authorId, err);
           });
         }

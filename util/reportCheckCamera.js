@@ -52,7 +52,7 @@ async function reportCheckCamera(message) {
       deactive: { $ne: true },
       roles_discord: { $nin: ['CLIENT', 'HR', 'ADMIN'], $exists: true },
     })
-    .select('id -_id');
+    .select('id username -_id');
 
   let mess;
   if (!checkCameraFullday) {
@@ -70,7 +70,7 @@ async function reportCheckCamera(message) {
       if (checkCameraFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
       mess = checkCameraFullday
         .slice(i * 50, (i + 1) * 50)
-        .map((checkCamera) => `<@${checkCamera.id}>`)
+        .map((checkCamera) => `<@${checkCamera.id}>(${checkCamera.username})`)
         .join('\n');
       const Embed = new MessageEmbed()
         .setTitle('Những người không bật camera trong ngày hôm nay')

@@ -75,17 +75,10 @@ async function getKomuWeeklyReport(options) {
   return { filePath: reportPath };
 }
 
-async function handleKomuWeeklyReport(message, args) {
+async function handleKomuWeeklyReport(client) {
+  const fetchChannel = await client.channels.fetch('925707563629150238');
   try {
-    if (args[1] && args[1] == 'help') {
-      return message.reply({
-        content:
-          'View komu weekly report\n*report komuweekly [date]\n*note: date format dd/mm/yyyy',
-        ephemeral: true,
-      });
-    }
-
-    const date = !args[1] ? new Date() : toDate(args[1], 'dd/mm/yyyy');
+    const date = new Date();
 
     if (isNaN(date.getTime())) {
       throw Error('invalid date provided');
@@ -106,10 +99,10 @@ async function handleKomuWeeklyReport(message, args) {
 
     const attachment = new MessageAttachment(report.filePath);
     const embed = new MessageEmbed().setTitle('Komu report weekly');
-    await message.channel.send({ files: [attachment], embed: embed });
+    await fetchChannel.send({ files: [attachment], embed: embed });
   } catch (error) {
     console.error(error);
-    message.channel.send(`Sorry, ${error.message}`);
+    fetchChannel.send(`Sorry, ${error.message}`);
   }
 }
 

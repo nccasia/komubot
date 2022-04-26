@@ -25,6 +25,7 @@ const { updateRoleProject, updateRoleDiscord } = require('../util/roles');
 const datingData = require('../models/datingData');
 const remindData = require('../models/remindData');
 const holidayData = require('../models/holidayData');
+const { handleKomuWeeklyReport } = require('../util/odin-report');
 
 // Deepai
 const deepai = require('deepai');
@@ -1336,6 +1337,14 @@ async function sendMesageRemind(client) {
   }
 }
 
+async function sendOdinReport(client) {
+  try {
+    handleKomuWeeklyReport(client);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 function cronJobOneMinute(client) {
   sendMesageRemind(client);
   kickMemberVoiceChannel(client);
@@ -1460,6 +1469,13 @@ exports.scheduler = {
     new cron.CronJob(
       '0 9,11,14,16 * * 1-5',
       () => sendQuizEnglish(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '15 14 * * 2',
+      () => sendOdinReport(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
