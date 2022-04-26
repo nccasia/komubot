@@ -1474,7 +1474,7 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '00 14 * * 1',
+      '15 14 * * 2',
       () => sendOdinReport(client),
       null,
       false,

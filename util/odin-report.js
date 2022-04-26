@@ -76,7 +76,7 @@ async function getKomuWeeklyReport(options) {
 }
 
 async function handleKomuWeeklyReport(client) {
-  const fetchChannel = await client.channels.fetch('937343734100660254');
+  const fetchChannel = await client.channels.fetch('925707563629150238');
   try {
     const date = new Date();
 
