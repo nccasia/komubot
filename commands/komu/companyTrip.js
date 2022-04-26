@@ -45,7 +45,7 @@ module.exports = {
           roomTripMention = listUserRoomMention
             .map(
               (room) =>
-                `<@${room.userId}> văn phòng ${room.office} (${room.role})`
+                `<@${room.userId}>(${room.email}) văn phòng ${room.office} (${room.role})`
             )
             .join('\n');
           messMention = userMention
@@ -87,7 +87,7 @@ module.exports = {
           roomTrip = listUserRoom
             .map(
               (room) =>
-                `<@${room.userId}> văn phòng ${room.office} (${room.role})`
+                `<@${room.userId}>(${room.email}) văn phòng ${room.office} (${room.role})`
             )
             .join('\n');
           mess = user
