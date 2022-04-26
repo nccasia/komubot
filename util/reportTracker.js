@@ -200,7 +200,7 @@ async function reportTracker(message, args, client) {
           });
         } else {
           const Embed = new MessageEmbed()
-            .setTitle(`Số giờ sử dụng tracker của ${email} hôm nay`)
+            .setTitle(`Số giờ sử dụng tracker của ${email} hôm qua`)
             .setColor('RED')
             .setDescription(`${showTrackerTime(spent_time)}`);
           await message.reply({ embeds: [Embed] }).catch((err) => {
@@ -260,7 +260,7 @@ async function reportTracker(message, args, client) {
           try {
             const events = await awc.query(
               [{ start: startTime, end: endTime }],
-              queryTracker(email)
+              queryTracker(item)
             );
 
             const spent_time = events.reduce(
@@ -270,9 +270,11 @@ async function reportTracker(message, args, client) {
 
             userTracker.map(async (check) => {
               if (spent_time < hours) {
-                mess = `${item}: ${showTrackerTime(
-                  spent_time
-                )}, call time: ${showTrackerTime(check.call_time || 0)}`;
+                listUser.push({
+                  email: item,
+                  spent_time: showTrackerTime(spent_time),
+                  call_time: showTrackerTime(check.call_time || 0),
+                });
               }
             });
           } catch (error) {
@@ -357,7 +359,8 @@ async function reportTracker(message, args, client) {
           {
             $match: {
               spent_time: { $lt: hours },
-              date: { $in: dateMondayToSFriday },
+              email: email,
+              date: itemDay,
               wfh: true,
             },
           },
@@ -464,7 +467,7 @@ async function reportTracker(message, args, client) {
                 $match: {
                   spent_time: { $lt: hours },
                   email: item,
-                  date: { $in: dateMondayToSFriday },
+                  date: itemDay,
                 },
               },
               {
@@ -491,7 +494,7 @@ async function reportTracker(message, args, client) {
             try {
               const events = await awc.query(
                 [{ start: startTime, end: endTime }],
-                queryTracker(email)
+                queryTracker(item)
               );
 
               const spent_time = events.reduce(
@@ -501,9 +504,11 @@ async function reportTracker(message, args, client) {
 
               userTracker.map(async (check) => {
                 if (spent_time < hours) {
-                  mess = `${item}: ${showTrackerTime(
-                    spent_time
-                  )}, call time: ${showTrackerTime(check.call_time || 0)}`;
+                  listUser.push({
+                    email: item,
+                    spent_time: showTrackerTime(spent_time),
+                    call_time: showTrackerTime(check.call_time || 0),
+                  });
                 }
               });
             } catch (error) {
@@ -658,9 +663,9 @@ async function reportTracker(message, args, client) {
           sendErrorToDevTest(client, authorId, err);
         });
     }
-    const month = itemDay.slice(0, 2);
-    const day = itemDay.slice(3, 5);
-    const year = itemDay.slice(6);
+    const month = args[1].slice(0, 2);
+    const day = args[1].slice(3, 5);
+    const year = args[1].slice(6);
 
     const fomat = `${day}/${month}/${year}`;
 
@@ -859,14 +864,5 @@ function showTrackerTime(spentTime) {
   const duration = intervalToDuration({ start: 0, end: spentTime * 1000 });
   return `${duration.hours}h ${duration.minutes}m ${duration.seconds}s`;
 }
-
-// function showTrackerTimeAndCallTime(spentTime, callTime) {
-//   const durationCallTime = intervalToDuration({
-//     start: callTime * 1000,
-//     end: spentTime * 1000,
-//   });
-
-//   return `${durationCallTime.hours}h ${durationCallTime.minutes}m ${durationCallTime.seconds}s`;
-// }
 
 module.exports = { reportTracker };
