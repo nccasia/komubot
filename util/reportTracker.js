@@ -40,8 +40,8 @@ async function getUserWFH(date, message, args, client) {
   let wfhGetApi;
   try {
     const url = date
-      ? `${client.config.wfh.api_public}?date=${date}`
-      : client.config.wfh.api_public;
+      ? `${client.config.wfh.api_url}?date=${date}`
+      : client.config.wfh.api_url;
     wfhGetApi = await axios.get(url, {
       headers: {
         securitycode: client.config.wfh.api_key_secret,
