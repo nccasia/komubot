@@ -99,6 +99,82 @@ function getTimeToDay() {
   };
 }
 
+function checkTimeMeeting() {
+  const dateTimeNow = new Date();
+  dateTimeNow.setHours(dateTimeNow.getHours() + 7);
+  let day = dateTimeNow.getDay();
+  const hourDateNow = dateTimeNow.getHours();
+  const dateNow = dateTimeNow.toLocaleDateString('en-US');
+  const minuteDateNow = dateTimeNow.getMinutes();
+  dateTimeNow.setHours(0, 0, 0, 0);
+
+  return {
+    day: day,
+    dateTimeNow: dateTimeNow,
+    hourDateNow: hourDateNow,
+    dateNow: dateNow,
+    minuteDateNow: minuteDateNow,
+  };
+}
+
+function isSameDate(dateCreatedTimestamp) {
+  let result = false;
+  if (checkTimeMeeting().dateNow === dateCreatedTimestamp) {
+    result = true;
+  }
+  return result;
+}
+
+function isSameDay() {
+  let result = false;
+  if (checkTimeMeeting().day === 0 || checkTimeMeeting().day === 6) {
+    result = true;
+  }
+  return result;
+}
+
+function isSameMinute(minuteDb, dateScheduler) {
+  let result = false;
+  let checkFiveMinute;
+  let hourTimestamp;
+  if (minuteDb >= 0 && minuteDb <= 4) {
+    checkFiveMinute = minuteDb + 60 - checkTimeMeeting().minuteDateNow;
+    const hourDb = dateScheduler;
+    setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+    hourTimestamp = new Date(setHourTimestamp).getHours();
+  } else {
+    checkFiveMinute = minuteDb - checkTimeMeeting().minuteDateNow;
+    hourTimestamp = dateScheduler.getHours();
+  }
+  if (
+    checkTimeMeeting().hourDateNow === hourTimestamp &&
+    0 <= checkFiveMinute &&
+    checkFiveMinute <= 5
+  ) {
+    result = true;
+  }
+  return result;
+}
+
+function isDiffDay(newDateTimestamp, multiples) {
+  let result = false;
+  newDateTimestamp.setHours(0, 0, 0, 0);
+  const diffTime = Math.abs(checkTimeMeeting().dateTimeNow - newDateTimestamp);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  if (diffDays % multiples === 0) {
+    result = true;
+  }
+  return result;
+}
+
+function isTimeDay(newDateTimestamp) {
+  let result = false;
+  if (checkTimeMeeting().dateTimeNow - newDateTimestamp >= 0) {
+    result = true;
+  }
+  return result;
+}
+
 async function showDaily(client) {
   if (await checkHoliday()) return;
   console.log('[Scheduler] Run');
@@ -544,14 +620,6 @@ async function tagMeeting(client) {
 
   const voiceChannel = getAllVoice.map((item) => item.id);
 
-  const dateTimeNow = new Date();
-  dateTimeNow.setHours(dateTimeNow.getHours() + 7);
-  let day = dateTimeNow.getDay();
-  const hourDateNow = dateTimeNow.getHours();
-  const dateNow = dateTimeNow.toLocaleDateString('en-US');
-  const minuteDateNow = dateTimeNow.getMinutes();
-  dateTimeNow.setHours(0, 0, 0, 0);
-
   let countVoice = 0;
   let roomMap = [];
   let voiceNow = [];
@@ -574,46 +642,26 @@ async function tagMeeting(client) {
 
     if (index === voiceChannel.length - 1) {
       const timeCheck = repeatMeet.map(async (item) => {
-        let checkFiveMinute;
-        let hourTimestamp;
         const dateScheduler = new Date(+item.createdTimestamp);
         const minuteDb = dateScheduler.getMinutes();
-
-        if (minuteDb >= 0 && minuteDb <= 4) {
-          checkFiveMinute = minuteDb + 60 - minuteDateNow;
-          const hourDb = dateScheduler;
-          setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
-          hourTimestamp = new Date(setHourTimestamp).getHours();
-        } else {
-          checkFiveMinute = minuteDb - minuteDateNow;
-          hourTimestamp = dateScheduler.getHours();
-        }
 
         const dateCreatedTimestamp = new Date(
           +item.createdTimestamp.toString()
         ).toLocaleDateString('en-US');
         if (
           countVoice === voiceChannel.length &&
-          hourDateNow === hourTimestamp &&
-          0 <= checkFiveMinute &&
-          checkFiveMinute <= 5 &&
-          dateCreatedTimestamp === dateNow
+          isSameMinute(minuteDb, dateScheduler) &&
+          isSameDate(dateCreatedTimestamp)
         ) {
           const fetchChannelFull = await client.channels.fetch(item.channelId);
           fetchChannelFull.send(`@here voice channel full`);
         } else {
           const newDateTimestamp = new Date(+item.createdTimestamp.toString());
-
-          newDateTimestamp.setHours(0, 0, 0, 0);
-          const diffTime = Math.abs(dateTimeNow - newDateTimestamp);
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           switch (item.repeat) {
             case 'once':
               if (
-                hourDateNow === hourTimestamp &&
-                0 <= checkFiveMinute &&
-                checkFiveMinute <= 5 &&
-                dateCreatedTimestamp === dateNow
+                isSameDate(dateCreatedTimestamp) &&
+                isSameMinute(minuteDb, dateScheduler)
               ) {
                 const onceFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -660,12 +708,8 @@ async function tagMeeting(client) {
               }
               return;
             case 'daily':
-              if (day === 0 || day === 6) return;
-              if (
-                hourDateNow === hourTimestamp &&
-                0 <= checkFiveMinute &&
-                checkFiveMinute <= 5
-              ) {
+              if (isSameDay()) return;
+              if (isSameMinute(minuteDb, dateScheduler)) {
                 const dailyFetchChannel = await client.channels.fetch(
                   item.channelId
                 );
@@ -711,11 +755,9 @@ async function tagMeeting(client) {
               return;
             case 'weekly':
               if (
-                hourDateNow === hourTimestamp &&
-                0 <= checkFiveMinute &&
-                checkFiveMinute <= 5 &&
-                diffDays % 7 === 0 &&
-                dateTimeNow - newDateTimestamp >= 0
+                isSameMinute(minuteDb, dateScheduler) &&
+                isDiffDay(newDateTimestamp, 7) &&
+                isTimeDay(newDateTimestamp)
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -762,11 +804,9 @@ async function tagMeeting(client) {
               return;
             case 'repeat':
               if (
-                hourDateNow === hourTimestamp &&
-                0 <= checkFiveMinute &&
-                checkFiveMinute <= 5 &&
-                diffDays % item.repeatTime === 0 &&
-                dateTimeNow - newDateTimestamp >= 0
+                isSameMinute(minuteDb, dateScheduler) &&
+                isDiffDay(newDateTimestamp, item.repeatTime) &&
+                isTimeDay(newDateTimestamp)
               ) {
                 const repeatFetchChannel = await client.channels.fetch(
                   item.channelId
