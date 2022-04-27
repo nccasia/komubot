@@ -40,8 +40,8 @@ async function getUserWFH(date, message, args, client) {
   let wfhGetApi;
   try {
     const url = date
-      ? `${client.config.wfh.api_public}?date=${date}`
-      : client.config.wfh.api_public;
+      ? `${client.config.wfh.api_url}?date=${date}`
+      : client.config.wfh.api_url;
     wfhGetApi = await axios.get(url, {
       headers: {
         securitycode: client.config.wfh.api_key_secret,
@@ -220,8 +220,8 @@ async function reportTracker(message, args, client) {
       let listUser = [];
       const userWFH = await getUserWFH(date, message, args, client);
       if (!userWFH) {
-        mess = '```' + 'Không có ai đăng kí WFH trong ngày' + '```';
-        return message.reply(mess).catch((err) => {
+        let messWFH = '```' + 'Không có ai đăng kí WFH trong ngày' + '```';
+        return message.reply(messWFH).catch((err) => {
           sendErrorToDevTest(client, authorId, err);
         });
       }
@@ -454,8 +454,8 @@ async function reportTracker(message, args, client) {
         let listUser = [];
         const userWFH = await getUserWFH(itemDay, message, args, client);
         if (!userWFH) {
-          mess = '```' + `Không có ai đăng kí WFH trong ngày ${fomat}` + '```';
-          return message.reply(mess).catch((err) => {
+          let messWFH = '```' + 'Không có ai đăng kí WFH trong ngày' + '```';
+          return message.reply(messWFH).catch((err) => {
             sendErrorToDevTest(client, authorId, err);
           });
         }
@@ -764,8 +764,8 @@ async function reportTracker(message, args, client) {
       let listUser = [];
       const userWFH = await getUserWFH(fomat, message, args, client);
       if (!userWFH) {
-        mess = '```' + 'Không có ai đăng kí WFH trong ngày' + '```';
-        return message.reply(mess).catch((err) => {
+        let messWFH = '```' + 'Không có ai đăng kí WFH trong ngày' + '```';
+        return message.reply(messWFH).catch((err) => {
           sendErrorToDevTest(client, authorId, err);
         });
       }
