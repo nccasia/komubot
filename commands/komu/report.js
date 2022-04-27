@@ -6,6 +6,7 @@ const { reportMention } = require('../../util/reportMention');
 const { reportCheckCamera } = require('../../util/reportCheckCamera');
 const reportWomenDay = require('../../util/reportWomenDay');
 const reportOrder = require('../../util/reportOrder');
+const { handleKomuWeeklyReport } = require('../../util/odin-report');
 const { reportTracker } = require('../../util/reportTracker');
 const { reportHoliday } = require('../../util/reportHoliday');
 
@@ -58,6 +59,8 @@ module.exports = {
         await reportWomenDay(message);
       } else if (args[0] === 'order') {
         await reportOrder(message);
+      } else if (args[0] === 'komuweekly') {
+        await handleKomuWeeklyReport(message, args, client, guildDB);
       } else if (args[0] === 'tracker') {
         await reportTracker(message, args, client);
       } else if (args[0] === 'holiday') {

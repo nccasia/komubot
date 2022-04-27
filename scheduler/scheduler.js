@@ -25,7 +25,7 @@ const { updateRoleProject, updateRoleDiscord } = require('../util/roles');
 const datingData = require('../models/datingData');
 const remindData = require('../models/remindData');
 const holidayData = require('../models/holidayData');
-const { handleKomuWeeklyReport } = require('../util/odin-report');
+const { getKomuWeeklyReport } = require('../util/odin-report');
 
 // Deepai
 const deepai = require('deepai');
@@ -1339,7 +1339,34 @@ async function sendMesageRemind(client) {
 
 async function sendOdinReport(client) {
   try {
-    handleKomuWeeklyReport(client);
+    const fetchChannel = await client.channels.fetch('925707563629150238');
+    try {
+      const date = new Date();
+
+      if (isNaN(date.getTime())) {
+        throw Error('invalid date provided');
+      }
+
+      const report = await getKomuWeeklyReport({
+        reportName: 'komu-weekly',
+        url: process.env.ODIN_URL,
+        username: process.env.ODIN_USERNAME,
+        password: process.env.ODIN_PASSWORD,
+        screenUrl: process.env.ODIN_KOMU_REPORT_WEEKLY_URL,
+        date,
+      });
+
+      if (!report || !report.filePath || !fs.existsSync(report.filePath)) {
+        throw new Error('requested report is not found');
+      }
+
+      const attachment = new MessageAttachment(report.filePath);
+      const embed = new MessageEmbed().setTitle('Komu report weekly');
+      await fetchChannel.send({ files: [attachment], embed: embed });
+    } catch (error) {
+      console.error(error);
+      fetchChannel.send(`Sorry, ${error.message}`);
+    }
   } catch (error) {
     console.log(error);
   }
@@ -1474,7 +1501,7 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '15 14 * * 2',
+      '10 30 * * 3',
       () => sendOdinReport(client),
       null,
       false,
