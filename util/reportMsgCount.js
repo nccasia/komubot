@@ -49,6 +49,23 @@ async function reportMessageCount(message) {
         },
       },
       {
+        $lookup: {
+          from: 'komu_users',
+          localField: '_id',
+          foreignField: 'id',
+          as: 'users',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          countMessage: 1,
+          username: {
+            $first: '$users.username',
+          },
+        },
+      },
+      {
         $sort: {
           countMessage: -1,
         },
@@ -62,7 +79,9 @@ async function reportMessageCount(message) {
       mess = '```' + 'no result' + '```';
     } else {
       mess = messageData
-        .map((item) => `<@${item._id}> : ${item.countMessage}`)
+        .map(
+          (item) => `<@${item._id}>(${item.username}) : ${item.countMessage}`
+        )
         .join('\n');
     }
 

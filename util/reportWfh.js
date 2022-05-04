@@ -64,6 +64,23 @@ async function reportWfh(message, args, client) {
       },
     },
     {
+      $lookup: {
+        from: 'komu_users',
+        localField: '_id',
+        foreignField: 'id',
+        as: 'users',
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        total: 1,
+        username: {
+          $first: '$users.username',
+        },
+      },
+    },
+    {
       $sort: { total: -1 },
     },
   ]);
@@ -81,7 +98,7 @@ async function reportWfh(message, args, client) {
       if (wfhFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
       mess = wfhFullday
         .slice(i * 50, (i + 1) * 50)
-        .map((wfh) => `<@${wfh._id}> - (${wfh.total})`)
+        .map((wfh) => `<@${wfh._id}>(${wfh.username}) - (${wfh.total})`)
         .join('\n');
       const Embed = new MessageEmbed()
         .setTitle('Những người bị phạt vì không trả lời wfh trong ngày hôm nay')
