@@ -249,7 +249,7 @@ async function pingWfh(client) {
     try {
       wfhGetApi = await axios.get(client.config.wfh.api_url, {
         headers: {
-          securitycode: client.config.wfh.api_key_secret,
+          securitycode: process.env.WFH_API_KEY_SECRET,
         },
       });
     } catch (error) {
@@ -387,7 +387,7 @@ async function punish(client) {
   try {
     wfhGetApi = await axios.get(client.config.wfh.api_url, {
       headers: {
-        securitycode: client.config.wfh.api_key_secret,
+        securitycode: process.env.WFH_API_KEY_SECRET,
       },
     });
   } catch (error) {
@@ -453,7 +453,7 @@ async function punish(client) {
         data._id.toString()
       );
       const channel = await client.channels.fetch(
-        client.config.komubotrest.machleo_channel_id
+        process.env.KOMUBOTREST_MACHLEO_CHANNEL_ID
       );
       await userData.updateOne(
         { id: user.id, deactive: { $ne: true } },
@@ -527,7 +527,7 @@ async function checkMention(client) {
           data._id.toString()
         );
         const channel = await client.channels.fetch(
-          client.config.komubotrest.machleo_channel_id
+          process.env.KOMUBOTREST_MACHLEO_CHANNEL_ID
         );
         await channel.send(message);
         await mentionedData.updateOne(

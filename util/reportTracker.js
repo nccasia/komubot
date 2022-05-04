@@ -44,7 +44,7 @@ async function getUserWFH(date, message, args, client) {
       : client.config.wfh.api_url;
     wfhGetApi = await axios.get(url, {
       headers: {
-        securitycode: client.config.wfh.api_key_secret,
+        securitycode: process.env.WFH_API_KEY_SECRET,
       },
     });
   } catch (error) {

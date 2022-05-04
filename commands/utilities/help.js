@@ -34,9 +34,9 @@ module.exports = {
               },
               description:
                 'A detailed list of commands can be found here: [' +
-                client.config.links.website +
+                process.env.LINKS_WEBSITE +
                 '/commands](https://komu.vn/commands)\nWant to listen rich quality music with me? [Invite me](' +
-                client.config.links.invite +
+                process.env.LINKS_INVITE +
                 ')',
               fields: [
                 {
@@ -94,17 +94,17 @@ module.exports = {
                 fields: [
                   {
                     name: `• ${r[0]}`,
-                    value: `[${l}](${client.config.links.website})`,
+                    value: `[${l}](${process.env.LINKS_WEBSITE})`,
                     inline: !0,
                   },
                   {
                     name: `• ${r[1]}`,
-                    value: `[${l}](${client.config.links.support})`,
+                    value: `[${l}](${process.env.LINKS_SUPPORT})`,
                     inline: !0,
                   },
                   {
                     name: `• ${r[2]}`,
-                    value: `[${l}](${client.config.links.invite})`,
+                    value: `[${l}](${process.env.LINKS_INVITE})`,
                     inline: !0,
                   },
                 ],

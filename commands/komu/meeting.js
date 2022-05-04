@@ -123,7 +123,7 @@ module.exports = {
           await page.waitForSelector('input[type="email"]');
           await page.click('input[type="email"]');
           await navigationPromise;
-          await page.keyboard.type(`${client.config.komubotrest.gmail}`, {
+          await page.keyboard.type(`${process.env.KOMUBOTREST_GMAIL}`, {
             delay: 200,
           });
           await page.waitForTimeout(15000);
@@ -133,7 +133,7 @@ module.exports = {
 
           // typing out password
           await page.waitForTimeout(10000);
-          await page.keyboard.type(`${client.config.komubotrest.password}`, {
+          await page.keyboard.type(`${process.env.KOMUBOTREST_PASSWORD}`, {
             delay: 200,
           });
           await page.waitForTimeout(800);

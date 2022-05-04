@@ -10,10 +10,12 @@ module.exports = {
       const list = args.slice(0, args.length).join(' ');
       const channel = message.channelId;
       const author = message.author.id;
+      const username = message.author.username;
 
       await new orderData({
         channelId: channel,
         userId: author,
+        username: username,
         menu: list,
         createdTimestamp: Date.now(),
       })

@@ -65,7 +65,7 @@ const wfh = async (interaction, client) => {
       }
       const { data } = await axios
         .get(`${client.config.wiki.api_url}${userdb.email}@ncc.asia`, {
-          headers: { 'X-Secret-Key': client.config.wiki.api_key_secret },
+          headers: { 'X-Secret-Key': process.env.WIKI_API_KEY_SECRET },
         })
         .catch(() => {
           interaction
@@ -197,7 +197,7 @@ const wfh = async (interaction, client) => {
             )
             .catch(console.error);
           await client.channels.cache
-            .get(client.config.komubotrest.machleo_channel_id)
+            .get(process.env.KOMUBOTREST_MACHLEO_CHANNEL_ID)
             .send(message)
             .catch(console.error);
           await interaction
@@ -240,7 +240,7 @@ const wfh = async (interaction, client) => {
     const answerValue = customId;
     await axios
       .put(
-        `${client.config.komubotrest.CHECK_IN_URL}/v1/employees/image-label/update-image-label`,
+        `${process.env.KOMUBOTREST_CHECK_IN_URL}/v1/employees/image-label/update-image-label`,
         {
           verifiedImageId: verifiedImageId,
           imageLabelId: imageLabelId,
@@ -250,7 +250,7 @@ const wfh = async (interaction, client) => {
         },
         {
           headers: {
-            'X-Secret-Key': client.config.komubotrest.komu_bot_secret_key,
+            'X-Secret-Key': process.env.KOMUBOTREST_KOMU_BOT_SECRET_KEY,
           },
         }
       )

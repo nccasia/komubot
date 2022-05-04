@@ -43,7 +43,7 @@ module.exports = {
 
             {
               headers: {
-                'X-Secret-Key': client.config.ticket.api_key_secret,
+                'X-Secret-Key': process.env.TICKET_API_KEY_SECRET,
                 'Content-Type': 'application/json',
               },
             }
@@ -62,7 +62,7 @@ module.exports = {
             `${client.config.ticket.api_url_get}?email=${topicAssignee}@ncc.asia`,
             {
               headers: {
-                'X-Secret-Key': client.config.ticket.api_key_secret,
+                'X-Secret-Key': process.env.TICKET_API_KEY_SECRET,
               },
             }
           )

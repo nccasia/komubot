@@ -36,7 +36,7 @@ module.exports = {
               dynamic: true,
               size: 512,
             }),
-            url: client.config.links.invite,
+            url: process.env.LINKS_INVITE,
           },
           color: guildDB.color,
           image: {

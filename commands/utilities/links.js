@@ -28,7 +28,7 @@ module.exports = {
               }),
             },
             color: guildDB.color,
-            description: `Want to invite KOMU on your server? [Click here](${client.config.links.invite})`,
+            description: `Want to invite KOMU on your server? [Click here](${process.env.LINKS_INVITE})`,
             footer: {
               text: message.client.footer,
               icon_url: message.client.user.displayAvatarURL({
@@ -54,10 +54,10 @@ module.exports = {
           `${
             guildDB.lang === 'fr'
               ? ' Vous pouvez rejoindre le discord de support en cliquant [ici](' +
-                client.config.links.support +
+                process.env.LINKS_SUPPORT +
                 ')'
               : ' You can join our support discord by clicking [`here`](' +
-                client.config.links.support +
+                process.env.LINKS_SUPPORT +
                 ')'
           }`
         )
@@ -104,17 +104,17 @@ module.exports = {
         .setColor(guildDB.color)
         .addField(
           'Support:',
-          '[' + here + '](' + client.config.links.support + ')',
+          '[' + here + '](' + process.env.LINKS_SUPPORT + ')',
           true
         )
         .addField(
           'Invite:',
-          '[' + here + '](' + client.config.links.invite + ')',
+          '[' + here + '](' + process.env.LINKS_INVITE + ')',
           true
         )
         .addField(
           'Dashboard:',
-          '[' + here + '](' + client.config.links.website + ')',
+          '[' + here + '](' + process.env.LINKS_WEBSITE + ')',
           true
         )
         .addField(

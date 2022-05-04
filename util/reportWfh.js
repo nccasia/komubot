@@ -28,7 +28,7 @@ async function reportWfh(message, args, client) {
   try {
     wfhGetApi = await axios.get(client.config.wfh.api_url, {
       headers: {
-        securitycode: client.config.wfh.api_key_secret,
+        securitycode: process.env.WFH_API_KEY_SECRET,
       },
     });
   } catch (error) {
@@ -99,7 +99,7 @@ async function reportCompalinWfh(message, args, client) {
   try {
     wfhGetApi = await axios.get(client.config.wfh.api_url, {
       headers: {
-        securitycode: client.config.wfh.api_key_secret,
+        securitycode: process.env.WFH_API_KEY_SECRET,
       },
     });
   } catch (error) {

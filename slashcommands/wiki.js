@@ -87,7 +87,7 @@ module.exports = {
 
         const { data } = await axios
           .get(`${client.config.wiki.api_url}${userdb.email}@ncc.asia`, {
-            headers: { 'X-Secret-Key': client.config.wiki.api_key_secret },
+            headers: { 'X-Secret-Key': process.env.WIKI_API_KEY_SECRET },
           })
           .catch((err) => {
             console.log('Error ', err);
