@@ -240,7 +240,7 @@ const wfh = async (interaction, client) => {
     const answerValue = customId;
     await axios
       .put(
-        `${process.env.KOMUBOTREST_CHECK_IN_URL}/v1/employees/image-label/update-image-label`,
+        `${process.env.KOMUBOTREST_CHECK_IN_URL}v1/employees/image-label/update-image-label`,
         {
           verifiedImageId: verifiedImageId,
           imageLabelId: imageLabelId,

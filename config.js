@@ -67,7 +67,7 @@ module.exports = {
     api_url_get: `${process.env.INFO_API}KomuJobService/GetJobs`,
   },
   role: {
-    api_url_getRole: `${process.env.PROJECT_API_DEV}User/GetEmployeeInformation`,
+    api_url_getRole: `${process.env.PROJECT_API}User/GetEmployeeInformation`,
   },
   user_status: {
     api_url_userstatus: `${process.env.TIMESHEET_API}Public/GetWorkingStatusByUser`,
