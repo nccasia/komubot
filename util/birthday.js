@@ -7,7 +7,7 @@ async function getBirthdayUser(email, client) {
     const { data } = await axios
       .get(`${client.config.wiki.api_url}${email}@ncc.asia`, {
         headers: {
-          'X-Secret-Key': client.config.wiki.api_key_secret,
+          'X-Secret-Key': process.env.WIKI_API_KEY_SECRET,
         },
       })
       .catch((err) => {

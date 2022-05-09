@@ -17,7 +17,7 @@ module.exports = {
       .setAuthor(
         `${message.client.user.tag}`,
         message.client.user.displayAvatarURL(),
-        client.config.links.invite
+        process.env.LINKS_INVITE
       )
       .addField(
         '__Informations__',
@@ -36,7 +36,7 @@ module.exports = {
           size: 512,
         })
       )
-      .addField('Website', client.config.links.website)
+      .addField('Website', process.env.LINKS_WEBSITE)
       .addField('Vote', '' + client.config.links.topgg + '/vote')
       .setFooter(
         `${message.client.footer}`,

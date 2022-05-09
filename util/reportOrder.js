@@ -45,6 +45,7 @@ async function reportOrder(message) {
         $group: {
           _id: '$userId',
           menu: { $last: '$menu' },
+          username: { $last: '$username' },
           createdTimestamp: { $last: '$createdTimestamp' },
         },
       },
@@ -53,6 +54,7 @@ async function reportOrder(message) {
           _id: 0,
           userId: '$_id',
           menu: 1,
+          username: 1,
           createdTimestamp: 1,
         },
       },
@@ -68,7 +70,9 @@ async function reportOrder(message) {
         if (listOrder.slice(i * 50, (i + 1) * 50).length === 0) break;
         mess = listOrder
           .slice(i * 50, (i + 1) * 50)
-          .map((list) => `<@${list.userId}> order ${list.menu}`)
+          .map(
+            (list) => `<@${list.userId}>(${list.username}) order ${list.menu}`
+          )
           .join('\n');
         const Embed = new MessageEmbed()
           .setTitle(

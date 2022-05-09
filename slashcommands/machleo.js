@@ -10,7 +10,7 @@ module.exports = {
   async execute(message, client) {
     const machleomsg = message.options.get('message').value;
     await client.channels.cache
-      .get(client.config.komubotrest.machleo_channel_id)
+      .get(process.env.KOMUBOTREST_MACHLEO_CHANNEL_ID)
       .send(machleomsg)
       .catch(console.error);
     message.reply({

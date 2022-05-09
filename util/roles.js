@@ -11,7 +11,7 @@ const updateRoleProject = async (client) => {
     try {
       response = await axios.get(url, {
         headers: {
-          'X-Secret-Key': client.config.wiki.api_key_secret,
+          'X-Secret-Key': process.env.WIKI_API_KEY_SECRET,
         },
       });
     } catch (error) {

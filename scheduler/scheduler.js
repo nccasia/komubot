@@ -175,6 +175,32 @@ function isTimeDay(newDateTimestamp) {
   return result;
 }
 
+function withoutFirstTime(dateTime) {
+  const date = new Date(dateTime);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function withoutLastTime(dateTime) {
+  const date = new Date(dateTime);
+  date.setHours(23, 59, 59, 999);
+  return date;
+}
+
+function getYesterdayDate() {
+  const today = new Date();
+  const yesterday = new Date(withoutLastTime(today));
+  yesterday.setDate(yesterday.getDate() - 1);
+  return new Date(yesterday).valueOf();
+}
+
+function getTomorrowDate() {
+  const today = new Date();
+  const yesterday = new Date(withoutFirstTime(today));
+  yesterday.setDate(yesterday.getDate() + 1);
+  return new Date(yesterday).valueOf();
+}
+
 async function showDaily(client) {
   if (await checkHoliday()) return;
   console.log('[Scheduler] Run');
@@ -223,7 +249,7 @@ async function pingWfh(client) {
     try {
       wfhGetApi = await axios.get(client.config.wfh.api_url, {
         headers: {
-          securitycode: client.config.wfh.api_key_secret,
+          securitycode: process.env.WFH_API_KEY_SECRET,
         },
       });
     } catch (error) {
@@ -361,7 +387,7 @@ async function punish(client) {
   try {
     wfhGetApi = await axios.get(client.config.wfh.api_url, {
       headers: {
-        securitycode: client.config.wfh.api_key_secret,
+        securitycode: process.env.WFH_API_KEY_SECRET,
       },
     });
   } catch (error) {
@@ -427,7 +453,7 @@ async function punish(client) {
         data._id.toString()
       );
       const channel = await client.channels.fetch(
-        client.config.komubotrest.machleo_channel_id
+        process.env.KOMUBOTREST_MACHLEO_CHANNEL_ID
       );
       await userData.updateOne(
         { id: user.id, deactive: { $ne: true } },
@@ -501,7 +527,7 @@ async function checkMention(client) {
           data._id.toString()
         );
         const channel = await client.channels.fetch(
-          client.config.komubotrest.machleo_channel_id
+          process.env.KOMUBOTREST_MACHLEO_CHANNEL_ID
         );
         await channel.send(message);
         await mentionedData.updateOne(
@@ -1412,6 +1438,28 @@ async function sendOdinReport(client) {
   }
 }
 
+async function renameVoiceChannel(client) {
+  try {
+    const findVoice = await voiceChannelData.find({
+      status: 'start',
+      createdTimestamp: {
+        $gte: getYesterdayDate(),
+        $lte: getTomorrowDate(),
+      },
+    });
+    findVoice.map(async (item) => {
+      const channelName = await client.channels.fetch(item.id);
+      await channelName.setName(`${item.originalName}`);
+      await voiceChannelData.updateOne(
+        { _id: item._id },
+        { status: 'finished' }
+      );
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 function cronJobOneMinute(client) {
   sendMesageRemind(client);
   kickMemberVoiceChannel(client);
@@ -1541,8 +1589,15 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '10 30 * * 3',
+      '14 00 * * 1',
       () => sendOdinReport(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '23 00 * * 0-6',
+      () => renameVoiceChannel(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
