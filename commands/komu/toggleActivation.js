@@ -7,48 +7,46 @@ module.exports = {
   cat: 'komu',
   async execute(message, args) {
     try {
-      let authorId = message.author.id;
-      const checkMention = message.mentions.members.first();
-      const findUserId = await userData.find({
-        id: checkMention.user.id,
+      let authorId = args[0];
+      const findUserId = await userData.findOne({
+        $or: [{ id: authorId }, { username: authorId }],
       });
-      findUserId.map(async (item) => {
-        if (item.deactive !== true) {
-          const disableUser = await userData.updateOne(
-            {
-              id: item.id,
-            },
-            {
-              deactive: true,
-            }
-          );
-          message
-            .reply({
-              content: 'Disable account successfully',
-              ephemeral: true,
-            })
-            .catch((err) => {
-              sendErrorToDevTest(client, authorId, err);
-            });
-        } else {
-          const enableUser = await userData.updateOne(
-            {
-              id: item.id,
-            },
-            {
-              deactive: false,
-            }
-          );
-          message
-            .reply({
-              content: 'Enable account successfully',
-              ephemeral: true,
-            })
-            .catch((err) => {
-              sendErrorToDevTest(client, authorId, err);
-            });
-        }
-      });
+
+      if (findUserId.deactive !== true) {
+        await userData.updateOne(
+          {
+            id: findUserId.id,
+          },
+          {
+            deactive: true,
+          }
+        );
+        message
+          .reply({
+            content: 'Disable account successfully',
+            ephemeral: true,
+          })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
+      } else {
+        await userData.updateOne(
+          {
+            id: findUserId.id,
+          },
+          {
+            deactive: false,
+          }
+        );
+        message
+          .reply({
+            content: 'Enable account successfully',
+            ephemeral: true,
+          })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
+      }
     } catch (err) {
       console.log(err);
     }
