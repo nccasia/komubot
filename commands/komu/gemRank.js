@@ -45,7 +45,7 @@ module.exports = {
               .slice(i * 50, (i + 1) * 50)
               .map(
                 (list) =>
-                  `${list.ranking}: ${list.displayName}-elo: ${list.elo}`
+                  `${list.ranking}: ${list.displayName}, elo: ${list.elo}`
               )
               .join('\n');
             const Embed = new MessageEmbed()
