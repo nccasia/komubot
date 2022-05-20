@@ -3,9 +3,9 @@ const { sendErrorToDevTest } = require('../../util/komubotrest.js');
 const moment = require('moment');
 
 const TIME_BEGIN_MORNING = moment('7:30:59am', 'h:mma');
-const TIME_END_MORNING = moment('9:30:01am', 'h:mma');
+const TIME_END_MORNING = moment('9:31am', 'h:mma');
 const TIME_BEGIN_AFTERNOON = moment('11:59:59am', 'h:mma');
-const TIME_END_AFTERNOON = moment('14:00:01pm', 'h:mma');
+const TIME_END_AFTERNOON = moment('14:01pm', 'h:mma');
 
 function checkTimeSheet() {
   // let timeNow = new Date().toLocaleTimeString();
