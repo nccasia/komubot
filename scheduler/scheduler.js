@@ -1469,138 +1469,138 @@ function cronJobOneMinute(client) {
 
 exports.scheduler = {
   run(client) {
-    new cron.CronJob(
-      '*/1 * * * *',
-      () => cronJobOneMinute(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0-15/1 17 * * 5',
-      () => dating(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '15 13 * * 5',
-      () => audioPlayer(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '00 00 9 * * 1-5',
-      () => showDaily(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/5 9-11,13-17 * * 1-5',
-      () => pingWfh(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 9-11,13-17 * * 1-5',
-      () => punish(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '00 09 * * 0-6',
-      () => happyBirthday(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 9-11,13-17 * * 1-5',
-      () => checkMention(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '45 08 * * 1-5',
-      async () => await topTracker(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '30 17 * * 1-5',
-      () => sendMessTurnOffPc(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '00 12 * * 0',
-      () => sendSubmitTimesheet(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0 0 * * 1',
-      () => updateRoleProject(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0 * * * *',
-      () => updateRoleDiscord(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0 9-11,13-17 * * 1-5',
-      () => checkJoinCall(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0 9,11,13,15 * * 1-5',
-      () => sendQuiz(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '15 14 * * 5',
-      () => turnOffBot(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0 9,11,14,16 * * 1-5',
-      () => sendQuizEnglish(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '14 00 * * 1',
-      () => sendOdinReport(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '23 00 * * 0-6',
-      () => renameVoiceChannel(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
+    // new cron.CronJob(
+    //   '*/1 * * * *',
+    //   () => cronJobOneMinute(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '0-15/1 17 * * 5',
+    //   () => dating(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '15 13 * * 5',
+    //   () => audioPlayer(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '00 00 9 * * 1-5',
+    //   () => showDaily(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '*/5 9-11,13-17 * * 1-5',
+    //   () => pingWfh(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '*/1 9-11,13-17 * * 1-5',
+    //   () => punish(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '00 09 * * 0-6',
+    //   () => happyBirthday(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '*/1 9-11,13-17 * * 1-5',
+    //   () => checkMention(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '45 08 * * 1-5',
+    //   async () => await topTracker(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '30 17 * * 1-5',
+    //   () => sendMessTurnOffPc(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '00 12 * * 0',
+    //   () => sendSubmitTimesheet(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '0 0 * * 1',
+    //   () => updateRoleProject(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '0 * * * *',
+    //   () => updateRoleDiscord(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '0 9-11,13-17 * * 1-5',
+    //   () => checkJoinCall(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '0 9,11,13,15 * * 1-5',
+    //   () => sendQuiz(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '15 14 * * 5',
+    //   () => turnOffBot(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '0 9,11,14,16 * * 1-5',
+    //   () => sendQuizEnglish(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '14 00 * * 1',
+    //   () => sendOdinReport(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '23 00 * * 0-6',
+    //   () => renameVoiceChannel(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
   },
 };
