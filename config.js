@@ -105,6 +105,6 @@ module.exports = {
     api_url_getTopRank: `${process.env.GEMSOFGOD_API}komu/get-top-ranking`,
   },
   noti: {
-    api_url_quickNews: `${process.env.QUICKNEWS_API}services/app/QuickNews/Create`,
+    api_url_quickNews: `${process.env.IMS_API}services/app/QuickNews/Create`,
   },
 };
