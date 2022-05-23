@@ -10,10 +10,11 @@ const TIME_END_AFTERNOON = moment('14:01pm', 'h:mma');
 function checkTimeSheet() {
   // let timeNow = new Date().toLocaleTimeString();
   let timeNow = new Date();
+  console.log(timeNow);
   timeNow.setHours(timeNow.getHours() + 7);
   const getTimeNow = timeNow.toLocaleTimeString();
   let checkTimeNow = moment(getTimeNow, 'h:mma');
-
+  console.log(checkTimeNow);
   // check time morning
   if (
     checkTimeNow.isAfter(TIME_BEGIN_MORNING) &&
@@ -56,7 +57,7 @@ module.exports = {
         return message
           .reply({
             content:
-              '````✅` Daily saved. (Invalid daily time frame. Please daily at 7h30-9h30, 12h-14h. WFH not daily 20k/day.)```',
+              '```✅ Daily saved. (Invalid daily time frame. Please daily at 7h30-9h30, 12h-14h. WFH not daily 20k/day.)```',
             ephemeral: true,
           })
           .catch((err) => {
