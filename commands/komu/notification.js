@@ -10,13 +10,16 @@ module.exports = {
     try {
       const authorId = message.author.id;
       const noti = args.join(' ');
-      const checkRoleHr = await userData.find({
+      const checkRole = await userData.find({
         id: authorId,
         deactive: { $ne: true },
-        roles_discord: { $nin: ['HR', 'ADMIN'], $exists: true },
+        $or: [
+          { roles_discord: { $all: ['ADMIN'] } },
+          { roles_discord: { $all: ['HR'] } },
+        ],
       });
 
-      if (checkRoleHr.length === 0) {
+      if (checkRole.length === 0) {
         return message
           .reply({
             content:
