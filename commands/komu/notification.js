@@ -13,13 +13,14 @@ module.exports = {
       const checkRoleHr = await userData.find({
         id: authorId,
         deactive: { $ne: true },
-        roles_discord: 'HR',
+        roles_discord: { $nin: ['HR', 'ADMIN'], $exists: true },
       });
 
       if (checkRoleHr.length === 0) {
         return message
           .reply({
-            content: 'You do not have permission to execute this command!',
+            content:
+              '```You do not have permission to execute this command!```',
             ephemeral: true,
           })
           .catch((err) => {
@@ -30,7 +31,7 @@ module.exports = {
       if (!noti || noti == undefined) {
         return message
           .reply({
-            content: 'please add your text',
+            content: '```please add your text```',
             ephemeral: true,
           })
           .catch((err) => {
@@ -50,7 +51,7 @@ module.exports = {
         }
       );
       message
-        .reply({ content: '✅ Notification saved.', ephemeral: true })
+        .reply({ content: '`✅` Notification saved.', ephemeral: true })
         .catch((err) => {
           sendErrorToDevTest(client, authorId, err);
         });
