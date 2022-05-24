@@ -1,36 +1,34 @@
 const dailyData = require('../../models/dailyData.js');
 const { sendErrorToDevTest } = require('../../util/komubotrest.js');
-const moment = require('moment');
 
-const TIME_BEGIN_MORNING = moment('7:29:59am', 'h:mma');
-const TIME_END_MORNING = moment('9:31am', 'h:mma');
-const TIME_BEGIN_AFTERNOON = moment('11:59:59am', 'h:mma');
-const TIME_END_AFTERNOON = moment('14:01pm', 'h:mma');
+function setTime(date, hours, minute, second, msValue) {
+  return date.setHours(hours, minute, second, msValue);
+}
 
 function checkTimeSheet() {
-  // let timeNow = new Date().toLocaleTimeString();
-  let timeNow = new Date();
-  timeNow.setHours(timeNow.getHours() + 7);
-  const getTimeNow = timeNow.toLocaleTimeString();
-  let checkTimeNow = moment(getTimeNow, 'h:mma');
-
-  // check time morning
+  let result = false;
+  const time = new Date();
+  const cur = new Date();
+  const timezone = time.getTimezoneOffset() / -60;
+  const fisrtTimeMorning = new Date(
+    setTime(time, 7 + timezone, 30, 0, 0)
+  ).getTime();
+  const lastTimeMorning = new Date(
+    setTime(time, 9 + timezone, 31, 0, 0)
+  ).getTime();
+  const fisrtTimeAfternoon = new Date(
+    setTime(time, 12 + timezone, 0, 0, 0)
+  ).getTime();
+  const lastTimeAfternoon = new Date(
+    setTime(time, 14 + timezone, 1, 0, 0)
+  ).getTime();
   if (
-    checkTimeNow.isAfter(TIME_BEGIN_MORNING) &&
-    checkTimeNow.isBefore(TIME_END_MORNING)
+    (cur.getTime() >= fisrtTimeMorning && cur.getTime() <= lastTimeMorning) ||
+    (cur.getTime() >= fisrtTimeAfternoon && cur.getTime() <= lastTimeAfternoon)
   ) {
-    return true;
+    result = true;
   }
-
-  //check time afternoon
-  if (
-    checkTimeNow.isAfter(TIME_BEGIN_AFTERNOON) &&
-    checkTimeNow.isBefore(TIME_END_AFTERNOON)
-  ) {
-    return true;
-  }
-
-  return false;
+  return result;
 }
 
 module.exports = {
@@ -56,7 +54,7 @@ module.exports = {
         return message
           .reply({
             content:
-              '````✅` Daily saved. (Invalid daily time frame. Please daily at 7h30-9h30, 12h-14h. WFH not daily 20k/day.)```',
+              '```✅ Daily saved. (Invalid daily time frame. Please daily at 7h30-9h30, 12h-14h. WFH not daily 20k/day.)```',
             ephemeral: true,
           })
           .catch((err) => {
