@@ -1,6 +1,9 @@
 const userData = require('../../models/userData');
 const { sendErrorToDevTest } = require('../../util/komubotrest');
 
+const messHelp =
+  '```' + '*toggleactivation username' + '\n' + '*toggleactivation id' + '```';
+
 module.exports = {
   name: 'toggleactivation',
   description: 'Toggle Activation',
@@ -12,6 +15,15 @@ module.exports = {
         $or: [{ id: authorId }, { username: authorId }],
       });
 
+      if (findUserId === null)
+        return message
+          .reply({
+            content: `${messHelp}`,
+            ephemeral: true,
+          })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
       if (findUserId.deactive !== true) {
         await userData.updateOne(
           {
