@@ -13,7 +13,7 @@ module.exports = {
       const checkRoleHr = await userData.find({
         id: authorId,
         deactive: { $ne: true },
-        roles_discord: 'HR',
+        roles_discord: { $nin: ['HR', 'ADMIN'], $exists: true },
       });
 
       if (checkRoleHr.length === 0) {
@@ -55,6 +55,19 @@ module.exports = {
         .catch((err) => {
           sendErrorToDevTest(client, authorId, err);
         });
+      const fetchChannel = [
+        '922135616962068520',
+        '922402247260909569',
+        '935151571581423626',
+        '921686261943635988',
+        '921652536933499002',
+        '969511102885019688',
+        '921239541388554240',
+      ];
+      fetchChannel.map(async (channel) => {
+        const userDiscord = await client.channels.fetch(channel);
+        userDiscord.send(`${noti}`);
+      });
     } catch (err) {
       console.log(err);
     }

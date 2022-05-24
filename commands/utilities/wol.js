@@ -65,41 +65,44 @@ function wakeDeviceOnAvailableNetworks(macAddress) {
 
 function sendCMDToPfsense(branch, identity, ipAddress) {
   switch (branch) {
-	case "hn2":
-	  host = "10.10.40.1";
-	  break;
-	case "dn":
-	  host = "10.10.30.1";
-	  break;
-	case "sg1":
-	  host = "10.10.10.1";
-	  break;
-	case "sg2":
-	  host = "10.10.50.1";
-	  break;
-	case "vinh":
-      host = "10.10.20.1";
-	  break;
-	default:
-	  return;
+    case 'hn2':
+      host = '10.10.40.1';
+      break;
+    case 'dn':
+      host = '10.10.30.1';
+      break;
+    case 'sg1':
+      host = '10.10.10.1';
+      break;
+    case 'sg2':
+      host = '10.10.50.1';
+      break;
+    case 'vinh':
+      host = '10.10.20.1';
+      break;
+    default:
+      return;
   }
-  
+
   try {
-    var client  = new net.Socket();
-    client.connect({
-	  host: host,  
-      port:6996
-    }, () => {
-      // 'connect' listener
-      console.log('connected to server!', ipAddress, identity);
-      client.write(`${ipAddress} ${identity}`);
-    });
+    var client = new net.Socket();
+    client.connect(
+      {
+        host: host,
+        port: 6996,
+      },
+      () => {
+        // 'connect' listener
+        console.log('connected to server!', ipAddress, identity);
+        client.write(`${ipAddress} ${identity}`);
+      }
+    );
 
     client.on('data', (data) => {
       console.log(data.toString());
       client.end();
     });
-  } catch(err) {
+  } catch (err) {
     console.log(err);
   }
 }

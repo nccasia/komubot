@@ -7,6 +7,15 @@ function getUserNameByEmail(string) {
   }
 }
 
+const messHelp =
+  '```' +
+  '*wfh daily' +
+  '\n' +
+  '*wfh wellky' +
+  '\n' +
+  '*wfh dd/MM/YYYY' +
+  '```';
+
 async function getApiWfh(client, date) {
   let wfhGetApi;
   let dataWfh = [];
@@ -147,6 +156,15 @@ module.exports = {
             }
           }
         }
+      } else if (args[0] === 'help') {
+        return message
+          .reply({ content: `${messHelp}`, ephemeral: true })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
+      }
+      if (!args[0]) {
+        return message.channel.send(messHelp);
       } else {
         let dateTime = args[0];
         const day = dateTime.slice(0, 2);
