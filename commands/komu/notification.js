@@ -46,7 +46,7 @@ module.exports = {
         },
         {
           headers: {
-            securityCode: process.env.QUICKNEWS_KEY_SECRET,
+            securityCode: process.env.IMS_KEY_SECRET,
           },
         }
       );
