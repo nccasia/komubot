@@ -2,6 +2,7 @@ const wol = require('wake_on_lan');
 const find = require('local-devices');
 const broadcastAddress = require('broadcast-address');
 const os = require('os');
+var net = require('net');
 
 function getAvailableBroadcastAddresses() {
   const interfacesNames = Object.keys(os.networkInterfaces());
@@ -62,9 +63,55 @@ function wakeDeviceOnAvailableNetworks(macAddress) {
   );
 }
 
+function sendCMDToPfsense(branch, identity, ipAddress) {
+  switch (branch) {
+    case 'hn2':
+      host = '10.10.40.1';
+      break;
+    case 'dn':
+      host = '10.10.30.1';
+      break;
+    case 'sg1':
+      host = '10.10.10.1';
+      break;
+    case 'sg2':
+      host = '10.10.50.1';
+      break;
+    case 'vinh':
+      host = '10.10.20.1';
+      break;
+    default:
+      return;
+  }
+
+  try {
+    var client = new net.Socket();
+    client.connect(
+      {
+        host: host,
+        port: 6996,
+      },
+      () => {
+        // 'connect' listener
+        console.log('connected to server!', ipAddress, identity);
+        client.write(`${ipAddress} ${identity}`);
+      }
+    );
+
+    client.on('data', (data) => {
+      console.log(data.toString());
+      client.end();
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 function handleWoL(message, args) {
   const identity = args[0];
   const ipAddress = args[1];
+  const branch = args[2];
+  sendCMDToPfsense(branch, identity, ipAddress);
   return discoverDevice(identity, ipAddress)
     .then((device) => {
       if (!device || !device.mac) {
