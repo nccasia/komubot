@@ -6,9 +6,11 @@ const { reportMention } = require('../../util/reportMention');
 const { reportCheckCamera } = require('../../util/reportCheckCamera');
 const reportWomenDay = require('../../util/reportWomenDay');
 const reportOrder = require('../../util/reportOrder');
+const reportOpentalk = require('../../util/reportOpentalk');
 const { handleKomuWeeklyReport } = require('../../util/odin-report');
 const { reportTracker } = require('../../util/reportTracker');
 const { reportHoliday } = require('../../util/reportHoliday');
+const { util } = require('prettier');
 
 function getTimeWeekMondayToFriday(dayNow) {
   const curr = new Date();
@@ -59,6 +61,8 @@ module.exports = {
         await reportWomenDay(message);
       } else if (args[0] === 'order') {
         await reportOrder(message);
+      } else if (args[0] === 'opentalk') {
+        await reportOpentalk(message);
       } else if (args[0] === 'komuweekly') {
         await handleKomuWeeklyReport(message, args, client, guildDB);
       } else if (args[0] === 'tracker') {
