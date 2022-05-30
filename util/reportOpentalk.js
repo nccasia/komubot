@@ -69,7 +69,7 @@ async function reportOpentalk(message) {
           .join('\n');
         const Embed = new MessageEmbed()
           .setTitle(
-            `Danh sách đăng kí Opentalk đến hôm nay tổng là ${listOpentalk.length} người`
+            `Danh sách đăng kí tham gia opentalk (${listOpentalk.length})`
           )
           .setColor('RED')
           .setDescription(`${mess}`);
