@@ -1693,7 +1693,7 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '*/1 10-13 * * 6',
+      '*/1 10-12 * * 6',
       () => punish(client),
       null,
       false,
