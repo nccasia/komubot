@@ -26,7 +26,7 @@ const datingData = require('../models/datingData');
 const remindData = require('../models/remindData');
 const holidayData = require('../models/holidayData');
 const { getKomuWeeklyReport } = require('../util/odin-report');
-
+const openTalkData = require('../models/opentalkData');
 // Deepai
 const deepai = require('deepai');
 const API_KEY_DEEPAI = '9763204a-9c9a-4657-b393-5bbf4010217d';
@@ -34,6 +34,31 @@ deepai.setApiKey(API_KEY_DEEPAI);
 
 function setTime(date, hours, minute, second, msValue) {
   return date.setHours(hours, minute, second, msValue);
+}
+
+function getTimeWeek() {
+  const setTimeZero = (dateTime) => {
+    const date = new Date(dateTime);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
+  let curr = new Date();
+  // current date of week
+  const currentWeekDay = curr.getDay();
+  const lessDays = currentWeekDay == 0 ? 6 : currentWeekDay - 1;
+  const firstweek = new Date(new Date(curr).setDate(curr.getDate() - lessDays));
+  const lastweek = new Date(
+    new Date(firstweek).setDate(firstweek.getDate() + 7)
+  );
+
+  return {
+    firstday: {
+      timestamp: new Date(setTimeZero(firstweek)).getTime(),
+    },
+    lastday: {
+      timestamp: new Date(setTimeZero(lastweek)).getTime(),
+    },
+  };
 }
 
 function checkTime(time) {
@@ -924,17 +949,21 @@ async function sendMessTurnOffPc(client) {
   const staffRoleId = '921328149927690251';
   const channel = await client.channels.fetch('921239541388554240');
   const roles = await channel.guild.roles.fetch(staffRoleId);
-  const membersName = roles.members.map(async (member) => {
-    const userid = await userData.find({ username: member.displayName });
-    await Promise.all(
-      userid.map(async (user) => {
-        const userDiscord = await client.users.fetch(user.id);
-        userDiscord.send(
-          `Nhớ tắt máy trước khi ra về nếu không dùng nữa nhé!!!`
-        );
-      })
-    );
-  });
+  try {
+    const membersName = roles.members.map(async (member) => {
+      const userid = await userData.find({ username: member.displayName });
+      await Promise.all(
+        userid.map(async (user) => {
+          const userDiscord = await client.users.fetch(user.id);
+          userDiscord.send(
+            `Nhớ tắt máy trước khi ra về nếu không dùng nữa nhé!!!`
+          );
+        })
+      );
+    });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function sendSubmitTimesheet(client) {
@@ -1460,6 +1489,193 @@ async function renameVoiceChannel(client) {
   }
 }
 
+async function pingOpenTalk(client) {
+  try {
+    if (await checkHoliday()) return;
+
+    const usersRegisterOpenTalk = await openTalkData.find({
+      $and: [
+        { date: { $gte: getTimeWeek().firstday.timestamp } },
+        { date: { $lte: getTimeWeek().lastday.timestamp } },
+      ],
+    });
+
+    if (
+      Array.isArray(usersRegisterOpenTalk) &&
+      usersRegisterOpenTalk.length === 0
+    ) {
+      return;
+    }
+    const userIds = usersRegisterOpenTalk.map((user) => user.userId);
+
+    const userWfhWithSomeCodition = await userData.aggregate([
+      {
+        $match: {
+          id: { $in: userIds },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          username: 1,
+          last_message_id: 1,
+          id: 1,
+          roles: 1,
+          last_bot_message_id: 1,
+        },
+      },
+      {
+        $match: {
+          last_message_id: { $exists: true },
+          last_bot_message_id: {
+            $exists: true,
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'komu_msgs',
+          localField: 'last_bot_message_id',
+          foreignField: 'id',
+          as: 'last_message_bot',
+        },
+      },
+      {
+        $lookup: {
+          from: 'komu_msgs',
+          localField: 'last_message_id',
+          foreignField: 'id',
+          as: 'last_message',
+        },
+      },
+      {
+        $project: {
+          username: 1,
+          message_bot_timestamp: {
+            $first: '$last_message_bot.createdTimestamp',
+          },
+          message_timestamp: {
+            $first: '$last_message.createdTimestamp',
+          },
+          id: 1,
+          roles: 1,
+        },
+      },
+    ]);
+
+    const coditionGetTimeStamp = (user) => {
+      let result = false;
+      if (!user.message_bot_timestamp) {
+        result = true;
+      } else {
+        if (Date.now() - user.message_bot_timestamp >= 15 * 60 * 1000) {
+          result = true;
+        }
+      }
+      return result;
+    };
+    const arrayUser = userWfhWithSomeCodition.filter((user) =>
+      coditionGetTimeStamp(user)
+    );
+
+    try {
+      await Promise.all(
+        arrayUser.map((userWfh) => sendQuizToSingleUser(client, userWfh, true))
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function punishOpenTalk(client) {
+  if (await checkHoliday()) return;
+  if (checkTime(new Date())) return;
+  let wfhGetApi;
+  try {
+    wfhGetApi = await axios.get(client.config.wfh.api_url, {
+      headers: {
+        securitycode: process.env.WFH_API_KEY_SECRET,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  if (!wfhGetApi || wfhGetApi.data == undefined) {
+    return;
+  }
+  const wfhUserEmail = wfhGetApi.data.result.map((item) =>
+    getUserNameByEmail(item.emailAddress)
+  );
+  const users = await userData.aggregate([
+    {
+      $match: {
+        deactive: { $ne: true },
+        roles_discord: { $ne: [], $exists: true },
+        last_bot_message_id: { $exists: true, $ne: '' },
+        email: { $in: wfhUserEmail },
+        botPing: true,
+      },
+    },
+    {
+      $lookup: {
+        from: 'komu_msgs',
+        localField: 'last_bot_message_id',
+        foreignField: 'id',
+        as: 'last_message',
+      },
+    },
+    {
+      $project: {
+        id: 1,
+        username: 1,
+        createdTimestamp: {
+          $first: '$last_message.createdTimestamp',
+        },
+      },
+    },
+  ]);
+
+  users.map(async (user) => {
+    if (
+      Date.now() - user.createdTimestamp >= 900000 &&
+      user.createdTimestamp <= getTimeToDay().lastDay.getTime() &&
+      user.createdTimestamp >= getTimeToDay().firstDay.getTime()
+    ) {
+      const content = `<@${
+        user.id
+      }> không trả lời tin nhắn trong thời gian OpenTalk lúc ${moment(
+        parseInt(user.createdTimestamp.toString())
+      )
+        .utcOffset(420)
+        .format('YYYY-MM-DD HH:mm:ss')} !\n`;
+      const data = await new wfhData({
+        userid: user.id,
+        wfhMsg: content,
+        complain: false,
+        pmconfirm: false,
+        status: 'ACTIVE',
+      }).save();
+      const message = getWFHWarninghMessage(
+        content,
+        user.id,
+        data._id.toString()
+      );
+      const channel = await client.channels.fetch(
+        process.env.KOMUBOTREST_MACHLEO_CHANNEL_ID
+      );
+      await userData.updateOne(
+        { id: user.id, deactive: { $ne: true } },
+        { botPing: false }
+      );
+      await channel.send(message);
+    }
+  });
+}
+
 function cronJobOneMinute(client) {
   sendMesageRemind(client);
   kickMemberVoiceChannel(client);
@@ -1469,6 +1685,20 @@ function cronJobOneMinute(client) {
 
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '*/15 10-12 * * 6',
+      () => pingOpenTalk(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '*/1 10-12 * * 6',
+      () => punish(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     new cron.CronJob(
       '*/1 * * * *',
       () => cronJobOneMinute(client),
