@@ -150,6 +150,13 @@ function isSameDate(dateCreatedTimestamp) {
   return result;
 }
 
+function checkReportTimePause(timeEnd) {
+  const timeEndStamp = timeEnd.getTime();
+  const now = new Date().getTime();
+  if (now > timeEndStamp) return true;
+  return false;
+}
+
 function isSameDay() {
   let result = false;
   if (checkTimeMeeting().day === 0 || checkTimeMeeting().day === 6) {
@@ -710,6 +717,12 @@ async function tagMeeting(client) {
           const newDateTimestamp = new Date(+item.createdTimestamp.toString());
           switch (item.repeat) {
             case 'once':
+              if (checkReportTimePause(newDateTimestamp)) {
+                await meetingData.updateOne(
+                  { _id: item._id },
+                  { cancel: true }
+                );
+              }
               if (
                 isSameDate(dateCreatedTimestamp) &&
                 isSameMinute(minuteDb, dateScheduler)
@@ -937,10 +950,13 @@ async function updateReminderMeeting(client) {
       checkFiveMinute = minuteDateNow - minuteDb;
       hourTimestamp = dateScheduler.getHours();
     }
-
-    if (hourDateNow === hourTimestamp && checkFiveMinute > 5) {
-      await meetingData.updateOne({ _id: item._id }, { reminder: false });
-    }
+    if (hourDateNow === hourTimestamp && checkFiveMinute > 5)
+      if (item.repeat === 'once') {
+        console.log(item);
+        await meetingData.updateOne({ _id: item._id }, { cancel: true });
+      } else {
+        await meetingData.updateOne({ _id: item._id }, { reminder: false });
+      }
   });
 }
 
