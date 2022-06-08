@@ -53,7 +53,7 @@ module.exports = {
 
       if (!args[0]) {
         const calendarChannel = message.channelId;
-        const list = await meetingData.find({
+        const item = await meetingData.find({
           channelId: calendarChannel,
           cancel: { $ne: true },
         });
@@ -71,6 +71,9 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         } else {
+          list = list.filter((item) => {
+            return item.repeat !== 'once' && item.createdTimestamp > Date.now();
+          });
           for (let i = 0; i <= Math.ceil(list.length / 50); i += 1) {
             if (list.slice(i * 50, (i + 1) * 50).length === 0) break;
             mess =
