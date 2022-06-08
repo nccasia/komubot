@@ -72,7 +72,7 @@ module.exports = {
             });
         } else {
           list = list.filter((item) => {
-            return item.repeat !== 'once' && item.createdTimestamp > Date.now();
+            return item.repeat !== 'once' || item.createdTimestamp > Date.now();
           });
           for (let i = 0; i <= Math.ceil(list.length / 50); i += 1) {
             if (list.slice(i * 50, (i + 1) * 50).length === 0) break;
