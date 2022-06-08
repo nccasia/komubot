@@ -105,6 +105,17 @@ async function checkHoliday() {
   return result;
 }
 
+async function checkHolidayMeeting(date) {
+  const format = formatDate(date);
+  if (date.getDay() === 6 || date.getDay() === 0) {
+    return true;
+  }
+  const holiday = await holidayData.find({
+    dateTime: format,
+  });
+  return holiday.length > 0;
+}
+
 function withoutTime(dateTime) {
   const date = new Date(dateTime);
   const curDate = new Date();
@@ -198,6 +209,19 @@ function isTimeDay(newDateTimestamp) {
     result = true;
   }
   return result;
+}
+
+function formatDate(date) {
+  const dateNow = date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const month = dateNow.slice(0, 2);
+  const day = dateNow.slice(3, 5);
+  const year = dateNow.slice(6);
+
+  return `${day}/${month}/${year}`;
 }
 
 function withoutFirstTime(dateTime) {
@@ -765,7 +789,7 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  dailyFetchChannel.send(
+                  await dailyFetchChannel.send(
                     `@here our meeting room is <#${roomVoice[0]}>`
                   );
                   const dailyShift = roomVoice.shift(roomVoice[0]);
@@ -797,10 +821,21 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                } else dailyFetchChannel.send(`@here voice channel full`);
+                } else await dailyFetchChannel.send(`@here voice channel full`);
+                let newCreatedTimestamp = item.createdTimestamp;
+                newCreatedTimestamp = newDateTimestamp.setDate(
+                  newDateTimestamp.getDate() + 1
+                );
+
+                while (await checkHolidayMeeting(newDateTimestamp)) {
+                  newCreatedTimestamp = newDateTimestamp.setDate(
+                    newDateTimestamp.getDate() + 1
+                  );
+                }
+
                 await meetingData.updateOne(
                   { _id: item._id },
-                  { reminder: true }
+                  { reminder: true, createdTimestamp: newCreatedTimestamp }
                 );
               }
               return;
@@ -814,7 +849,7 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  weeklyFetchChannel.send(
+                  await weeklyFetchChannel.send(
                     `@here our meeting room is <#${roomVoice[0]}>`
                   );
                   const weeklyShift = roomVoice.shift(roomVoice[0]);
@@ -846,10 +881,23 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                } else weeklyFetchChannel.send(`@here voice channel full`);
+                } else
+                  await weeklyFetchChannel.send(`@here voice channel full`);
+                let newCreatedTimestampWeekly = item.createdTimestamp;
+                newCreatedTimestampWeekly = newDateTimestamp.setDate(
+                  newDateTimestamp.getDate() + 7
+                );
+                while (await checkHolidayMeeting(newDateTimestamp)) {
+                  newCreatedTimestampWeekly = newDateTimestamp.setDate(
+                    newDateTimestamp.getDate() + 7
+                  );
+                }
                 await meetingData.updateOne(
                   { _id: item._id },
-                  { reminder: true }
+                  {
+                    reminder: true,
+                    createdTimestamp: newCreatedTimestampWeekly,
+                  }
                 );
               }
               return;
@@ -863,7 +911,7 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  repeatFetchChannel.send(
+                  await repeatFetchChannel.send(
                     `@here our meeting room is <#${roomVoice[0]}>`
                   );
                   const repeatShift = roomVoice.shift(roomVoice[0]);
@@ -895,10 +943,25 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                } else repeatFetchChannel.send(`@here voice channel full`);
+                } else
+                  await repeatFetchChannel.send(`@here voice channel full`);
+                let newCreatedTimestampRepeat = item.createdTimestamp;
+                newCreatedTimestampRepeat = newDateTimestamp.setDate(
+                  newDateTimestamp.getDate() + item.repeatTime
+                );
+
+                console.log(newCreatedTimestampRepeat);
+                while (await checkHolidayMeeting(newDateTimestamp)) {
+                  newCreatedTimestampRepeat = newDateTimestamp.setDate(
+                    newDateTimestamp.getDate() + item.repeatTime
+                  );
+                }
                 await meetingData.updateOne(
                   { _id: item._id },
-                  { reminder: true }
+                  {
+                    reminder: true,
+                    createdTimestamp: newCreatedTimestampRepeat,
+                  }
                 );
               }
               return;
@@ -937,10 +1000,12 @@ async function updateReminderMeeting(client) {
       checkFiveMinute = minuteDateNow - minuteDb;
       hourTimestamp = dateScheduler.getHours();
     }
-
-    if (hourDateNow === hourTimestamp && checkFiveMinute > 5) {
-      await meetingData.updateOne({ _id: item._id }, { reminder: false });
-    }
+    if (hourDateNow === hourTimestamp && checkFiveMinute > 5)
+      if (item.repeat === 'once') {
+        await meetingData.updateOne({ _id: item._id }, { cancel: true });
+      } else {
+        await meetingData.updateOne({ _id: item._id }, { reminder: false });
+      }
   });
 }
 
@@ -1568,7 +1633,7 @@ async function pingOpenTalk(client) {
       if (!user.message_bot_timestamp) {
         result = true;
       } else {
-        if (Date.now() - user.message_bot_timestamp >= 15 * 60 * 1000) {
+        if (Date.now() - user.message_bot_timestamp >= 1 * 60 * 1000) {
           result = true;
         }
       }
@@ -1580,7 +1645,9 @@ async function pingOpenTalk(client) {
 
     try {
       await Promise.all(
-        arrayUser.map((userWfh) => sendQuizToSingleUser(client, userWfh, true))
+        arrayUser.map((userWfh) =>
+          sendQuizToSingleUser(client, userWfh, true, 'english')
+        )
       );
     } catch (error) {
       console.log(error);
