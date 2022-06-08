@@ -52,7 +52,7 @@ module.exports = {
       const channel_id = message.channel.id;
 
       if (!args[0]) {
-        const calendarChannel = message.channelId;
+        const calendarChannel = message.channel_id;
         const list = await meetingData.find({
           channelId: calendarChannel,
           cancel: { $ne: true },
