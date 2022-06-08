@@ -53,7 +53,7 @@ module.exports = {
 
       if (!args[0]) {
         const calendarChannel = message.channelId;
-        const list = await meetingData.find({
+        let list = await meetingData.find({
           channelId: calendarChannel,
           cancel: { $ne: true },
         });
