@@ -729,9 +729,13 @@ async function tagMeeting(client) {
           isSameDate(dateCreatedTimestamp)
         ) {
           const fetchChannelFull = await client.channels.fetch(item.channelId);
-          fetchChannelFull.send(`@here voice channel full`);
+          await fetchChannelFull.send(`@here voice channel full`);
         } else {
           const newDateTimestamp = new Date(+item.createdTimestamp.toString());
+          const currentDate = new Date(newDateTimestamp.getTime());
+          const today = new Date();
+          currentDate.setDate(today.getDate());
+          currentDate.setMonth(today.getMonth());
           switch (item.repeat) {
             case 'once':
               if (
@@ -742,7 +746,7 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  onceFetchChannel.send(
+                  await onceFetchChannel.send(
                     `@here our meeting room is <#${roomVoice[0]}>`
                   );
                   const onceShift = roomVoice.shift(roomVoice[0]);
@@ -775,7 +779,7 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                } else onceFetchChannel.send(`@here voice channel full`);
+                } else await onceFetchChannel.send(`@here voice channel full`);
                 await meetingData.updateOne(
                   { _id: item._id },
                   { reminder: true }
@@ -823,13 +827,13 @@ async function tagMeeting(client) {
                     .catch((err) => console.log(err));
                 } else await dailyFetchChannel.send(`@here voice channel full`);
                 let newCreatedTimestamp = item.createdTimestamp;
-                newCreatedTimestamp = newDateTimestamp.setDate(
-                  newDateTimestamp.getDate() + 1
+                newCreatedTimestamp = currentDate.setDate(
+                  currentDate.getDate() + 1
                 );
 
-                while (await checkHolidayMeeting(newDateTimestamp)) {
-                  newCreatedTimestamp = newDateTimestamp.setDate(
-                    newDateTimestamp.getDate() + 1
+                while (await checkHolidayMeeting(currentDate)) {
+                  newCreatedTimestamp = currentDate.setDate(
+                    currentDate.getDate() + 1
                   );
                 }
 
@@ -842,8 +846,8 @@ async function tagMeeting(client) {
             case 'weekly':
               if (
                 isSameMinute(minuteDb, dateScheduler) &&
-                isDiffDay(newDateTimestamp, 7) &&
-                isTimeDay(newDateTimestamp)
+                isDiffDay(dateScheduler, 7) &&
+                isTimeDay(dateScheduler)
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -884,12 +888,12 @@ async function tagMeeting(client) {
                 } else
                   await weeklyFetchChannel.send(`@here voice channel full`);
                 let newCreatedTimestampWeekly = item.createdTimestamp;
-                newCreatedTimestampWeekly = newDateTimestamp.setDate(
-                  newDateTimestamp.getDate() + 7
+                newCreatedTimestampWeekly = currentDate.setDate(
+                  currentDate.getDate() + 7
                 );
-                while (await checkHolidayMeeting(newDateTimestamp)) {
-                  newCreatedTimestampWeekly = newDateTimestamp.setDate(
-                    newDateTimestamp.getDate() + 7
+                while (await checkHolidayMeeting(currentDate)) {
+                  newCreatedTimestampWeekly = currentDate.setDate(
+                    currentDate.getDate() + 7
                   );
                 }
                 await meetingData.updateOne(
@@ -904,8 +908,8 @@ async function tagMeeting(client) {
             case 'repeat':
               if (
                 isSameMinute(minuteDb, dateScheduler) &&
-                isDiffDay(newDateTimestamp, item.repeatTime) &&
-                isTimeDay(newDateTimestamp)
+                isDiffDay(dateScheduler, item.repeatTime) &&
+                isTimeDay(dateScheduler)
               ) {
                 const repeatFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -946,14 +950,14 @@ async function tagMeeting(client) {
                 } else
                   await repeatFetchChannel.send(`@here voice channel full`);
                 let newCreatedTimestampRepeat = item.createdTimestamp;
-                newCreatedTimestampRepeat = newDateTimestamp.setDate(
-                  newDateTimestamp.getDate() + item.repeatTime
+                newCreatedTimestampRepeat = currentDate.setDate(
+                  currentDate.getDate() + item.repeatTime
                 );
 
                 console.log(newCreatedTimestampRepeat);
-                while (await checkHolidayMeeting(newDateTimestamp)) {
-                  newCreatedTimestampRepeat = newDateTimestamp.setDate(
-                    newDateTimestamp.getDate() + item.repeatTime
+                while (await checkHolidayMeeting(currentDate)) {
+                  newCreatedTimestampRepeat = currentDate.setDate(
+                    currentDate.getDate() + item.repeatTime
                   );
                 }
                 await meetingData.updateOne(
