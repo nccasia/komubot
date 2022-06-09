@@ -60,7 +60,14 @@ module.exports = {
 
         let mess;
         if (!list || list.length === 0) {
-          return;
+          return message
+            .reply({
+              content: '`✅` No scheduled meeting.',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              sendErrorToDevTest(client, authorId, err);
+            });
         } else {
           list = list.filter((item) => {
             return item.repeat !== 'once' || item.createdTimestamp > Date.now();
