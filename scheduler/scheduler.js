@@ -746,7 +746,7 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  await onceFetchChannel.send(
+                  onceFetchChannel.send(
                     `@here our meeting room is <#${roomVoice[0]}>`
                   );
                   const onceShift = roomVoice.shift(roomVoice[0]);
@@ -793,7 +793,7 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  await dailyFetchChannel.send(
+                  dailyFetchChannel.send(
                     `@here our meeting room is <#${roomVoice[0]}>`
                   );
                   const dailyShift = roomVoice.shift(roomVoice[0]);
@@ -853,7 +853,7 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  await weeklyFetchChannel.send(
+                  weeklyFetchChannel.send(
                     `@here our meeting room is <#${roomVoice[0]}>`
                   );
                   const weeklyShift = roomVoice.shift(roomVoice[0]);
@@ -915,7 +915,7 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  await repeatFetchChannel.send(
+                  repeatFetchChannel.send(
                     `@here our meeting room is <#${roomVoice[0]}>`
                   );
                   const repeatShift = roomVoice.shift(roomVoice[0]);
