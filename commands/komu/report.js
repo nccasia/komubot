@@ -16,7 +16,7 @@ const messHelpDaily =
   '```' +
   '*report daily' +
   '\n' +
-  '*report daily weekly' +
+  '*report weekly' +
   '\n' +
   '*report daily dd/MM/YYYY' +
   '```';
@@ -49,11 +49,7 @@ module.exports = {
   async execute(message, args, client, guildDB) {
     try {
       if (args[0] === 'daily') {
-        if (args[1] === 'weekly') {
-          for (const day of getTimeWeekMondayToFriday(new Date().getDay())) {
-            await reportDaily(day, message, args, client, guildDB);
-          }
-        } else if (args[1]) {
+        if (args[1]) {
           const day = args[1].slice(0, 2);
           const month = args[1].slice(3, 5);
           const year = args[1].slice(6);
@@ -70,6 +66,10 @@ module.exports = {
           await reportDaily(dateTime, message, args, client, guildDB);
         } else {
           await reportDaily(null, message, args, client, guildDB);
+        }
+      } else if (args[0] === 'weekly') {
+        for (const day of getTimeWeekMondayToFriday(new Date().getDay())) {
+          await reportDaily(day, message, args, client, guildDB);
         }
       } else if (args[0] === 'mention') {
         await reportMention(message, args, client, guildDB);
