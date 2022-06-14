@@ -12,6 +12,15 @@ const { reportTracker } = require('../../util/reportTracker');
 const { reportHoliday } = require('../../util/reportHoliday');
 const { util } = require('prettier');
 
+const messHelpDaily =
+  '```' +
+  '*report daily' +
+  '\n' +
+  '*report daily weekly' +
+  '\n' +
+  '*report daily dd/MM/YYYY' +
+  '```';
+
 function getTimeWeekMondayToFriday(dayNow) {
   const curr = new Date();
   // current date of week
@@ -56,7 +65,7 @@ module.exports = {
               args[1]
             )
           ) {
-            return;
+            return message.channel.send(messHelpDaily);
           }
           await reportDaily(dateTime, message, args, client, guildDB);
         } else {
