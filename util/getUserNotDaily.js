@@ -114,7 +114,10 @@ async function getUserNotDaily(date, message, args, client) {
     try {
       userNotDaily = await Promise.all(
         notDaily.map((user) =>
-          userData.findOne({ username: user.email, deactive: { $ne: true } })
+          userData.findOne({
+            $or: [{ email: user.email }, { username: user.email }],
+            deactive: { $ne: true },
+          })
         )
       );
     } catch (error) {
