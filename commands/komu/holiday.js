@@ -1,7 +1,7 @@
 const holidayData = require('../../models/holidayData.js');
 const { sendErrorToDevTest } = require('../../util/komubotrest.js');
 
-const messHelp = '```' + '*holiday register dd/MM/YYYY' + '```';
+const messHelp = '```' + '*holiday register dd/MM/YYYY content' + '```';
 
 module.exports = {
   name: 'holiday',

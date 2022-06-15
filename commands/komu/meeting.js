@@ -53,15 +53,13 @@ module.exports = {
 
       if (!args[0]) {
         const calendarChannel = message.channelId;
-        const list = await meetingData.find({
+        let list = await meetingData.find({
           channelId: calendarChannel,
           cancel: { $ne: true },
         });
 
         let mess;
-        if (!list) {
-          return;
-        } else if (Array.isArray(list) && list.length === 0) {
+        if (!list || list.length === 0) {
           return message
             .reply({
               content: '`✅` No scheduled meeting.',
@@ -71,6 +69,19 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         } else {
+          list = list.filter((item) => {
+            return item.repeat !== 'once' || item.createdTimestamp > Date.now();
+          });
+          if (list.length === 0) {
+            return message
+              .reply({
+                content: '`✅` No scheduled meeting.',
+                ephemeral: true,
+              })
+              .catch((err) => {
+                sendErrorToDevTest(client, authorId, err);
+              });
+          }
           for (let i = 0; i <= Math.ceil(list.length / 50); i += 1) {
             if (list.slice(i * 50, (i + 1) * 50).length === 0) break;
             mess =

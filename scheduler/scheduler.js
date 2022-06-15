@@ -105,6 +105,17 @@ async function checkHoliday() {
   return result;
 }
 
+async function checkHolidayMeeting(date) {
+  const format = formatDate(date);
+  if (date.getDay() === 6 || date.getDay() === 0) {
+    return true;
+  }
+  const holiday = await holidayData.find({
+    dateTime: format,
+  });
+  return holiday.length > 0;
+}
+
 function withoutTime(dateTime) {
   const date = new Date(dateTime);
   const curDate = new Date();
@@ -198,6 +209,19 @@ function isTimeDay(newDateTimestamp) {
     result = true;
   }
   return result;
+}
+
+function formatDate(date) {
+  const dateNow = date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const month = dateNow.slice(0, 2);
+  const day = dateNow.slice(3, 5);
+  const year = dateNow.slice(6);
+
+  return `${day}/${month}/${year}`;
 }
 
 function withoutFirstTime(dateTime) {
@@ -705,9 +729,13 @@ async function tagMeeting(client) {
           isSameDate(dateCreatedTimestamp)
         ) {
           const fetchChannelFull = await client.channels.fetch(item.channelId);
-          fetchChannelFull.send(`@here voice channel full`);
+          await fetchChannelFull.send(`@here voice channel full`);
         } else {
           const newDateTimestamp = new Date(+item.createdTimestamp.toString());
+          const currentDate = new Date(newDateTimestamp.getTime());
+          const today = new Date();
+          currentDate.setDate(today.getDate());
+          currentDate.setMonth(today.getMonth());
           switch (item.repeat) {
             case 'once':
               if (
@@ -751,7 +779,7 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                } else onceFetchChannel.send(`@here voice channel full`);
+                } else await onceFetchChannel.send(`@here voice channel full`);
                 await meetingData.updateOne(
                   { _id: item._id },
                   { reminder: true }
@@ -797,18 +825,29 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                } else dailyFetchChannel.send(`@here voice channel full`);
+                } else await dailyFetchChannel.send(`@here voice channel full`);
+                let newCreatedTimestamp = item.createdTimestamp;
+                newCreatedTimestamp = currentDate.setDate(
+                  currentDate.getDate() + 1
+                );
+
+                while (await checkHolidayMeeting(currentDate)) {
+                  newCreatedTimestamp = currentDate.setDate(
+                    currentDate.getDate() + 1
+                  );
+                }
+
                 await meetingData.updateOne(
                   { _id: item._id },
-                  { reminder: true }
+                  { reminder: true, createdTimestamp: newCreatedTimestamp }
                 );
               }
               return;
             case 'weekly':
               if (
                 isSameMinute(minuteDb, dateScheduler) &&
-                isDiffDay(newDateTimestamp, 7) &&
-                isTimeDay(newDateTimestamp)
+                isDiffDay(dateScheduler, 7) &&
+                isTimeDay(dateScheduler)
               ) {
                 const weeklyFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -846,18 +885,31 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                } else weeklyFetchChannel.send(`@here voice channel full`);
+                } else
+                  await weeklyFetchChannel.send(`@here voice channel full`);
+                let newCreatedTimestampWeekly = item.createdTimestamp;
+                newCreatedTimestampWeekly = currentDate.setDate(
+                  currentDate.getDate() + 7
+                );
+                while (await checkHolidayMeeting(currentDate)) {
+                  newCreatedTimestampWeekly = currentDate.setDate(
+                    currentDate.getDate() + 7
+                  );
+                }
                 await meetingData.updateOne(
                   { _id: item._id },
-                  { reminder: true }
+                  {
+                    reminder: true,
+                    createdTimestamp: newCreatedTimestampWeekly,
+                  }
                 );
               }
               return;
             case 'repeat':
               if (
                 isSameMinute(minuteDb, dateScheduler) &&
-                isDiffDay(newDateTimestamp, item.repeatTime) &&
-                isTimeDay(newDateTimestamp)
+                isDiffDay(dateScheduler, item.repeatTime) &&
+                isTimeDay(dateScheduler)
               ) {
                 const repeatFetchChannel = await client.channels.fetch(
                   item.channelId
@@ -895,10 +947,25 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                } else repeatFetchChannel.send(`@here voice channel full`);
+                } else
+                  await repeatFetchChannel.send(`@here voice channel full`);
+                let newCreatedTimestampRepeat = item.createdTimestamp;
+                newCreatedTimestampRepeat = currentDate.setDate(
+                  currentDate.getDate() + item.repeatTime
+                );
+
+                console.log(newCreatedTimestampRepeat);
+                while (await checkHolidayMeeting(currentDate)) {
+                  newCreatedTimestampRepeat = currentDate.setDate(
+                    currentDate.getDate() + item.repeatTime
+                  );
+                }
                 await meetingData.updateOne(
                   { _id: item._id },
-                  { reminder: true }
+                  {
+                    reminder: true,
+                    createdTimestamp: newCreatedTimestampRepeat,
+                  }
                 );
               }
               return;
@@ -937,10 +1004,12 @@ async function updateReminderMeeting(client) {
       checkFiveMinute = minuteDateNow - minuteDb;
       hourTimestamp = dateScheduler.getHours();
     }
-
-    if (hourDateNow === hourTimestamp && checkFiveMinute > 5) {
-      await meetingData.updateOne({ _id: item._id }, { reminder: false });
-    }
+    if (hourDateNow === hourTimestamp && checkFiveMinute > 5)
+      if (item.repeat === 'once') {
+        await meetingData.updateOne({ _id: item._id }, { cancel: true });
+      } else {
+        await meetingData.updateOne({ _id: item._id }, { reminder: false });
+      }
   });
 }
 
@@ -1568,7 +1637,7 @@ async function pingOpenTalk(client) {
       if (!user.message_bot_timestamp) {
         result = true;
       } else {
-        if (Date.now() - user.message_bot_timestamp >= 15 * 60 * 1000) {
+        if (Date.now() - user.message_bot_timestamp >= 1 * 60 * 1000) {
           result = true;
         }
       }
@@ -1580,7 +1649,9 @@ async function pingOpenTalk(client) {
 
     try {
       await Promise.all(
-        arrayUser.map((userWfh) => sendQuizToSingleUser(client, userWfh, true))
+        arrayUser.map((userWfh) =>
+          sendQuizToSingleUser(client, userWfh, true, 'english')
+        )
       );
     } catch (error) {
       console.log(error);
