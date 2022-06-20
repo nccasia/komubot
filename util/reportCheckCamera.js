@@ -70,7 +70,7 @@ async function reportCheckCamera(message) {
       if (checkCameraFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
       mess = checkCameraFullday
         .slice(i * 50, (i + 1) * 50)
-        .map((checkCamera) => `<@${checkCamera.id}>(${checkCamera.username})`)
+        .map((checkCamera) => `${checkCamera.username}`)
         .join('\n');
       const Embed = new MessageEmbed()
         .setTitle('Những người không bật camera trong ngày hôm nay')
