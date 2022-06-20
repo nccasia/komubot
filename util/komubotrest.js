@@ -2,6 +2,7 @@ const userData = require('../models/userData');
 const wfhData = require('../models/wfhData');
 const msgData = require('../models/msgData');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const deleteMessage = require('./deleteMessage');
 
 const getUserIdByUsername = async (client, req, res) => {
   if (
@@ -560,6 +561,9 @@ const init = async (client) => {
   });
   app.post('/sendEmbedMessage', (req, res) => {
     sendEmbedMessage(client, req, res);
+  });
+  app.post('/deleteMessage', (req, res) => {
+    deleteMessage(client, req, res);
   });
   app.post('/uploadFile', mp3.single('File'), async (req, res, next) => {
     const file = req.file;

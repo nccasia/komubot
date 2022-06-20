@@ -38,7 +38,7 @@ async function reportDaily(date, message, args, client, guildDB) {
               return `<@${user.id}> (${findCountNotDaily(
                 notDaily,
                 user.username
-              )})`;
+              )}) (${user.email})`;
             } else {
               return `${user.email} (${user.countnotdaily})`;
             }
