@@ -71,7 +71,7 @@ async function reportOrder(message) {
         mess = listOrder
           .slice(i * 50, (i + 1) * 50)
           .map(
-            (list) => `<@${list.userId}>(${list.username}) order ${list.menu}`
+            (list) => `<${list.username}> 🧑‍🔧order ${list.menu.toUpperCase()}`
           )
           .join('\n');
         const Embed = new MessageEmbed()

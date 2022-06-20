@@ -83,10 +83,7 @@ async function reportMention(message) {
       if (mentionFullday.slice(i * 50, (i + 1) * 50).length === 0) break;
       mess = mentionFullday
         .slice(i * 50, (i + 1) * 50)
-        .map(
-          (mention) =>
-            `<@${mention._id}>(${mention.username}) (${mention.total})`
-        )
+        .map((mention) => `${mention.username} (${mention.total})`)
         .join('\n');
       const Embed = new MessageEmbed()
         .setTitle('Những người không trả lời mention trong ngày hôm nay')

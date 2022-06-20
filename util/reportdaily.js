@@ -35,10 +35,10 @@ async function reportDaily(date, message, args, client, guildDB) {
           .slice(i * 50, (i + 1) * 50)
           .map((user) => {
             if (user.id) {
-              return `<@${user.id}> (${findCountNotDaily(
+              return `${user.email} (${findCountNotDaily(
                 notDaily,
                 user.username
-              )}) (${user.email})`;
+              )})`;
             } else {
               return `${user.email} (${user.countnotdaily})`;
             }

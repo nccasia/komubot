@@ -65,7 +65,7 @@ async function reportOpentalk(message) {
         if (listOpentalk.slice(i * 50, (i + 1) * 50).length === 0) break;
         mess = listOpentalk
           .slice(i * 50, (i + 1) * 50)
-          .map((list) => `<@${list.userId}>(${list.username}) `)
+          .map((list) => `${list.username} `)
           .join('\n');
         const Embed = new MessageEmbed()
           .setTitle(
