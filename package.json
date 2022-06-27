@@ -39,6 +39,7 @@
     "puppeteer-extra-plugin-stealth": "^2.9.0",
     "query-string": "^7.1.1",
     "react-number-format": "^4.9.0",
+    "rss-parser": "^3.12.0",
     "tiktok-scraper": "^1.4.23",
     "topgg-autoposter": "^1.1.10",
     "twemoji-parser": "^13.0.0",
