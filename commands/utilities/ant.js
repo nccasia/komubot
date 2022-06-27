@@ -47,7 +47,6 @@ const handleAntFeed = async (message, args) => {
 module.exports = {
   name: 'ant',
   description: 'Display ant feed',
-  aliases: ['pcon'],
   usages: ['ant [slug]'],
   cat: 'utilities',
   async execute(message, args) {
