@@ -1018,21 +1018,13 @@ async function sendMessTurnOffPc(client) {
   const staffRoleId = '921328149927690251';
   const channel = await client.channels.fetch('921239541388554240');
   const roles = await channel.guild.roles.fetch(staffRoleId);
-  try {
-    const membersName = roles.members.map(async (member) => {
-      const userid = await userData.find({ username: member.displayName });
-      await Promise.all(
-        userid.map(async (user) => {
-          const userDiscord = await client.users.fetch(user.id);
-          userDiscord.send(
-            `Nhớ tắt máy trước khi ra về nếu không dùng nữa nhé!!!`
-          );
-        })
-      );
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  roles.members.map((member) => {
+    try {
+      member.send('Nhớ tắt máy trước khi ra về nếu không dùng nữa nhé!!!');
+    } catch (error) {
+      console.log(error);
+    }
+  });
 }
 
 async function sendSubmitTimesheet(client) {
