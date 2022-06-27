@@ -3,7 +3,8 @@ const { MessageEmbed } = require('discord.js');
 const { sendErrorToDevTest } = require('../util/komubotrest');
 
 function findCountNotDaily(arr, email) {
-  return arr.filter((item) => item.email === email)[0].countnotdaily;
+  const users = arr.filter((item) => item.email === email);
+  return users[0] ? users[0].countnotdaily : 0;
 }
 async function reportDaily(date, message, args, client, guildDB) {
   try {
@@ -46,7 +47,7 @@ async function reportDaily(date, message, args, client, guildDB) {
           .join('\n');
         const Embed = new MessageEmbed()
           .setTitle(
-            `${dateString} 
+            `${dateString}
             ${dailyString}`
           )
           .setColor('RED')
