@@ -43,7 +43,7 @@ const pollEmbed = async (
   const emojiInfo = {};
   for (const option of options) {
     const emoji = emojiList.splice(0, 1);
-    emojiInfo[emoji] = { option: option, votes: 0 };
+    emojiInfo[emoji] = { option: option, votes: 0, username: [] };
     text += `${emoji} : \`${option}\`\n\n`;
   }
   const usedEmojis = Object.keys(emojiInfo);
@@ -77,11 +77,15 @@ const pollEmbed = async (
         lastVote.users.remove(user.id);
         if (emojiInfo[votedEmoji] !== undefined) {
           emojiInfo[votedEmoji].votes -= 1;
+          emojiInfo[votedEmoji].username = emojiInfo[
+            votedEmoji
+          ].username.filter((item) => item !== user.username);
         }
         voterInfo.set(user.id, { emoji: reaction.emoji.name });
       }
       if (emojiInfo[reaction.emoji.name] !== undefined) {
         emojiInfo[reaction.emoji.name].votes += 1;
+        emojiInfo[reaction.emoji.name].username.push(user.username);
       }
     }
   });
@@ -90,6 +94,9 @@ const pollEmbed = async (
     if (usedEmojis.includes(reaction.emoji.name)) {
       voterInfo.delete(user.id);
       emojiInfo[reaction.emoji.name].votes -= 1;
+      emojiInfo[reaction.emoji.name].username = emojiInfo[
+        reaction.emoji.name
+      ].username.filter((item) => item !== user.username);
     }
   });
 
@@ -97,6 +104,9 @@ const pollEmbed = async (
     text = "*Ding! Ding! Ding! Time's up!\n Results are in,*\n\n";
     for (const emoji in emojiInfo) {
       text += `\`${emojiInfo[emoji].option}\` - \`${emojiInfo[emoji].votes}\`\n\n`;
+      emojiInfo[emoji].username.map((item) => {
+        text += `\`+ ${item}\`\n\n`;
+      });
     }
     poll.delete();
     msg.channel.send({
