@@ -1629,7 +1629,7 @@ async function pingOpenTalk(client) {
       if (!user.message_bot_timestamp) {
         result = true;
       } else {
-        if (Date.now() - user.message_bot_timestamp >= 1 * 60 * 1000) {
+        if (Date.now() - user.message_bot_timestamp >= 15 * 60 * 1000) {
           result = true;
         }
       }
