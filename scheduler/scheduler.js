@@ -1020,7 +1020,11 @@ async function sendMessTurnOffPc(client) {
   const roles = await channel.guild.roles.fetch(staffRoleId);
   roles.members.map((member) => {
     try {
-      member.send('Nhớ tắt máy trước khi ra về nếu không dùng nữa nhé!!!');
+      member
+        .send('Nhớ tắt máy trước khi ra về nếu không dùng nữa nhé!!!')
+        .catch((err) => {
+          console.log(err);
+        });
     } catch (error) {
       console.log(error);
     }
