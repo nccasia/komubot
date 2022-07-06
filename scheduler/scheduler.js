@@ -674,7 +674,7 @@ async function sendQuiz(client) {
         Date.now() - user.last_message_time >= 1000 * 60 * 60 * 2
     );
     await Promise.all(
-      arrayUser.map((user) => sendQuizToSingleUser(client, user, true))
+      arrayUser.map((user) => sendQuizToSingleUser(client, user, false))
     );
   } catch (error) {
     console.log(error);
@@ -1573,7 +1573,7 @@ async function pingOpenTalk(client) {
     }
     const userIds = usersRegisterOpenTalk.map((user) => user.userId);
 
-    const userWfhWithSomeCodition = await userData.aggregate([
+    const userOpenTalkWithSomeCodition = await userData.aggregate([
       {
         $match: {
           id: { $in: userIds },
@@ -1630,23 +1630,27 @@ async function pingOpenTalk(client) {
 
     const coditionGetTimeStamp = (user) => {
       let result = false;
-      if (!user.message_bot_timestamp) {
+      if (!user.message_bot_timestamp || !user.message_timestamp) {
         result = true;
       } else {
-        if (Date.now() - user.message_bot_timestamp >= 15 * 60 * 1000) {
+        if (
+          Date.now() - user.message_bot_timestamp >= 1800000 &&
+          Date.now() - user.message_timestamp >= 1800000
+        ) {
           result = true;
         }
       }
       return result;
     };
-    const arrayUser = userWfhWithSomeCodition.filter((user) =>
+
+    const arrayUser = userOpenTalkWithSomeCodition.filter((user) =>
       coditionGetTimeStamp(user)
     );
 
     try {
       await Promise.all(
         arrayUser.map((userWfh) =>
-          sendQuizToSingleUser(client, userWfh, true, 'english')
+          sendQuizToSingleUser(client, userWfh, true)
         )
       );
     } catch (error) {
@@ -1660,30 +1664,29 @@ async function pingOpenTalk(client) {
 async function punishOpenTalk(client) {
   if (await checkHoliday()) return;
   if (checkTime(new Date())) return;
-  let wfhGetApi;
-  try {
-    wfhGetApi = await axios.get(client.config.wfh.api_url, {
-      headers: {
-        securitycode: process.env.WFH_API_KEY_SECRET,
-      },
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  
+  const usersRegisterOpenTalk = await openTalkData.find({
+    $and: [
+      { date: { $gte: getTimeWeek().firstday.timestamp } },
+      { date: { $lte: getTimeWeek().lastday.timestamp } },
+    ],
+  });
 
-  if (!wfhGetApi || wfhGetApi.data == undefined) {
+  if (
+    Array.isArray(usersRegisterOpenTalk) &&
+    usersRegisterOpenTalk.length === 0
+  ) {
     return;
   }
-  const wfhUserEmail = wfhGetApi.data.result.map((item) =>
-    getUserNameByEmail(item.emailAddress)
-  );
+  const userIds = usersRegisterOpenTalk.map((user) => user.userId);
+
   const users = await userData.aggregate([
     {
       $match: {
         deactive: { $ne: true },
         roles_discord: { $ne: [], $exists: true },
         last_bot_message_id: { $exists: true, $ne: '' },
-        email: { $in: wfhUserEmail },
+        id: { $in: userIds },
         botPing: true,
       },
     },
@@ -1760,8 +1763,8 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '*/1 10-12 * * 6',
-      () => punish(client),
+      '*/1 10-13 * * 6',
+      () => punishOpenTalk(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'

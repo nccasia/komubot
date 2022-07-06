@@ -52,7 +52,8 @@ async function sendQuizToSingleUser(
         client,
         { embeds: [Embed], components: [row] },
         username,
-        botPing
+        botPing,
+        true
       );
       await saveQuestion(userid, q._id);
     } else if (totalRow == 2) {

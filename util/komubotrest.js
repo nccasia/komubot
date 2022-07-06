@@ -37,7 +37,8 @@ const sendMessageKomuToUser = async (
   client,
   msg,
   username,
-  botPing = false
+  botPing = false,
+  isSendQuiz = false
 ) => {
   try {
     const userdb = await userData
@@ -67,10 +68,17 @@ const sendMessageKomuToUser = async (
     const sent = await user.send(msg);
     const newMessage = new msgData(sent);
     await newMessage.save();
-    if (botPing) {
+
+    // botPing : work when bot send quiz wfh user
+    // isSendQuiz : work when bot send quiz
+    if (botPing && isSendQuiz) {
       userdb.last_bot_message_id = sent.id;
       userdb.botPing = true;
     }
+    if(!botPing && isSendQuiz) {
+      userdb.last_bot_message_id = sent.id;
+    }
+    
     await userdb.save();
     return user;
   } catch (error) {
