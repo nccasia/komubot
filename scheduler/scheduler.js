@@ -269,18 +269,29 @@ function formatDateTimeReminder(date) {
   return `${d} ${t}`;
 }
 
-async function sendMessageReminder(client, channelId, task, dateTime) {
+async function sendMessageReminder(
+  client,
+  channelId,
+  task,
+  dateTime,
+  mentionUserId
+) {
   const fetchChannel = await client.channels.fetch(channelId);
-  fetchChannel.guild.members.fetch().then((members) => {
-    members.forEach(async (member) => {
-      const fetchUser = await client.users.fetch(member.user.id);
-      await fetchUser
-        .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
-        .catch((err) => {
-          console.log(err);
-        });
+  if (mentionUserId) {
+    const fetchUser = await client.users.fetch(mentionUserId);
+    await fetchUser
+      .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
+      .catch((err) => {});
+  } else {
+    fetchChannel.guild.members.fetch().then((members) => {
+      members.forEach(async (member) => {
+        const fetchUser = await client.users.fetch(member.user.id);
+        await fetchUser
+          .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
+          .catch((err) => {});
+      });
     });
-  });
+  }
 }
 
 async function showDaily(client) {
@@ -1780,20 +1791,17 @@ async function pingReminder(client) {
       $lte: getTomorrowDate(),
     },
   });
-  if (remindLists.length !== 0) {
-    remindLists.map(async (item) => {
-      const dateTimeRemind = formatDateTimeReminder(
-        new Date(Number(item.createdTimestamp))
-      );
-      sendMessageReminder(client, item.channelId, item.content, dateTimeRemind);
-    });
-  }
+
   const meetingLists = await meetingData.find({
     cancel: { $ne: true },
     reminder: { $ne: true },
   });
-  if (meetingLists.length !== 0) {
-    meetingLists.map(async (item) => {
+  const listMeetingAndRemind = meetingLists.concat(remindLists);
+  const lists = listMeetingAndRemind.sort(
+    (a, b) => +a.createdTimestamp.toString() - +b.createdTimestamp.toString()
+  );
+  if (lists.length !== 0) {
+    lists.map(async (item) => {
       const dateScheduler = new Date(+item.createdTimestamp);
 
       const dateCreatedTimestamp = new Date(
@@ -1811,16 +1819,36 @@ async function pingReminder(client) {
       switch (item.repeat) {
         case 'once':
           if (isSameDate(dateCreatedTimestamp)) {
-            sendMessageReminder(client, item.channelId, item.task, dateTime);
+            sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              null
+            );
           }
           return;
         case 'daily':
           if (isSameDay()) return;
-          sendMessageReminder(client, item.channelId, item.task, dateTime);
+          if (isTimeDay(dateScheduler)) {
+            sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              null
+            );
+          }
           return;
         case 'weekly':
           if (isDiffDay(dateScheduler, 7) && isTimeDay(dateScheduler)) {
-            sendMessageReminder(client, item.channelId, item.task, dateTime);
+            sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              null
+            );
           }
           return;
         case 'repeat':
@@ -1828,11 +1856,23 @@ async function pingReminder(client) {
             isDiffDay(dateScheduler, item.repeatTime) &&
             isTimeDay(dateScheduler)
           ) {
-            sendMessageReminder(client, item.channelId, item.task, dateTime);
+            sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              null
+            );
           }
           return;
         default:
-          break;
+          sendMessageReminder(
+            client,
+            item.channelId,
+            item.content,
+            dateTime,
+            item.mentionUserId
+          );
       }
     });
   }
