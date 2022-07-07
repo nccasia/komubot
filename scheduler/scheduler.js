@@ -250,6 +250,50 @@ function getTomorrowDate() {
   return new Date(yesterday).valueOf();
 }
 
+function padTo2Digits(num) {
+  return num.toString().padStart(2, '0');
+}
+
+function formatDateTimeReminder(date) {
+  const d = [
+    padTo2Digits(date.getDate()),
+    padTo2Digits(date.getMonth() + 1),
+    date.getFullYear(),
+  ].join('/');
+
+  const t = [
+    padTo2Digits(date.getHours()),
+    padTo2Digits(date.getMinutes()),
+  ].join(':');
+
+  return `${d} ${t}`;
+}
+
+async function sendMessageReminder(
+  client,
+  channelId,
+  task,
+  dateTime,
+  mentionUserId
+) {
+  const fetchChannel = await client.channels.fetch(channelId);
+  if (mentionUserId) {
+    const fetchUser = await client.users.fetch(mentionUserId);
+    await fetchUser
+      .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
+      .catch((err) => {});
+  } else {
+    fetchChannel.guild.members.fetch().then((members) => {
+      members.forEach(async (member) => {
+        const fetchUser = await client.users.fetch(member.user.id);
+        await fetchUser
+          .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
+          .catch((err) => {});
+      });
+    });
+  }
+}
+
 async function showDaily(client) {
   if (await checkHoliday()) return;
   console.log('[Scheduler] Run');
@@ -1746,6 +1790,101 @@ async function punishOpenTalk(client) {
   });
 }
 
+async function pingReminder(client) {
+  if (await checkHoliday()) return;
+  const remindLists = await remindData.find({
+    createdTimestamp: {
+      $gte: getYesterdayDate(),
+      $lte: getTomorrowDate(),
+    },
+  });
+
+  const meetingLists = await meetingData.find({
+    cancel: { $ne: true },
+    reminder: { $ne: true },
+  });
+  const listMeetingAndRemind = meetingLists.concat(remindLists);
+  const lists = listMeetingAndRemind.sort(
+    (a, b) => +a.createdTimestamp.toString() - +b.createdTimestamp.toString()
+  );
+  if (lists.length !== 0) {
+    lists.map(async (item) => {
+      const dateScheduler = new Date(+item.createdTimestamp);
+
+      const dateCreatedTimestamp = new Date(
+        +item.createdTimestamp.toString()
+      ).toLocaleDateString('en-US');
+
+      const newDateTimestamp = new Date(+item.createdTimestamp.toString());
+      const currentDate = new Date(newDateTimestamp.getTime());
+      const today = new Date();
+      currentDate.setDate(today.getDate());
+      currentDate.setMonth(today.getMonth());
+      const dateTime = formatDateTimeReminder(
+        new Date(Number(item.createdTimestamp))
+      );
+      switch (item.repeat) {
+        case 'once':
+          if (isSameDate(dateCreatedTimestamp)) {
+            sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              null
+            );
+          }
+          return;
+        case 'daily':
+          if (isSameDay()) return;
+          if (isTimeDay(dateScheduler)) {
+            sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              null
+            );
+          }
+          return;
+        case 'weekly':
+          if (isDiffDay(dateScheduler, 7) && isTimeDay(dateScheduler)) {
+            sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              null
+            );
+          }
+          return;
+        case 'repeat':
+          if (
+            isDiffDay(dateScheduler, item.repeatTime) &&
+            isTimeDay(dateScheduler)
+          ) {
+            sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              null
+            );
+          }
+          return;
+        default:
+          sendMessageReminder(
+            client,
+            item.channelId,
+            item.content,
+            dateTime,
+            item.mentionUserId
+          );
+      }
+    });
+  }
+}
+
 function cronJobOneMinute(client) {
   sendMesageRemind(client);
   kickMemberVoiceChannel(client);
@@ -1755,6 +1894,13 @@ function cronJobOneMinute(client) {
 
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '30 08 * * 0-6',
+      () => pingReminder(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     new cron.CronJob(
       '*/15 10-12 * * 6',
       () => pingOpenTalk(client),
