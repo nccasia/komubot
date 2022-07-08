@@ -104,13 +104,7 @@ module.exports = {
         }
 
         const option = categorys[args[0] - 1];
-        const optionsubcatgory = subcategorys[0];
-
-        if (parseInt(args[0]) !== parseInt(optionsubcatgory.categoryId)) {
-          return message.reply(`Bạn đang nhập sai category`).catch((err) => {
-            sendErrorToDevTest(client, authorId, err);
-          });
-        }
+        const optionsubcatgory = subcategorys[parseInt(args[1] - 1)];
 
         if (!parseInt(args[1]) || parseInt(args[1]) > subcategorys.length) {
           return message
@@ -118,6 +112,12 @@ module.exports = {
             .catch((err) => {
               sendErrorToDevTest(client, authorId, err);
             });
+        }
+
+        if (parseInt(args[0]) !== parseInt(optionsubcatgory.categoryId)) {
+          return message.reply(`Bạn đang nhập sai category`).catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
         }
 
         let subcategory = await subcategoryData.find({
