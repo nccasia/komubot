@@ -1,7 +1,7 @@
 const checkList = require('../../util/checklist');
 
 module.exports = {
-  name: 'checklist',
+  name: 'cl',
   description: 'checklist',
   cat: 'komu',
   async execute(message, args) {
