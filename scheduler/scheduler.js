@@ -904,10 +904,6 @@ async function tagMeeting(client) {
                     .save()
                     .catch((err) => console.log(err));
                 } else await dailyFetchChannel.send(`@here voice channel full`);
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  { reminder: true, createdTimestamp: newCreatedTimestamp }
-                );
 
                 let newCreatedTimestamp = item.createdTimestamp;
                 newCreatedTimestamp = currentDate.setDate(
@@ -919,6 +915,11 @@ async function tagMeeting(client) {
                     currentDate.getDate() + 1
                   );
                 }
+
+                await meetingData.updateOne(
+                  { _id: item._id },
+                  { reminder: true, createdTimestamp: newCreatedTimestamp }
+                );
               }
               return;
             case 'weekly':
@@ -965,14 +966,6 @@ async function tagMeeting(client) {
                     .catch((err) => console.log(err));
                 } else
                   await weeklyFetchChannel.send(`@here voice channel full`);
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  {
-                    reminder: true,
-                    createdTimestamp: newCreatedTimestampWeekly,
-                  }
-                );
-
                 let newCreatedTimestampWeekly = item.createdTimestamp;
                 newCreatedTimestampWeekly = currentDate.setDate(
                   currentDate.getDate() + 7
@@ -982,6 +975,14 @@ async function tagMeeting(client) {
                     currentDate.getDate() + 7
                   );
                 }
+
+                await meetingData.updateOne(
+                  { _id: item._id },
+                  {
+                    reminder: true,
+                    createdTimestamp: newCreatedTimestampWeekly,
+                  }
+                );
               }
               return;
             case 'repeat':
@@ -1028,14 +1029,6 @@ async function tagMeeting(client) {
                     .catch((err) => console.log(err));
                 } else
                   await repeatFetchChannel.send(`@here voice channel full`);
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  {
-                    reminder: true,
-                    createdTimestamp: newCreatedTimestampRepeat,
-                  }
-                );
-
                 let newCreatedTimestampRepeat = item.createdTimestamp;
                 newCreatedTimestampRepeat = currentDate.setDate(
                   currentDate.getDate() + item.repeatTime
@@ -1046,6 +1039,14 @@ async function tagMeeting(client) {
                     currentDate.getDate() + item.repeatTime
                   );
                 }
+
+                await meetingData.updateOne(
+                  { _id: item._id },
+                  {
+                    reminder: true,
+                    createdTimestamp: newCreatedTimestampRepeat,
+                  }
+                );
               }
               return;
             default:
