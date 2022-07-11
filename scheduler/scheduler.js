@@ -283,14 +283,23 @@ async function sendMessageReminder(
       .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
       .catch((err) => {});
   } else {
-    fetchChannel.guild.members.fetch().then((members) => {
-      members.forEach(async (member) => {
-        const fetchUser = await client.users.fetch(member.user.id);
-        await fetchUser
+    if (fetchChannel.type === 'GUILD_PUBLIC_THREAD') {
+      fetchChannel.members.fetch().then((members) => {
+        members.forEach(async (member) => {
+          const fetchUser = await client.users.fetch(member.user.id);
+          await fetchUser
+            .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
+            .catch((err) => {});
+        });
+      });
+    } else {
+      fetchChannel.members.map(async (item) => {
+        const fetchUserChannel = await client.users.fetch(item.user.id);
+        await fetchUserChannel
           .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
           .catch((err) => {});
       });
-    });
+    }
   }
 }
 
@@ -1824,7 +1833,7 @@ async function pingReminder(client) {
       switch (item.repeat) {
         case 'once':
           if (isSameDate(dateCreatedTimestamp)) {
-            sendMessageReminder(
+            await sendMessageReminder(
               client,
               item.channelId,
               item.task,
@@ -1835,19 +1844,17 @@ async function pingReminder(client) {
           return;
         case 'daily':
           if (isSameDay()) return;
-          if (isTimeDay(dateScheduler)) {
-            sendMessageReminder(
-              client,
-              item.channelId,
-              item.task,
-              dateTime,
-              null
-            );
-          }
+          await sendMessageReminder(
+            client,
+            item.channelId,
+            item.task,
+            dateTime,
+            null
+          );
           return;
         case 'weekly':
           if (isDiffDay(dateScheduler, 7) && isTimeDay(dateScheduler)) {
-            sendMessageReminder(
+            await sendMessageReminder(
               client,
               item.channelId,
               item.task,
@@ -1861,7 +1868,7 @@ async function pingReminder(client) {
             isDiffDay(dateScheduler, item.repeatTime) &&
             isTimeDay(dateScheduler)
           ) {
-            sendMessageReminder(
+            await sendMessageReminder(
               client,
               item.channelId,
               item.task,
@@ -1871,7 +1878,7 @@ async function pingReminder(client) {
           }
           return;
         default:
-          sendMessageReminder(
+          await sendMessageReminder(
             client,
             item.channelId,
             item.content,
