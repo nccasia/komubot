@@ -80,6 +80,9 @@ function sendCMDToPfsense(branch, identity, ipAddress) {
     case 'vinh':
       host = '10.10.20.1';
       break;
+    case 'qn':
+      host = '10.10.60.1';
+      break;  
     default:
       return;
   }
