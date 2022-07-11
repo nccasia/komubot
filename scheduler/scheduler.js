@@ -1693,9 +1693,7 @@ async function pingOpenTalk(client) {
 
     try {
       await Promise.all(
-        arrayUser.map((userWfh) =>
-          sendQuizToSingleUser(client, userWfh, true)
-        )
+        arrayUser.map((userWfh) => sendQuizToSingleUser(client, userWfh, true))
       );
     } catch (error) {
       console.log(error);
@@ -1708,7 +1706,7 @@ async function pingOpenTalk(client) {
 async function punishOpenTalk(client) {
   if (await checkHoliday()) return;
   if (checkTime(new Date())) return;
-  
+
   const usersRegisterOpenTalk = await openTalkData.find({
     $and: [
       { date: { $gte: getTimeWeek().firstday.timestamp } },
@@ -1902,14 +1900,14 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '*/15 10-12 * * 6',
+      '*/15 10-11 * * 6',
       () => pingOpenTalk(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '*/1 10-13 * * 6',
+      '*/1 10-12 * * 6',
       () => punishOpenTalk(client),
       null,
       false,
