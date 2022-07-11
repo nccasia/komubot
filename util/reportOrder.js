@@ -70,9 +70,7 @@ async function reportOrder(message) {
         if (listOrder.slice(i * 50, (i + 1) * 50).length === 0) break;
         mess = listOrder
           .slice(i * 50, (i + 1) * 50)
-          .map(
-            (list) => `<${list.username}> 🧑‍🔧order ${list.menu.toUpperCase()}`
-          )
+          .map((list) => `<${list.username}> order ${list.menu.toUpperCase()}`)
           .join('\n');
         const Embed = new MessageEmbed()
           .setTitle(
