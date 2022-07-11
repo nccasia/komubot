@@ -250,7 +250,7 @@ function getTomorrowDate() {
   return new Date(yesterday).valueOf();
 }
 
-async function showDaily(client) {
+async function remindDailyMorning(client) {
   if (await checkHoliday()) return;
   console.log('[Scheduler] Run');
   try {
@@ -270,6 +270,27 @@ async function showDaily(client) {
     console.log(error);
   }
 }
+
+async function remindDailyAfternoon(client) {
+  if (await checkHoliday()) return;
+  console.log('[Scheduler] Run');
+  try {
+    const { notDailyAfternoon } = await getUserNotDaily(null, null, null, client);
+    // send message komu to user
+    await Promise.all(
+      notDailyAfternoon.map((email) =>
+        sendMessageKomuToUser(
+          client,
+          "Don't forget to daily, dude! Don't be mad at me, we are friends I mean we are best friends.",
+          email
+        )
+      )
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 
 function getUserNameByEmail(string) {
   if (string.includes('@ncc.asia')) {
@@ -1788,7 +1809,14 @@ exports.scheduler = {
     ).start();
     new cron.CronJob(
       '00 00 9 * * 1-5',
-      () => showDaily(client),
+      () => remindDailyMorning(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '00 00 13 * * 1-5',
+      () => remindDailyAfternoon(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
