@@ -2,9 +2,9 @@ const wfhData = require('../models/wfhData');
 const axios = require('axios');
 const userData = require('../models/userData');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const { sendErrorToDevTest } = require('./komubotrest');
 
 const wfh = async (interaction, client) => {
-  const arrIds = interaction.customId.split('#');
   const customId = arrIds[0];
   const labelImageId = arrIds.length > 1 ? arrIds[1] : '';
   let isCheckin = true;
@@ -26,7 +26,11 @@ const wfh = async (interaction, client) => {
           { pmconfirm: false, data: arrIds[0], status: 'ACCEPT' }
         )
         .catch(console.error);
-      interaction.reply({ content: 'Thanks!!!', ephemeral: true });
+      interaction
+        .reply({ content: 'Thanks!!!', ephemeral: true })
+        .catch((err) => {
+          sendErrorToDevTest(client, authorId, err);
+        });
       return;
     }
     if (arrIds.length == 3) {
@@ -34,23 +38,35 @@ const wfh = async (interaction, client) => {
         .findOne({ _id: wfhid })
         .catch(console.error);
       if (!wfhdata) {
-        interaction.reply({ content: 'No WFH found', ephemeral: true });
+        interaction
+          .reply({ content: 'No WFH found', ephemeral: true })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
         return;
       }
       const msec = new Date() - new Date(wfhdata.createdAt);
       if (msec > 3600000) {
-        interaction.reply({
-          content: 'WFH complain is expired. You have an hour to request.',
-          ephemeral: true,
-        });
+        interaction
+          .reply({
+            content: 'WFH complain is expired. You have an hour to request.',
+            ephemeral: true,
+          })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
         return;
       }
 
       if (wfhdata.complain) {
-        interaction.reply({
-          content: 'You have already complained.',
-          ephemeral: true,
-        });
+        interaction
+          .reply({
+            content: 'You have already complained.',
+            ephemeral: true,
+          })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
         return;
       }
 
