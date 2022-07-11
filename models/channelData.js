@@ -8,6 +8,7 @@ const channelDb = new mongoose.Schema({
   rawPosition: { type: Number, required: false },
   lastMessageId: { type: String, required: false },
   rateLimitPerUser: { type: Number, required: false },
+  parentId: { type: String, required: false },
 });
 
 module.exports = mongoose.model('komu_channel', channelDb);
