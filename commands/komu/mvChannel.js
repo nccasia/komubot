@@ -1,4 +1,5 @@
 const channelData = require('../../models/channelData');
+const userData = require('../../models/userData');
 const messHelp = `*mv <this|channel> <category>`;
 module.exports = {
   name: 'mv',
@@ -7,6 +8,23 @@ module.exports = {
   async execute(message, args, client) {
     try {
       let authorId = message.author.id;
+      const checkRole = await userData.find({
+        id: authorId,
+        deactive: { $ne: true },
+        $or: [{ roles_discord: { $all: ['PM'] } }],
+      });
+
+      if (checkRole.length === 0) {
+        return message
+          .reply({
+            content:
+              '```You do not have permission to execute this command!```',
+            ephemeral: true,
+          })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
+      }
       if (args[0] && args[1]) {
         const findCategory = args.slice(1, args.length).join(' ');
 
