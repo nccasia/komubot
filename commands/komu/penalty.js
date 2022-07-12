@@ -106,9 +106,11 @@ module.exports = {
             (item, index) => `${index + 1} - ${item.reason} (${item.ammount})`
           )
           .join('\n');
-        return message.channel.send(
-          '```' + `Lý do ${dataPen[0].username} bị phạt` + '\n' + mess + '```'
-        );
+        return message.channel
+          .send(
+            '```' + `Lý do ${dataPen[0].username} bị phạt` + '\n' + mess + '```'
+          )
+          .catch(console.error);
       } else if (args[0] === 'clear') {
         // clear
         await penatlyData.updateMany(
@@ -202,9 +204,9 @@ module.exports = {
         }
 
         if (interaction) {
-          message.channel.send(
-            `<@!${user.id}>(${user.username}) reject penalty`
-          );
+          message.channel
+            .send(`<@!${user.id}>(${user.username}) reject penalty`)
+            .catch(console.error);
           await interaction.reply('Rejection sent!!!').catch((err) => {
             sendErrorToDevTest(client, authorId, err);
           });

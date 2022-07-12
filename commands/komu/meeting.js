@@ -119,9 +119,14 @@ module.exports = {
             message.member.voice.channel.type === 'GUILD_VOICE'
           ) {
             const voiceCheck = message.member.voice.channel;
-            return message.channel.send(
-              `Everyone please join the voice channel <#${voiceCheck.id}>`
-            );
+            return message
+              .reply({
+                content: `Everyone please join the voice channel <#${voiceCheck.id}>`,
+                ephemeral: true,
+              })
+              .catch((err) => {
+                sendErrorToDevTest(client, authorId, err);
+              });
           } else {
             let guild = await client.guilds.fetch('921239248991055882');
             const getAllVoice = client.channels.cache.filter(
@@ -153,23 +158,37 @@ module.exports = {
               if (index === voiceChannel.length - 1) {
                 if (countVoice === voiceChannel.length) {
                   {
-                    const fetchChannelFull = await client.channels.fetch(
-                      message.channelId
-                    );
-                    fetchChannelFull.send(`Voice channel full`);
+                    await message
+                      .reply({
+                        content: `Voice channel full`,
+                        ephemeral: true,
+                      })
+                      .catch((err) => {
+                        sendErrorToDevTest(client, authorId, err);
+                      });
                   }
                 } else {
-                  const nowFetchChannel = await client.channels.fetch(
-                    message.channelId
-                  );
                   const roomRandom = Math.floor(
                     Math.random() * roomVoice.length
                   );
                   if (roomVoice.length !== 0) {
-                    nowFetchChannel.send(
-                      `Our meeting room is <#${roomVoice[roomRandom]}>`
-                    );
-                  } else nowFetchChannel.send(`Voice channel full`);
+                    await message
+                      .reply({
+                        content: `Our meeting room is <#${roomVoice[roomRandom]}>`,
+                        ephemeral: true,
+                      })
+                      .catch((err) => {
+                        sendErrorToDevTest(client, authorId, err);
+                      });
+                  } else
+                    await message
+                      .reply({
+                        content: `Voice channel full`,
+                        ephemeral: true,
+                      })
+                      .catch((err) => {
+                        sendErrorToDevTest(client, authorId, err);
+                      });
                 }
               }
             });
@@ -315,16 +334,28 @@ module.exports = {
               checkDate
             )
           ) {
-            return message.channel.send(messHelp);
+            return message
+              .reply({ content: messHelp, ephemeral: true })
+              .catch((err) => {
+                sendErrorToDevTest(client, authorId, err);
+              });
           }
           if (!/(2[0-3]|[01][0-9]):[0-5][0-9]/.exec(checkTime)) {
-            return message.channel.send(messHelp);
+            return message
+              .reply({ content: messHelp, ephemeral: true })
+              .catch((err) => {
+                sendErrorToDevTest(client, authorId, err);
+              });
           }
 
           if (repeat === '') repeat = 'once';
           const list = ['once', 'daily', 'weekly', 'repeat'];
           if (list.includes(repeat) === false)
-            return message.channel.send(messHelp);
+            return message
+              .reply({ content: messHelp, ephemeral: true })
+              .catch((err) => {
+                sendErrorToDevTest(client, authorId, err);
+              });
 
           const day = datetime.slice(0, 2);
           const month = datetime.slice(3, 5);

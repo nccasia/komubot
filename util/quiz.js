@@ -58,7 +58,7 @@ async function randomQuiz(userInput, context, type, roleSelect) {
     if (Array.isArray(questions) && questions.length === 0) {
       const mess = 'You have answered all the questions!!!';
       if (type === 'commands') {
-        await context.channel.send(mess);
+        await context.channel.send(mess).catch(console.error);
       } else {
         return;
       }

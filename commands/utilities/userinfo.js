@@ -93,9 +93,11 @@ module.exports = {
         message.client.footer,
         message.client.user.displayAvatarURL({ dynamic: true, size: 512 })
       );
-    message.channel.send({
-      embeds: [embedUser],
-      allowedMentions: { repliedUser: false },
-    });
+    message.channel
+      .send({
+        embeds: [embedUser],
+        allowedMentions: { repliedUser: false },
+      })
+      .catch(console.error);
   },
 };

@@ -72,11 +72,13 @@ module.exports = {
       fetchChannel.map(async (channel) => {
         const userDiscord = await client.channels.fetch(channel);
         if (message.attachments && message.attachments.first())
-          userDiscord.send({
-            content: `${noti}`,
-            files: [message.attachments.first().url],
-          });
-        else userDiscord.send(`${noti} `);
+          userDiscord
+            .send({
+              content: `${noti}`,
+              files: [message.attachments.first().url],
+            })
+            .catch(console.error);
+        else userDiscord.send(`${noti} `).catch(console.error);
       });
     } catch (err) {
       console.log(err);

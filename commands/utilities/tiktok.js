@@ -54,10 +54,12 @@ module.exports = {
           message.client.user.displayAvatarURL({ dynamic: true, size: 512 })
         );
 
-      message.channel.send({
-        embeds: [userbe],
-        allowedMentions: { repliedUser: false },
-      });
+      message.channel
+        .send({
+          embeds: [userbe],
+          allowedMentions: { repliedUser: false },
+        })
+        .catch(console.error);
     } catch (error) {
       console.log(error);
       return message.errorMessage(lang.error.replace('{text}', args[0]));
