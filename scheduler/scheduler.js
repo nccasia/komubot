@@ -857,7 +857,6 @@ async function tagMeeting(client) {
                     await channelNameOnce.setName(
                       `${channelNameOnce.name} (${item.task})`
                     );
-                  console.log(`setname ${item.task} once ${item.channelId}`);
                   const newRoomOnce = channelNameOnce.name;
                   await new voiceChannelData({
                     id: channelNameOnce.id,
@@ -867,9 +866,6 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                  console.log(
-                    `wait for update ${item.task} once ${item.channelId}`
-                  );
                 } else
                   await onceFetchChannel
                     .send(`@here voice channel full`)
@@ -877,9 +873,6 @@ async function tagMeeting(client) {
                 await meetingData
                   .updateOne({ _id: item._id }, { reminder: true })
                   .catch((err) => console.log('updateone error once', err));
-                console.log(
-                  `update once ${item.task} successfully ${item.channelId}`
-                );
               }
               return;
             case 'daily':
@@ -940,7 +933,9 @@ async function tagMeeting(client) {
                     currentDate.getDate() + 1
                   );
                 }
-
+                console.log(
+                  `checkholiday set timestamp ${item.task} ${item.channelId}`
+                );
                 await meetingData
                   .updateOne(
                     { _id: item._id },
@@ -985,7 +980,6 @@ async function tagMeeting(client) {
                     await channelNameWeekly.setName(
                       `${channelNameWeekly.name} (${item.task})`
                     );
-                  console.log(`setname ${item.task} weekly ${item.channelId}`);
                   const newRoomWeekly = channelNameWeekly.name;
                   await new voiceChannelData({
                     id: channelNameWeekly.id,
@@ -995,9 +989,6 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                  console.log(
-                    `wait for update ${item.task} weekly ${item.channelId}`
-                  );
                 } else
                   await weeklyFetchChannel
                     .send(`@here voice channel full`)
@@ -1021,9 +1012,6 @@ async function tagMeeting(client) {
                     }
                   )
                   .catch((err) => console.log('updateone error weekly', err));
-                console.log(
-                  `update weekly ${item.task} successfully ${item.channelId}`
-                );
               }
               return;
             case 'repeat':
@@ -1059,7 +1047,6 @@ async function tagMeeting(client) {
                     await channelNameRepeat.setName(
                       `${channelNameRepeat.name} (${item.task})`
                     );
-                  console.log(`setname ${item.task} repeat ${item.channelId}`);
                   const newRoomRepeat = channelNameRepeat.name;
                   await new voiceChannelData({
                     id: channelNameRepeat.id,
@@ -1069,9 +1056,6 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                  console.log(
-                    `wait for update ${item.task} repeat ${item.channelId}`
-                  );
                 } else
                   await repeatFetchChannel
                     .send(`@here voice channel full`)
@@ -1096,9 +1080,6 @@ async function tagMeeting(client) {
                     }
                   )
                   .catch((err) => console.log('updateone error repeat', err));
-                console.log(
-                  `update repeat ${item.task} successfully ${item.channelId}`
-                );
               }
               return;
             default:
