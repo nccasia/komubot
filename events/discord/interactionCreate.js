@@ -11,7 +11,7 @@ const userQuizData = require('../../models/userQuiz');
 const womenDayData = require('../../models/womenDayData');
 const {
   sendMessageToNhaCuaChung,
-  sendErrorToMachLeo,
+  sendErrorToDevTest,
 } = require('../../util/komubotrest');
 const newEmbed = (message, color) =>
   new MessageEmbed().setTitle(message).setColor(color);
@@ -59,7 +59,7 @@ module.exports = {
           await interaction
             .reply({ embeds: [EmbedCorrect, btnCorrect] })
             .catch((err) => {
-              sendErrorToMachLeo(client, userid, err);
+              sendErrorToDevTest(client, userid, err);
             });
         } else {
           await saveQuestionInCorrect(userid, id, key);
@@ -75,7 +75,7 @@ module.exports = {
           await interaction
             .reply({ embeds: [EmbedInCorrect, btnInCorrect] })
             .catch((err) => {
-              sendErrorToMachLeo(client, userid, err);
+              sendErrorToDevTest(client, userid, err);
             });
         }
       }
