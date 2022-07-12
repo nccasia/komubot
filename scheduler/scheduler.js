@@ -556,6 +556,7 @@ async function punish(client) {
     },
   ]);
 
+  console.log('sendmachleo', user);
   users.map(async (user) => {
     if (
       Date.now() - user.createdTimestamp >= 1800000 &&
@@ -586,6 +587,7 @@ async function punish(client) {
         { id: user.id, deactive: { $ne: true } },
         { botPing: false }
       );
+      console.log('update botping punish', user.id);
       await channel.send(message).catch(console.error);
     }
   });

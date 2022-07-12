@@ -33,6 +33,8 @@ module.exports = {
           components: [],
         });
 
+        console.log(id, 'id interaction');
+        console.log(correct, 'correct interaction');
         await userData.updateOne(
           { id: userid },
           {
@@ -40,6 +42,7 @@ module.exports = {
           }
         );
 
+        console.log('update botping successfully', userid);
         if (key == correct) {
           const newUser = await addScores(userid);
           if (!newUser) return;
