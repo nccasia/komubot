@@ -767,6 +767,7 @@ async function sendQuiz(client) {
 
 async function tagMeeting(client) {
   if (await checkHoliday()) return;
+  console.log('start meeting');
   let guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
@@ -856,7 +857,7 @@ async function tagMeeting(client) {
                     await channelNameOnce.setName(
                       `${channelNameOnce.name} (${item.task})`
                     );
-
+                  console.log(`setname ${item.task} once ${item.channelId}`);
                   const newRoomOnce = channelNameOnce.name;
                   await new voiceChannelData({
                     id: channelNameOnce.id,
@@ -866,16 +867,19 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                  console.log(`wait for update ${item.task} once`);
+                  console.log(
+                    `wait for update ${item.task} once ${item.channelId}`
+                  );
                 } else
                   await onceFetchChannel
                     .send(`@here voice channel full`)
                     .catch(console.error);
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  { reminder: true }
+                await meetingData
+                  .updateOne({ _id: item._id }, { reminder: true })
+                  .catch((err) => console.log('updateone error once', err));
+                console.log(
+                  `update once ${item.task} successfully ${item.channelId}`
                 );
-                console.log(`update once ${item.task} successfully`);
               }
               return;
             case 'daily':
@@ -908,6 +912,7 @@ async function tagMeeting(client) {
                     await channelNameDaily.setName(
                       `${channelNameDaily.name} (${item.task})`
                     );
+                  console.log(`setname ${item.task} daily ${item.channelId}`);
                   const newRoomDaily = channelNameDaily.name;
                   await new voiceChannelData({
                     id: channelNameDaily.id,
@@ -917,7 +922,9 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                  console.log(`wait for update ${item.task} daily`);
+                  console.log(
+                    `wait for update ${item.task} daily ${item.channelId}`
+                  );
                 } else
                   await dailyFetchChannel
                     .send(`@here voice channel full`)
@@ -934,11 +941,15 @@ async function tagMeeting(client) {
                   );
                 }
 
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  { reminder: true, createdTimestamp: newCreatedTimestamp }
+                await meetingData
+                  .updateOne(
+                    { _id: item._id },
+                    { reminder: true, createdTimestamp: newCreatedTimestamp }
+                  )
+                  .catch((err) => console.log('updateone error daily', err));
+                console.log(
+                  `update daily ${item.task} successfully ${item.channelId}`
                 );
-                console.log(`update daily ${item.task} successfully`);
               }
               return;
             case 'weekly':
@@ -974,6 +985,7 @@ async function tagMeeting(client) {
                     await channelNameWeekly.setName(
                       `${channelNameWeekly.name} (${item.task})`
                     );
+                  console.log(`setname ${item.task} weekly ${item.channelId}`);
                   const newRoomWeekly = channelNameWeekly.name;
                   await new voiceChannelData({
                     id: channelNameWeekly.id,
@@ -983,7 +995,9 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                  console.log(`wait for update ${item.task} weekly`);
+                  console.log(
+                    `wait for update ${item.task} weekly ${item.channelId}`
+                  );
                 } else
                   await weeklyFetchChannel
                     .send(`@here voice channel full`)
@@ -998,14 +1012,18 @@ async function tagMeeting(client) {
                   );
                 }
 
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  {
-                    reminder: true,
-                    createdTimestamp: newCreatedTimestampWeekly,
-                  }
+                await meetingData
+                  .updateOne(
+                    { _id: item._id },
+                    {
+                      reminder: true,
+                      createdTimestamp: newCreatedTimestampWeekly,
+                    }
+                  )
+                  .catch((err) => console.log('updateone error weekly', err));
+                console.log(
+                  `update weekly ${item.task} successfully ${item.channelId}`
                 );
-                console.log(`update weekly ${item.task} successfully`);
               }
               return;
             case 'repeat':
@@ -1041,6 +1059,7 @@ async function tagMeeting(client) {
                     await channelNameRepeat.setName(
                       `${channelNameRepeat.name} (${item.task})`
                     );
+                  console.log(`setname ${item.task} repeat ${item.channelId}`);
                   const newRoomRepeat = channelNameRepeat.name;
                   await new voiceChannelData({
                     id: channelNameRepeat.id,
@@ -1050,7 +1069,9 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                  console.log(`wait for update ${item.task} repeat`);
+                  console.log(
+                    `wait for update ${item.task} repeat ${item.channelId}`
+                  );
                 } else
                   await repeatFetchChannel
                     .send(`@here voice channel full`)
@@ -1066,14 +1087,18 @@ async function tagMeeting(client) {
                   );
                 }
 
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  {
-                    reminder: true,
-                    createdTimestamp: newCreatedTimestampRepeat,
-                  }
+                await meetingData
+                  .updateOne(
+                    { _id: item._id },
+                    {
+                      reminder: true,
+                      createdTimestamp: newCreatedTimestampRepeat,
+                    }
+                  )
+                  .catch((err) => console.log('updateone error repeat', err));
+                console.log(
+                  `update repeat ${item.task} successfully ${item.channelId}`
                 );
-                console.log(`update repeat ${item.task} successfully`);
               }
               return;
             default:
