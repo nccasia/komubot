@@ -556,7 +556,7 @@ async function punish(client) {
     },
   ]);
 
-  console.log('sendmachleo', user);
+  console.log('sendmachleo', users);
   users.map(async (user) => {
     if (
       Date.now() - user.createdTimestamp >= 1800000 &&
