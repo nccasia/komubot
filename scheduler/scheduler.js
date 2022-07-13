@@ -556,6 +556,7 @@ async function punish(client) {
     },
   ]);
 
+  console.log('sendmachleo', users);
   users.map(async (user) => {
     if (
       Date.now() - user.createdTimestamp >= 1800000 &&
@@ -586,7 +587,8 @@ async function punish(client) {
         { id: user.id, deactive: { $ne: true } },
         { botPing: false }
       );
-      await channel.send(message);
+      console.log('update botping punish', user.id);
+      await channel.send(message).catch(console.error);
     }
   });
 }
@@ -618,9 +620,11 @@ async function checkMention(client) {
         let mentionName = await client.users.fetch(user.authorId);
 
         const userDiscord = await client.users.fetch(user.mentionUserId);
-        userDiscord.send(
-          `Hãy trả lời ${mentionName.username} tại channel ${mentionChannel.name} nhé!`
-        );
+        userDiscord
+          .send(
+            `Hãy trả lời ${mentionName.username} tại channel ${mentionChannel.name} nhé!`
+          )
+          .catch(console.error);
         await mentionedData.updateOne({ _id: user._id }, { noti: true });
       })
     );
@@ -656,7 +660,7 @@ async function checkMention(client) {
         const channel = await client.channels.fetch(
           process.env.KOMUBOTREST_MACHLEO_CHANNEL_ID
         );
-        await channel.send(message);
+        await channel.send(message).catch(console.error);
         await mentionedData.updateOne(
           { _id: user._id },
           { confirm: true, punish: true }
@@ -684,7 +688,9 @@ async function topTracker(client) {
   await Promise.all(
     userTracker.map(async (user) => {
       const userDiscord = await client.users.fetch(user);
-      userDiscord.send(`Nhớ bật top tracker <@${user}> nhé!!!`);
+      userDiscord
+        .send(`Nhớ bật top tracker <@${user}> nhé!!!`)
+        .catch(console.error);
     })
   );
 }
@@ -761,6 +767,7 @@ async function sendQuiz(client) {
 
 async function tagMeeting(client) {
   if (await checkHoliday()) return;
+  console.log('start meeting');
   let guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
@@ -770,6 +777,7 @@ async function tagMeeting(client) {
     cancel: { $ne: true },
     reminder: { $ne: true },
   });
+  console.log('repeatMeet', repeatMeet);
 
   const voiceChannel = getAllVoice.map((item) => item.id);
 
@@ -807,7 +815,9 @@ async function tagMeeting(client) {
           isSameDate(dateCreatedTimestamp)
         ) {
           const fetchChannelFull = await client.channels.fetch(item.channelId);
-          await fetchChannelFull.send(`@here voice channel full`);
+          await fetchChannelFull
+            .send(`@here voice channel full`)
+            .catch(console.error);
         } else {
           const newDateTimestamp = new Date(+item.createdTimestamp.toString());
           const currentDate = new Date(newDateTimestamp.getTime());
@@ -824,9 +834,9 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  onceFetchChannel.send(
-                    `@here our meeting room is <#${roomVoice[0]}>`
-                  );
+                  onceFetchChannel
+                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                    .catch(console.error);
                   const onceShift = roomVoice.shift(roomVoice[0]);
                   const channelNameOnce = await client.channels.fetch(
                     onceShift
@@ -847,7 +857,6 @@ async function tagMeeting(client) {
                     await channelNameOnce.setName(
                       `${channelNameOnce.name} (${item.task})`
                     );
-
                   const newRoomOnce = channelNameOnce.name;
                   await new voiceChannelData({
                     id: channelNameOnce.id,
@@ -857,11 +866,13 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                } else await onceFetchChannel.send(`@here voice channel full`);
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  { reminder: true }
-                );
+                } else
+                  await onceFetchChannel
+                    .send(`@here voice channel full`)
+                    .catch(console.error);
+                await meetingData
+                  .updateOne({ _id: item._id }, { reminder: true })
+                  .catch((err) => console.log('updateone error once', err));
               }
               return;
             case 'daily':
@@ -871,9 +882,9 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  dailyFetchChannel.send(
-                    `@here our meeting room is <#${roomVoice[0]}>`
-                  );
+                  dailyFetchChannel
+                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                    .catch(console.error);
                   const dailyShift = roomVoice.shift(roomVoice[0]);
                   const channelNameDaily = await client.channels.fetch(
                     dailyShift
@@ -894,6 +905,7 @@ async function tagMeeting(client) {
                     await channelNameDaily.setName(
                       `${channelNameDaily.name} (${item.task})`
                     );
+                  console.log(`setname ${item.task} daily ${item.channelId}`);
                   const newRoomDaily = channelNameDaily.name;
                   await new voiceChannelData({
                     id: channelNameDaily.id,
@@ -903,7 +915,13 @@ async function tagMeeting(client) {
                   })
                     .save()
                     .catch((err) => console.log(err));
-                } else await dailyFetchChannel.send(`@here voice channel full`);
+                  console.log(
+                    `wait for update ${item.task} daily ${item.channelId}`
+                  );
+                } else
+                  await dailyFetchChannel
+                    .send(`@here voice channel full`)
+                    .catch(console.error);
 
                 let newCreatedTimestamp = item.createdTimestamp;
                 newCreatedTimestamp = currentDate.setDate(
@@ -915,10 +933,17 @@ async function tagMeeting(client) {
                     currentDate.getDate() + 1
                   );
                 }
-
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  { reminder: true, createdTimestamp: newCreatedTimestamp }
+                console.log(
+                  `checkholiday set timestamp ${item.task} ${item.channelId}`
+                );
+                await meetingData
+                  .updateOne(
+                    { _id: item._id },
+                    { reminder: true, createdTimestamp: newCreatedTimestamp }
+                  )
+                  .catch((err) => console.log('updateone error daily', err));
+                console.log(
+                  `update daily ${item.task} successfully ${item.channelId}`
                 );
               }
               return;
@@ -932,9 +957,9 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  weeklyFetchChannel.send(
-                    `@here our meeting room is <#${roomVoice[0]}>`
-                  );
+                  weeklyFetchChannel
+                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                    .catch(console.error);
                   const weeklyShift = roomVoice.shift(roomVoice[0]);
                   const channelNameWeekly = await client.channels.fetch(
                     weeklyShift
@@ -965,7 +990,9 @@ async function tagMeeting(client) {
                     .save()
                     .catch((err) => console.log(err));
                 } else
-                  await weeklyFetchChannel.send(`@here voice channel full`);
+                  await weeklyFetchChannel
+                    .send(`@here voice channel full`)
+                    .catch(console.error);
                 let newCreatedTimestampWeekly = item.createdTimestamp;
                 newCreatedTimestampWeekly = currentDate.setDate(
                   currentDate.getDate() + 7
@@ -976,13 +1003,15 @@ async function tagMeeting(client) {
                   );
                 }
 
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  {
-                    reminder: true,
-                    createdTimestamp: newCreatedTimestampWeekly,
-                  }
-                );
+                await meetingData
+                  .updateOne(
+                    { _id: item._id },
+                    {
+                      reminder: true,
+                      createdTimestamp: newCreatedTimestampWeekly,
+                    }
+                  )
+                  .catch((err) => console.log('updateone error weekly', err));
               }
               return;
             case 'repeat':
@@ -995,9 +1024,9 @@ async function tagMeeting(client) {
                   item.channelId
                 );
                 if (roomVoice.length !== 0) {
-                  repeatFetchChannel.send(
-                    `@here our meeting room is <#${roomVoice[0]}>`
-                  );
+                  repeatFetchChannel
+                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                    .catch(console.error);
                   const repeatShift = roomVoice.shift(roomVoice[0]);
                   const channelNameRepeat = await client.channels.fetch(
                     repeatShift
@@ -1028,7 +1057,9 @@ async function tagMeeting(client) {
                     .save()
                     .catch((err) => console.log(err));
                 } else
-                  await repeatFetchChannel.send(`@here voice channel full`);
+                  await repeatFetchChannel
+                    .send(`@here voice channel full`)
+                    .catch(console.error);
                 let newCreatedTimestampRepeat = item.createdTimestamp;
                 newCreatedTimestampRepeat = currentDate.setDate(
                   currentDate.getDate() + item.repeatTime
@@ -1040,13 +1071,15 @@ async function tagMeeting(client) {
                   );
                 }
 
-                await meetingData.updateOne(
-                  { _id: item._id },
-                  {
-                    reminder: true,
-                    createdTimestamp: newCreatedTimestampRepeat,
-                  }
-                );
+                await meetingData
+                  .updateOne(
+                    { _id: item._id },
+                    {
+                      reminder: true,
+                      createdTimestamp: newCreatedTimestampRepeat,
+                    }
+                  )
+                  .catch((err) => console.log('updateone error repeat', err));
               }
               return;
             default:
@@ -1133,9 +1166,9 @@ async function sendSubmitTimesheet(client) {
     });
     checkUser.map(async (user) => {
       const userDiscord = await client.users.fetch(user.id);
-      userDiscord.send(
-        `Nhớ submit timesheet cuối tuần tránh bị phạt bạn nhé!!!`
-      );
+      userDiscord
+        .send(`Nhớ submit timesheet cuối tuần tránh bị phạt bạn nhé!!!`)
+        .catch(console.error);
     });
   });
 }
@@ -1392,7 +1425,7 @@ async function dating(client) {
             const fetchChannelFull = await client.channels.fetch(
               '956782882226073610'
             );
-            fetchChannelFull.send(`Voice channel full`);
+            fetchChannelFull.send(`Voice channel full`).catch(console.error);
           }
         } else {
           const nowFetchChannel = await client.channels.fetch(
@@ -1400,9 +1433,11 @@ async function dating(client) {
           );
           for (i = 0; i < datingIdWoman.length; i++) {
             if (roomMap.length !== 0) {
-              await nowFetchChannel.send(
-                `Hãy vào <#${roomMap[0]}> trò chuyện cuối tuần thôi nào <@${datingIdMan[i]}> <@${datingIdWoman[i]}>`
-              );
+              await nowFetchChannel
+                .send(
+                  `Hãy vào <#${roomMap[0]}> trò chuyện cuối tuần thôi nào <@${datingIdMan[i]}> <@${datingIdWoman[i]}>`
+                )
+                .catch(console.error);
               await new datingData({
                 channelId: roomMap[0],
                 userId: datingIdMan[i],
@@ -1425,7 +1460,8 @@ async function dating(client) {
                 .save()
                 .catch((err) => console.log(err));
               roomMap.shift(roomMap[0]);
-            } else nowFetchChannel.send(`Voice channel full`);
+            } else
+              nowFetchChannel.send(`Voice channel full`).catch(console.error);
           }
         }
       }
@@ -1566,9 +1602,11 @@ async function sendMesageRemind(client) {
         dateCreatedTimestamp === dateNow
       ) {
         const fetchChannel = await client.channels.fetch(item.channelId);
-        fetchChannel.send(
-          `<@${item.mentionUserId}>, due today ${item.content} of <@${item.authorId}>`
-        );
+        fetchChannel
+          .send(
+            `<@${item.mentionUserId}>, due today ${item.content} of <@${item.authorId}>`
+          )
+          .catch(console.error);
         await remindData.updateOne({ _id: item._id }, { cancel: true });
       }
     });
@@ -1602,7 +1640,9 @@ async function sendOdinReport(client) {
 
       const attachment = new MessageAttachment(report.filePath);
       const embed = new MessageEmbed().setTitle('Komu report weekly');
-      await fetchChannel.send({ files: [attachment], embed: embed });
+      await fetchChannel
+        .send({ files: [attachment], embed: embed })
+        .catch(console.error);
     } catch (error) {
       console.error(error);
       fetchChannel.send(`Sorry, ${error.message}`);
@@ -1819,7 +1859,7 @@ async function punishOpenTalk(client) {
         { id: user.id, deactive: { $ne: true } },
         { botPing: false }
       );
-      await channel.send(message);
+      await channel.send(message).catch(console.error);
     }
   });
 }

@@ -69,7 +69,9 @@ async function audioPlayer(client, message, episode) {
     player.play(resource);
 
     if (episode && message) {
-      message.channel.send(`@here go to <#921323636491710504>`);
+      message.channel
+        .send(`@here go to <#921323636491710504>`)
+        .catch(console.error);
     }
   } catch (err) {
     console.log(err);

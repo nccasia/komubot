@@ -164,7 +164,7 @@ module.exports = {
           });
       }
       if (!args[0]) {
-        return message.channel.send(messHelp);
+        return message.channel.send(messHelp).catch(console.error);
       } else {
         let dateTime = args[0];
         const day = dateTime.slice(0, 2);

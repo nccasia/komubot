@@ -49,9 +49,11 @@ const pollEmbed = async (
   const usedEmojis = Object.keys(emojiInfo);
   usedEmojis.push(forceEndPollEmoji);
 
-  const poll = await msg.channel.send({
-    embeds: [embedBuilder(title, msg.author.username).setDescription(text)],
-  });
+  const poll = await msg.channel
+    .send({
+      embeds: [embedBuilder(title, msg.author.username).setDescription(text)],
+    })
+    .catch(console.error);
   for (const emoji of usedEmojis) await poll.react(emoji);
 
   const reactionCollector = poll.createReactionCollector(
@@ -109,9 +111,11 @@ const pollEmbed = async (
       });
     }
     poll.delete();
-    msg.channel.send({
-      embeds: [embedBuilder(title, msg.author.tag).setDescription(text)],
-    });
+    msg.channel
+      .send({
+        embeds: [embedBuilder(title, msg.author.tag).setDescription(text)],
+      })
+      .catch(console.error);
   });
 };
 

@@ -73,9 +73,9 @@ const dmmessage = async (message, client) => {
         return message.channel.send(item.text).catch(console.log);
       });
     } else {
-      message.channel.send(
-        "Very busy, too much work today. I'm so tired. BRB."
-      );
+      message.channel
+        .send("Very busy, too much work today. I'm so tired. BRB.")
+        .catch(console.error);
       return;
     }
 
