@@ -789,6 +789,7 @@ async function tagMeeting(client) {
   findVoice.map((item) => {
     voiceNow.push(item.id);
   });
+  console.log('find voice start');
 
   const newList = voiceChannel.map(async (voice, index) => {
     const userDiscord = await client.channels.fetch(voice);
@@ -945,6 +946,13 @@ async function tagMeeting(client) {
                 console.log(
                   `update daily ${item.task} successfully ${item.channelId}`
                 );
+
+                const findMeetingAfter = await meetingData.find({
+                  channelId: item.channelId,
+                  task: item.task,
+                  repeat: item.repeat,
+                });
+                console.log(findMeetingAfter, 'findMeetingAfterUpdate');
               }
               return;
             case 'weekly':
@@ -1089,6 +1097,7 @@ async function tagMeeting(client) {
       });
     }
   });
+  console.log('end meeting');
 }
 
 async function updateReminderMeeting(client) {

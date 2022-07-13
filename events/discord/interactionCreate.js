@@ -22,6 +22,7 @@ module.exports = {
       // handle wfh button
       if (interaction.customId.startsWith('komu_')) {
         await wfh(interaction, client).catch(console.error);
+        console.log(interaction, 'interaction wfh');
         return;
       }
       if (interaction.customId.startsWith('question_')) {
@@ -35,12 +36,16 @@ module.exports = {
 
         console.log(id, 'id interaction');
         console.log(correct, 'correct interaction');
-        await userData.updateOne(
-          { id: userid },
-          {
-            botPing: false,
-          }
-        );
+        await userData
+          .updateOne(
+            { id: userid },
+            {
+              botPing: false,
+            }
+          )
+          .catch((err) =>
+            console.log(`updateone error interaction ${id} ${userid}`, err)
+          );
 
         console.log('update botping successfully', userid);
         if (key == correct) {
