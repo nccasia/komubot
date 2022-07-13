@@ -41,7 +41,7 @@ module.exports = {
 
         if (getChannel && category) {
           const channel = await client.channels.fetch(getChannel.id);
-          channel.setParent(category.id);
+          channel.setParent(category.id, { lockPermissions: false });
           await channelData.updateOne(
             { id: args[0] },
             { $set: { parentId: category.id } }
