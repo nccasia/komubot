@@ -48,6 +48,10 @@ module.exports = {
           );
 
         console.log('update botping successfully', userid);
+        const findUserAfter = await userData.find({
+          id: userid,
+        });
+        console.log(findUserAfter, 'findUserAfter');
         if (key == correct) {
           const newUser = await addScores(userid);
           if (!newUser) return;
