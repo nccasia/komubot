@@ -549,6 +549,7 @@ async function punish(client) {
       $project: {
         id: 1,
         username: 1,
+        botPing: 1,
         createdTimestamp: {
           $first: '$last_message.createdTimestamp',
         },
@@ -1970,11 +1971,17 @@ function cronJobOneMinute(client) {
   sendMesageRemind(client);
   kickMemberVoiceChannel(client);
   updateReminderMeeting(client);
-  tagMeeting(client);
 }
 
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '*/2 * * * *',
+      () => tagMeeting(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     new cron.CronJob(
       '30 08 * * 0-6',
       () => pingReminder(client),
