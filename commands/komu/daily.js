@@ -81,7 +81,7 @@ module.exports = {
         return message
           .reply({
             content:
-              '```Please be at least 100 characters in your daily text```',
+              '```Please enter at least 100 characters in your daily text```',
             ephemeral: true,
           })
           .catch((err) => {
