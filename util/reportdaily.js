@@ -4,7 +4,7 @@ const { sendErrorToDevTest } = require('../util/komubotrest');
 
 function findCountNotDaily(arr, email) {
   const users = arr.filter((item) => item.email === email);
-  return users[0] ? users[0].countnotdaily : 0;
+  return users[0] ? users[0].countnotdaily : 1;
 }
 async function reportDaily(date, message, args, client, guildDB) {
   try {
@@ -41,7 +41,10 @@ async function reportDaily(date, message, args, client, guildDB) {
                 user.username
               )})`;
             } else {
-              return `${user.email} (${user.countnotdaily})`;
+              return `${user.email} (${findCountNotDaily(
+                notDaily,
+                user.username
+              )})`;
             }
           })
           .join('\n');

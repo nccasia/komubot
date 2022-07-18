@@ -1,5 +1,6 @@
 const dailyData = require('../../models/dailyData.js');
 const { sendErrorToDevTest } = require('../../util/komubotrest.js');
+const axios = require('axios');
 
 function setTime(date, hours, minute, second, msValue) {
   return date.setHours(hours, minute, second, msValue);
@@ -33,6 +34,29 @@ function checkTimeSheet() {
   return result;
 }
 
+function checkTimeNotWFH() {
+  let resultWfh = false;
+  const time = new Date();
+  const cur = new Date();
+  const timezone = time.getTimezoneOffset() / -60;
+
+  const fisrtTimeWFH = new Date(
+    setTime(time, 0 + timezone, 30, 0, 0)
+  ).getTime();
+  const lastTimeWFH = new Date(setTime(time, 10 + timezone, 0, 0, 0)).getTime();
+
+  if (cur.getTime() >= fisrtTimeWFH && cur.getTime() <= lastTimeWFH) {
+    resultWfh = true;
+  }
+  return resultWfh;
+}
+
+function getUserNameByEmail(string) {
+  if (string.includes('@ncc.asia')) {
+    return string.slice(0, string.length - 9);
+  }
+}
+
 module.exports = {
   name: 'daily',
   description: 'WFH Daily',
@@ -40,6 +64,7 @@ module.exports = {
   async execute(message, args, client) {
     try {
       let authorId = message.author.id;
+      let authorUsername = message.author.username;
       const daily = args.join(' ');
       if (!daily || daily == undefined) {
         return message
@@ -52,34 +77,97 @@ module.exports = {
           });
       }
 
-      await new dailyData({
-        userid: message.author.id,
-        email:
-          message.member != null || message.member != undefined
-            ? message.member.displayName
-            : message.author.username,
-        daily: daily,
-        createdAt: new Date(),
-        channelid: message.channel.id,
-      })
-        .save()
-        .catch((err) => console.log(err));
-      if (!checkTimeSheet()) {
-        message
+      if (daily.length < 100) {
+        return message
           .reply({
             content:
-              '```✅ Daily saved. (Invalid daily time frame. Please daily at 7h30-9h30, 12h-14h. WFH not daily 20k/day.)```',
+              '```Please be at least 100 characters in your daily text```',
             ephemeral: true,
           })
           .catch((err) => {
             sendErrorToDevTest(client, authorId, err);
           });
+      }
+
+      const date = new Date();
+      let wfhGetApi;
+      try {
+        const url = date
+          ? `${client.config.wfh.api_url}?date=${date.toDateString()}`
+          : client.config.wfh.api_url;
+        wfhGetApi = await axios.get(url, {
+          headers: {
+            securitycode: process.env.WFH_API_KEY_SECRET,
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
+
+      const wfhUserEmail = wfhGetApi.data.result.map((item) =>
+        getUserNameByEmail(item.emailAddress)
+      );
+
+      if (wfhUserEmail.includes(authorUsername)) {
+        await new dailyData({
+          userid: message.author.id,
+          email:
+            message.member != null || message.member != undefined
+              ? message.member.displayName
+              : message.author.username,
+          daily: daily,
+          createdAt: new Date(),
+          channelid: message.channel.id,
+        })
+          .save()
+          .catch((err) => console.log(err));
+        if (!checkTimeSheet()) {
+          message
+            .reply({
+              content:
+                '```✅ Daily saved. (Invalid daily time frame. Please daily at 7h30-9h30, 12h-14h. WFH not daily 20k/day.)```',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              sendErrorToDevTest(client, authorId, err);
+            });
+        } else {
+          message
+            .reply({ content: '`✅` Daily saved.', ephemeral: true })
+            .catch((err) => {
+              sendErrorToDevTest(client, authorId, err);
+            });
+        }
       } else {
-        message
-          .reply({ content: '`✅` Daily saved.', ephemeral: true })
-          .catch((err) => {
-            sendErrorToDevTest(client, authorId, err);
-          });
+        await new dailyData({
+          userid: message.author.id,
+          email:
+            message.member != null || message.member != undefined
+              ? message.member.displayName
+              : message.author.username,
+          daily: daily,
+          createdAt: new Date(),
+          channelid: message.channel.id,
+        })
+          .save()
+          .catch((err) => console.log(err));
+        if (!checkTimeNotWFH()) {
+          message
+            .reply({
+              content:
+                '```✅ Daily saved. (Invalid daily time frame. Please daily at 7h30-17h. not daily 20k/day.)```',
+              ephemeral: true,
+            })
+            .catch((err) => {
+              sendErrorToDevTest(client, authorId, err);
+            });
+        } else {
+          message
+            .reply({ content: '`✅` Daily saved.', ephemeral: true })
+            .catch((err) => {
+              sendErrorToDevTest(client, authorId, err);
+            });
+        }
       }
     } catch (err) {
       console.log(err);

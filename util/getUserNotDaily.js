@@ -19,6 +19,10 @@ function getDateDay(time) {
       fisttime: new Date(setTime(date, 5 + timezone, 0, 0, 0)).getTime(),
       lastime: new Date(setTime(date, 7 + timezone, 1, 0, 0)).getTime(),
     },
+    fullday: {
+      fisttime: new Date(setTime(date, 0 + timezone, 0, 0, 0)).getTime(),
+      lastime: new Date(setTime(date, 10 + timezone, 0, 0, 0)).getTime(),
+    },
   };
 }
 
@@ -63,6 +67,14 @@ async function getUserNotDaily(date, message, args, client) {
       return;
     }
 
+    const userNotWFH = await userData
+      .find({
+        email: { $nin: wfhUserEmail },
+        deactive: { $ne: true },
+      })
+      .select('id email -_id');
+    const userEmail = userNotWFH.map((item) => item.email);
+
     const dailyMorning = await dailyData.find({
       createdAt: {
         $lte: getDateDay(date).morning.lastime,
@@ -77,8 +89,17 @@ async function getUserNotDaily(date, message, args, client) {
       },
     });
 
+    const dailyFullday = await dailyData.find({
+      createdAt: {
+        $lte: getDateDay(date).fullday.lastime,
+        $gte: getDateDay(date).fullday.fisttime,
+      },
+    });
+
     const dailyEmailMorning = dailyMorning.map((item) => item.email);
     const dailyEmailAfternoon = dailyAfternoon.map((item) => item.email);
+    const dailyEmailFullday = dailyFullday.map((item) => item.email);
+
     const notDailyMorning = [];
     for (const wfhData of wfhUserEmail) {
       if (!dailyEmailMorning.includes(wfhData) && wfhData !== undefined) {
@@ -91,7 +112,21 @@ async function getUserNotDaily(date, message, args, client) {
         notDailyAfternoon.push(wfhData);
       }
     }
-    const spreadNotDaily = [...notDailyMorning, ...notDailyAfternoon];
+    const notDailyFullday = [];
+    for (const userNotWFHData of userEmail) {
+      if (
+        !dailyEmailFullday.includes(userNotWFHData) &&
+        userNotWFHData !== undefined
+      ) {
+        notDailyFullday.push(userNotWFHData);
+      }
+    }
+
+    const spreadNotDaily = [
+      ...notDailyMorning,
+      ...notDailyAfternoon,
+      ...notDailyFullday,
+    ];
     // => notDaily : {email : "", countnotdaily : }
     const notDaily = spreadNotDaily.reduce((acc, cur) => {
       if (Array.isArray(acc) && acc.length === 0) {
