@@ -6,7 +6,6 @@ const { sendErrorToDevTest } = require('./komubotrest');
 
 const wfh = async (interaction, client) => {
   const arrIds = interaction.customId.split('#');
-  console.log(arrIds);
   const customId = arrIds[0];
   const labelImageId = arrIds.length > 1 ? arrIds[1] : '';
   let isCheckin = true;

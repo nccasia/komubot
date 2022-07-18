@@ -1175,7 +1175,9 @@ async function sendSubmitTimesheet(client) {
       roles_discord: { $ne: [], $exists: true },
     });
     checkUser.map(async (user) => {
-      const userDiscord = await client.users.fetch(user.id);
+      const userDiscord = await client.users
+        .fetch(user.id)
+        .catch(console.error);
       userDiscord
         .send(`Nhớ submit timesheet cuối tuần tránh bị phạt bạn nhé!!!`)
         .catch(console.error);
