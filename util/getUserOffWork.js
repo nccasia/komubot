@@ -23,13 +23,13 @@ async function getUserOffWork() {
     );
     if (response.data && response.data.result) {
       userOffFullday = response.data.result
-        .filter((user) => user.message === 'Off Fullday')
+        .filter((user) => user.message.includes('Off Fullday'))
         .map((item) => item.emailAddress.replace('@ncc.asia', ''));
       userOffMorning = response.data.result
-        .filter((user) => user.message === 'Off Morning')
+        .filter((user) => user.message.includes('Off Morning'))
         .map((item) => item.emailAddress.replace('@ncc.asia', ''));
       userOffAffternoon = response.data.result
-        .filter((user) => user.message === 'Off Afternoon')
+        .filter((user) => user.message.includes('Off Afternoon'))
         .map((item) => item.emailAddress.replace('@ncc.asia', ''));
     }
 

@@ -1,6 +1,7 @@
 const axios = require('axios');
 const dailyData = require('../models/dailyData');
 const userData = require('../models/userData');
+const getUserOffWork = require('./getUserOffWork');
 function getDateDay(time) {
   let date;
 
@@ -67,9 +68,10 @@ async function getUserNotDaily(date, message, args, client) {
       return;
     }
 
+    const { userOffFullday } = await getUserOffWork();
     const userNotWFH = await userData
       .find({
-        email: { $nin: wfhUserEmail },
+        email: { $nin: [...wfhUserEmail, ...userOffFullday] },
         deactive: { $ne: true },
       })
       .select('id email -_id');
