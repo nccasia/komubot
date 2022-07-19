@@ -77,7 +77,7 @@ module.exports = {
           });
       }
 
-      if (daily.length < 100) {
+      if (daily.length < 60) {
         return message
           .reply({
             content:
