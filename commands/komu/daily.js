@@ -77,11 +77,11 @@ module.exports = {
           });
       }
 
-      if (daily.length < 100) {
+      if (daily.length < 60) {
         return message
           .reply({
             content:
-              '```Please enter at least 100 characters in your daily text```',
+              '```Please enter at least 60 characters in your daily text```',
             ephemeral: true,
           })
           .catch((err) => {
