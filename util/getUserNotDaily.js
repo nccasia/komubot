@@ -68,11 +68,15 @@ async function getUserNotDaily(date, message, args, client) {
       return;
     }
 
-    const { userOffFullday } = await getUserOffWork();
+    const { userOffFullday } = await getUserOffWork(date);
     const userNotWFH = await userData
       .find({
         email: { $nin: [...wfhUserEmail, ...userOffFullday] },
         deactive: { $ne: true },
+        $or: [
+          { roles_discord: { $all: ['INTERN'] } },
+          { roles_discord: { $all: ['STAFF'] } },
+        ],
       })
       .select('id email -_id');
     const userEmail = userNotWFH.map((item) => item.email);
