@@ -13,8 +13,8 @@ module.exports = {
         message.guild.members.cache
           .filter(
             (m) =>
-              m.user.tag.toLowerCase() === args[0].toLowerCase() ||
-              m.displayName.toLowerCase() === args[0].toLowerCase() ||
+              // m.user.tag.toLowerCase() === args[0].toLowerCase() ||
+              // m.displayName.toLowerCase() === args[0].toLowerCase() ||
               m.user.username.toLowerCase() === args[0].toLowerCase()
           )
           .first();
