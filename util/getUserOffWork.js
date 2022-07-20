@@ -12,15 +12,16 @@ function getStatusDay() {
   return statusDay;
 }
 
-async function getUserOffWork() {
+async function getUserOffWork(date) {
   try {
     let userOffFullday = [];
     let userOffMorning = [];
     let userOffAffternoon = [];
 
-    const response = await axios.get(
-      'http://timesheetapi.nccsoft.vn/api/services/app/Public/GetAllUserLeaveDay'
-    );
+    const url = date
+      ? `http://timesheetapi.nccsoft.vn/api/services/app/Public/GetAllUserLeaveDay?date=${date.toDateString()}`
+      : 'http://timesheetapi.nccsoft.vn/api/services/app/Public/GetAllUserLeaveDay';
+    const response = await axios.get(url);
     if (response.data && response.data.result) {
       userOffFullday = response.data.result
         .filter((user) => user.message.includes('Off Fullday'))
