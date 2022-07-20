@@ -57,6 +57,45 @@ function getUserNameByEmail(string) {
   }
 }
 
+function findPeriod(daily) {
+  let period = false;
+  let dailyReplace = daily.replace('\n', ' ');
+  const arrDaily = dailyReplace.split(' ');
+  arrDaily.map((item) => {
+    if (item.length > 15) {
+      period = true;
+      return period;
+    }
+    if (!period) {
+      for (let i = 1; i < 6; i++) {
+        for (let j = 0; j < item.length; j++) {
+          let currChar = item.slice(j, j + i).toLowerCase();
+          let comparator = item.slice(j + i, j + i + i).toLowerCase();
+          let twoComparator = item
+            .slice(j + i + i, j + i + i + i)
+            .toLowerCase();
+          if (i === 1 || i === 2) {
+            if (currChar === comparator && currChar === twoComparator) {
+              period = true;
+              return period;
+            } else {
+              period = false;
+            }
+          } else {
+            if (currChar === comparator) {
+              period = true;
+              return period;
+            } else {
+              period = false;
+            }
+          }
+        }
+      }
+    }
+  });
+  return period;
+}
+
 module.exports = {
   name: 'daily',
   description: 'WFH Daily',
@@ -82,6 +121,17 @@ module.exports = {
           .reply({
             content:
               '```Please enter at least 60 characters in your daily text```',
+            ephemeral: true,
+          })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
+      }
+
+      if (findPeriod(daily)) {
+        return message
+          .reply({
+            content: '```Please chat with correct syntax```',
             ephemeral: true,
           })
           .catch((err) => {
