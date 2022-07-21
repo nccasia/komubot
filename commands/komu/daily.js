@@ -59,7 +59,7 @@ function getUserNameByEmail(string) {
 
 function findPeriod(daily) {
   let period = false;
-  let dailyReplace = daily.replace('\n', ' ');
+  const dailyReplace = daily.replace(/\n/g, ' ');
   const arrDaily = dailyReplace.split(' ');
   arrDaily.map((item) => {
     if (item.length > 15) {
@@ -69,9 +69,9 @@ function findPeriod(daily) {
     if (!period) {
       for (let i = 1; i < 6; i++) {
         for (let j = 0; j < item.length; j++) {
-          let currChar = item.slice(j, j + i).toLowerCase();
-          let comparator = item.slice(j + i, j + i + i).toLowerCase();
-          let twoComparator = item
+          const currChar = item.slice(j, j + i).toLowerCase();
+          const comparator = item.slice(j + i, j + i + i).toLowerCase();
+          const twoComparator = item
             .slice(j + i + i, j + i + i + i)
             .toLowerCase();
           if (i === 1 || i === 2) {
@@ -81,13 +81,11 @@ function findPeriod(daily) {
             } else {
               period = false;
             }
+          } else if (currChar === comparator) {
+            period = true;
+            return period;
           } else {
-            if (currChar === comparator) {
-              period = true;
-              return period;
-            } else {
-              period = false;
-            }
+            period = false;
           }
         }
       }
@@ -102,8 +100,8 @@ module.exports = {
   cat: 'komu',
   async execute(message, args, client) {
     try {
-      let authorId = message.author.id;
-      let authorUsername = message.author.username;
+      const authorId = message.author.id;
+      const authorUsername = message.author.username;
       const daily = args.join(' ');
       if (!daily || daily == undefined) {
         return message
@@ -131,7 +129,7 @@ module.exports = {
       if (findPeriod(daily)) {
         return message
           .reply({
-            content: '```Please chat with correct syntax```',
+            content: '```Please daily with correct syntax```',
             ephemeral: true,
           })
           .catch((err) => {
