@@ -127,7 +127,14 @@ module.exports = {
       });
 
       if (checkDaily) {
-        return message.channel.send(messHelp);
+        return message
+          .reply({
+            content: messHelp,
+            ephemeral: true,
+          })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
       }
 
       if (!daily || daily == undefined) {
