@@ -307,11 +307,17 @@ async function remindDailyMorning(client) {
   if (await checkHoliday()) return;
   console.log('[Scheduler] Run');
   try {
-    const { notDailyMorning } = await getUserNotDaily(null, null, null, client);
+    const { notDailyMorning, notDailyFullday } = await getUserNotDaily(
+      null,
+      null,
+      null,
+      client
+    );
     // send message komu to user
 
+    const userNotDaily = [...notDailyMorning, ...notDailyFullday];
     await Promise.all(
-      notDailyMorning.map((email) =>
+      userNotDaily.map((email) =>
         sendMessageKomuToUser(
           client,
           "Don't forget to daily, dude! Don't be mad at me, we are friends I mean we are best friends.",
@@ -328,15 +334,17 @@ async function remindDailyAfternoon(client) {
   if (await checkHoliday()) return;
   console.log('[Scheduler] Run');
   try {
-    const { notDailyAfternoon } = await getUserNotDaily(
+    const { notDailyAfternoon, notDailyFullday } = await getUserNotDaily(
       null,
       null,
       null,
       client
     );
     // send message komu to user
+
+    const userNotDaily = [...notDailyAfternoon, ...notDailyFullday];
     await Promise.all(
-      notDailyAfternoon.map((email) =>
+      userNotDaily.map((email) =>
         sendMessageKomuToUser(
           client,
           "Don't forget to daily, dude! Don't be mad at me, we are friends I mean we are best friends.",
@@ -1179,7 +1187,9 @@ async function sendSubmitTimesheet(client) {
         .fetch(user.id)
         .catch(console.error);
       userDiscord
-        .send(`Nhớ submit timesheet cuối tuần tránh bị phạt bạn nhé!!!`)
+        .send(
+          `Nhớ submit timesheet cuối tuần tránh bị phạt bạn nhé!!! Nếu bạn có tham gia opentalk bạn hãy log timesheet vào project company activities nhé.`
+        )
         .catch(console.error);
     });
   });
@@ -2027,14 +2037,14 @@ exports.scheduler = {
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '00 00 9 * * 1-5',
+      '00 9 * * 1-5',
       () => remindDailyMorning(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '00 00 13 * * 1-5',
+      '00 13 * * 1-5',
       () => remindDailyAfternoon(client),
       null,
       false,
