@@ -117,22 +117,16 @@ module.exports = {
     try {
       let authorId = message.author.id;
       let authorUsername = message.author.username;
-      const dateDaily = args[0];
-      const daily = args.slice(1).join(' ');
+      const daily = args.join(' ');
 
-      let checkDaily;
+      let checkDaily = false;
       const wordInString = (s, word) =>
         new RegExp('\\b' + word + '\\b', 'i').test(s);
       ['yesterday', 'today', 'block'].forEach((q) => {
         if (!wordInString(daily, q)) return (checkDaily = true);
       });
 
-      if (
-        !/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/.test(
-          dateDaily
-        ) ||
-        checkDaily
-      ) {
+      if (checkDaily) {
         return message.channel.send(messHelp);
       }
 
