@@ -170,7 +170,7 @@ async function getUserNotDaily(date, message, args, client) {
         userNotDaily[i] = notDaily[i];
       }
     }
-    return { notDaily, userNotDaily, notDailyMorning };
+    return { notDaily, userNotDaily, notDailyMorning, notDailyFullday };
   } catch (error) {
     console.log(error);
   }
