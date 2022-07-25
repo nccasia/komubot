@@ -57,44 +57,57 @@ function getUserNameByEmail(string) {
   }
 }
 
-function findPeriod(daily) {
-  let period = false;
-  let dailyReplace = daily.replace('\n', ' ');
-  const arrDaily = dailyReplace.split(' ');
-  arrDaily.map((item) => {
-    if (item.length > 15) {
-      period = true;
-      return period;
-    }
-    if (!period) {
-      for (let i = 1; i < 6; i++) {
-        for (let j = 0; j < item.length; j++) {
-          let currChar = item.slice(j, j + i).toLowerCase();
-          let comparator = item.slice(j + i, j + i + i).toLowerCase();
-          let twoComparator = item
-            .slice(j + i + i, j + i + i + i)
-            .toLowerCase();
-          if (i === 1 || i === 2) {
-            if (currChar === comparator && currChar === twoComparator) {
-              period = true;
-              return period;
-            } else {
-              period = false;
-            }
-          } else {
-            if (currChar === comparator) {
-              period = true;
-              return period;
-            } else {
-              period = false;
-            }
-          }
-        }
-      }
-    }
-  });
-  return period;
-}
+// function findPeriod(daily) {
+//   let period = false;
+//   let dailyReplace = daily.replace('\n', ' ');
+//   const arrDaily = dailyReplace.split(' ');
+//   arrDaily.map((item) => {
+//     if (item.length > 15) {
+//       period = true;
+//       return period;
+//     }
+//     if (!period) {
+//       for (let i = 1; i < 6; i++) {
+//         for (let j = 0; j < item.length; j++) {
+//           let currChar = item.slice(j, j + i).toLowerCase();
+//           let comparator = item.slice(j + i, j + i + i).toLowerCase();
+//           let twoComparator = item
+//             .slice(j + i + i, j + i + i + i)
+//             .toLowerCase();
+//           if (i === 1 || i === 2) {
+//             if (currChar === comparator && currChar === twoComparator) {
+//               period = true;
+//               return period;
+//             } else {
+//               period = false;
+//             }
+//           } else {
+//             if (currChar === comparator) {
+//               period = true;
+//               return period;
+//             } else {
+//               period = false;
+//             }
+//           }
+//         }
+//       }
+//     }
+//   });
+//   return period;
+// }
+
+const messHelp =
+  '```' +
+  'Please daily follow this template' +
+  '\n' +
+  '*daily dd/mm/yyyy' +
+  '\n' +
+  '- yesterday:' +
+  '\n' +
+  '- today:' +
+  '\n' +
+  '- block: ' +
+  '```';
 
 module.exports = {
   name: 'daily',
@@ -104,7 +117,25 @@ module.exports = {
     try {
       let authorId = message.author.id;
       let authorUsername = message.author.username;
-      const daily = args.join(' ');
+      const dateDaily = args[0];
+      const daily = args.slice(1).join(' ');
+
+      let checkDaily;
+      const wordInString = (s, word) =>
+        new RegExp('\\b' + word + '\\b', 'i').test(s);
+      ['yesterday', 'today', 'block'].forEach((q) => {
+        if (!wordInString(daily, q)) return (checkDaily = true);
+      });
+
+      if (
+        !/^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/.test(
+          dateDaily
+        ) ||
+        checkDaily
+      ) {
+        return message.channel.send(messHelp);
+      }
+
       if (!daily || daily == undefined) {
         return message
           .reply({
@@ -128,16 +159,16 @@ module.exports = {
           });
       }
 
-      if (findPeriod(daily)) {
-        return message
-          .reply({
-            content: '```Please chat with correct syntax```',
-            ephemeral: true,
-          })
-          .catch((err) => {
-            sendErrorToDevTest(client, authorId, err);
-          });
-      }
+      // if (findPeriod(daily)) {
+      //   return message
+      //     .reply({
+      //       content: '```Please chat with correct syntax```',
+      //       ephemeral: true,
+      //     })
+      //     .catch((err) => {
+      //       sendErrorToDevTest(client, authorId, err);
+      //     });
+      // }
 
       const date = new Date();
       let wfhGetApi;

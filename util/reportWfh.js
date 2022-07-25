@@ -11,9 +11,16 @@ function withoutTime(dateTime) {
   return date;
 }
 
-function getTimeToDay() {
-  const today = new Date();
-  const tomorrows = new Date();
+function getTimeToDay(date) {
+  let today;
+  let tomorrows;
+  if (date) {
+    today = new Date(date);
+    tomorrows = new Date(date);
+  } else {
+    today = new Date();
+    tomorrows = new Date();
+  }
   const tomorrowsDate = tomorrows.setDate(tomorrows.getDate() + 1);
 
   return {
@@ -24,19 +31,33 @@ function getTimeToDay() {
 
 async function reportWfh(message, args, client) {
   let authorId = message.author.id;
-  let wfhGetApi;
-  try {
-    wfhGetApi = await axios.get(client.config.wfh.api_url, {
-      headers: {
-        securitycode: process.env.WFH_API_KEY_SECRET,
-      },
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  // let wfhGetApi;
+  // try {
+  //   wfhGetApi = await axios.get(client.config.wfh.api_url, {
+  //     headers: {
+  //       securitycode: process.env.WFH_API_KEY_SECRET,
+  //     },
+  //   });
+  // } catch (error) {
+  //   console.log(error);
+  // }
 
-  if (!wfhGetApi || wfhGetApi.data == undefined) {
-    return;
+  // if (!wfhGetApi || wfhGetApi.data == undefined) {
+  //   return;
+  // }
+  let fomatDate;
+  if (args[1]) {
+    const day = args[1].slice(0, 2);
+    const month = args[1].slice(3, 5);
+    const year = args[1].slice(6);
+
+    fomatDate = `${month}/${day}/${year}`;
+  } else {
+    fomatDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
   }
 
   const wfhFullday = await wfhData.aggregate([
@@ -44,8 +65,8 @@ async function reportWfh(message, args, client) {
       $match: {
         type: 'wfh',
         createdAt: {
-          $gte: getTimeToDay().firstDay,
-          $lte: getTimeToDay().lastDay,
+          $gte: getTimeToDay(fomatDate).firstDay,
+          $lte: getTimeToDay(fomatDate).lastDay,
         },
         $or: [
           { status: 'ACCEPT' },
@@ -112,27 +133,41 @@ async function reportWfh(message, args, client) {
 }
 
 async function reportCompalinWfh(message, args, client) {
-  let wfhGetApi;
-  try {
-    wfhGetApi = await axios.get(client.config.wfh.api_url, {
-      headers: {
-        securitycode: process.env.WFH_API_KEY_SECRET,
-      },
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  // let wfhGetApi;
+  // try {
+  //   wfhGetApi = await axios.get(client.config.wfh.api_url, {
+  //     headers: {
+  //       securitycode: process.env.WFH_API_KEY_SECRET,
+  //     },
+  //   });
+  // } catch (error) {
+  //   console.log(error);
+  // }
 
-  if (!wfhGetApi || wfhGetApi.data == undefined) {
-    return;
+  // if (!wfhGetApi || wfhGetApi.data == undefined) {
+  //   return;
+  // }
+  let fomatDate;
+  if (args[2]) {
+    const day = args[2].slice(0, 2);
+    const month = args[2].slice(3, 5);
+    const year = args[2].slice(6);
+
+    fomatDate = `${month}/${day}/${year}`;
+  } else {
+    fomatDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
   }
 
   const wfhFullday = await wfhData.find({
     status: 'APPROVED',
     complain: true,
     createdAt: {
-      $gte: getTimeToDay().firstDay,
-      $lte: getTimeToDay().lastDay,
+      $gte: getTimeToDay(fomatDate).firstDay,
+      $lte: getTimeToDay(fomatDate).lastDay,
     },
   });
 
