@@ -27,6 +27,8 @@ const remindData = require('../models/remindData');
 const holidayData = require('../models/holidayData');
 const { getKomuWeeklyReport } = require('../util/odin-report');
 const openTalkData = require('../models/opentalkData');
+const channelData = require('../models/channelData');
+const msgData = require('../models/msgData');
 // Deepai
 const deepai = require('deepai');
 const API_KEY_DEEPAI = '9763204a-9c9a-4657-b393-5bbf4010217d';
@@ -1979,6 +1981,41 @@ async function pingReminder(client) {
   }
 }
 
+async function moveChannel(client) {
+  const CATEGORY_ACHIEVED_CHANNEL_ID = '958646576627187733';
+  const TIME = 1000;
+
+  const channels = await channelData.find({
+    parentId: { $ne: CATEGORY_ACHIEVED_CHANNEL_ID, $exists: true },
+    type: { $in: ['GUILD_TEXT'] },
+  });
+  const channelIds = channels.map((channel) => channel.id);
+
+  for (channelId of channelIds) {
+    try {
+      const channel = await client.channels.fetch(channelId);
+      const message = await channel.messages.fetch({ limit: 1 });
+      const messageId = message.map((mes) => mes.id)[0];
+
+      if (!messageId) continue;
+
+      const messData = await msgData
+        .findOne({ id: messageId })
+        .select('-_id createdTimestamp');
+
+      if (Date.now() - messData.createdTimestamp >= TIME) {
+        channel.setParent(CATEGORY_ACHIEVED_CHANNEL_ID);
+        channelData.updateOne(
+          { id: channelId },
+          { $set: { parentId: CATEGORY_ACHIEVED_CHANNEL_ID } }
+        );
+      }
+    } catch (error) {
+      continue;
+    }
+  }
+}
+
 function cronJobOneMinute(client) {
   sendMesageRemind(client);
   kickMemberVoiceChannel(client);
@@ -1987,6 +2024,13 @@ function cronJobOneMinute(client) {
 
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '00 23 * * 0-6',
+      () => moveChannel(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     new cron.CronJob(
       '*/2 * * * *',
       () => tagMeeting(client),
