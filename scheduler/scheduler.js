@@ -1982,7 +1982,7 @@ async function pingReminder(client) {
 }
 
 async function moveChannel(client) {
-  const CATEGORY_ACHIEVED_CHANNEL_ID = '958646576627187733';
+  const CATEGORY_ACHIEVED_CHANNEL_ID = '983326721782710312';
   const TIME = 1000;
 
   const channels = await channelData.find({
@@ -2004,6 +2004,7 @@ async function moveChannel(client) {
         .select('-_id createdTimestamp');
 
       if (Date.now() - messData.createdTimestamp >= TIME) {
+        console.log(messData);
         channel.setParent(CATEGORY_ACHIEVED_CHANNEL_ID);
         channelData.updateOne(
           { id: channelId },
