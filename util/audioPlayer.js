@@ -63,7 +63,10 @@ async function audioPlayer(client, message, episode) {
     });
 
     const resource = await createAudioResource(
-      createReadStream(join('uploads', `${fileNameMp3[0]}`))
+      createReadStream(join('uploads', `${fileNameMp3[0]}`)),
+      {
+        inlineVolume: true,
+      }
     );
 
     player.play(resource);
