@@ -2025,13 +2025,13 @@ function cronJobOneMinute(client) {
 
 exports.scheduler = {
   run(client) {
-    new cron.CronJob(
-      '00 23 * * 0-6',
-      () => moveChannel(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
+    // new cron.CronJob(
+    //   '00 23 * * 0-6',
+    //   () => moveChannel(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
     new cron.CronJob(
       '*/2 * * * *',
       () => tagMeeting(client),
@@ -2046,20 +2046,20 @@ exports.scheduler = {
       false,
       'Asia/Ho_Chi_Minh'
     ).start();
-    new cron.CronJob(
-      '*/15 10-11 * * 6',
-      () => pingOpenTalk(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 10-12 * * 6',
-      () => punishOpenTalk(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
+    // new cron.CronJob(
+    //   '*/15 10-11 * * 6',
+    //   () => pingOpenTalk(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '*/1 10-12 * * 6',
+    //   () => punishOpenTalk(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
     new cron.CronJob(
       '*/1 * * * *',
       () => cronJobOneMinute(client),
