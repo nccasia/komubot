@@ -2021,7 +2021,7 @@ async function remindCheckout(client) {
   if (await checkHoliday()) return;
   try {
     const listsUser = await axios.get(
-      'http://172.16.11.147:8000/v1/employees/report-checkin',
+      `${process.env.CHECKIN_API}/v1/employees/report-checkin`,
       {
         headers: {
           'X-Secret-Key': `${process.env.CHECKIN_API_KEY_SECRET}`,
