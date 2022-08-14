@@ -2017,6 +2017,40 @@ async function moveChannel(client) {
   }
 }
 
+async function remindCheckout(client) {
+  if (await checkHoliday()) return;
+  try {
+    const listsUser = await axios.get(
+      'http://172.16.11.147:8000/v1/employees/report-checkin',
+      {
+        headers: {
+          'X-Secret-Key': `${process.env.CHECKIN_API_KEY_SECRET}`,
+        },
+      }
+    );
+    const userListNotCheckIn = listsUser.data.filter(
+      (user) => user.checkout === null
+    );
+    const { userOffFullday } = await getUserOffWork();
+
+    userListNotCheckIn.map(async (user) => {
+      const checkUser = await userData.findOne({
+        $or: [{ email: user.komuUserName }, { username: user.komuUserName }],
+        email: { $nin: [...userOffFullday] },
+        deactive: { $ne: true },
+      });
+      if (checkUser && checkUser !== null) {
+        const userDiscord = await client.users.fetch(checkUser.id);
+        userDiscord
+          .send(`Đừng quên checkout trước khi ra về nhé!!!`)
+          .catch(console.error);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 function cronJobOneMinute(client) {
   sendMesageRemind(client);
   kickMemberVoiceChannel(client);
@@ -2025,6 +2059,13 @@ function cronJobOneMinute(client) {
 
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '00 18 * * 1-5',
+      () => remindCheckout(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     // new cron.CronJob(
     //   '00 23 * * 0-6',
     //   () => moveChannel(client),
