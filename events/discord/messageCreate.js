@@ -88,7 +88,11 @@ module.exports = {
       }
       let a;
       if (e.content.startsWith(guildDB.prefix)) {
-        a = e.content.slice(guildDB.prefix.length).trim().split(/ +/);
+        a = e.content
+          .slice(guildDB.prefix.length)
+          .trim()
+          .replaceAll('\n', ' ')
+          .split(' ');
       }
       if (e.content.startsWith('komu ')) {
         a = e.content.slice(5).trim().split(/ +/);
