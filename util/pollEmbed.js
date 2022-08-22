@@ -105,8 +105,11 @@ const pollEmbed = async (
   reactionCollector.on('end', () => {
     text = "*Ding! Ding! Ding! Time's up!\n Results are in,*\n\n";
     for (const emoji in emojiInfo) {
-      text += `\`${emojiInfo[emoji].option}\` - \`${emojiInfo[emoji].votes}\`\n\n`;
-      emojiInfo[emoji].username.map((item) => {
+      const vote = emojiInfo[emoji].username
+        .map((item) => item)
+        .filter((x, i, a) => a.indexOf(x) === i);
+      text += `\`${emojiInfo[emoji].option}\` - \`${vote.length}\`\n\n`;
+      vote.map((item) => {
         text += `\`+ ${item}\`\n\n`;
       });
     }
