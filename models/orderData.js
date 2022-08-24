@@ -5,6 +5,7 @@ const orderDb = new mongoose.Schema({
   userId: { type: String, required: true },
   menu: { type: String, required: true },
   username: { type: String, required: true },
+  isCancel: { type: Boolean, required: true },
   createdTimestamp: { type: mongoose.Decimal128, required: false },
 });
 

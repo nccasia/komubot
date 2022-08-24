@@ -39,6 +39,7 @@ async function reportOrder(message) {
             $gte: getYesterdayDate(),
             $lte: getTomorrowDate(),
           },
+          isCancel: { $ne: true },
         },
       },
       {
