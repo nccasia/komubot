@@ -25,7 +25,7 @@ module.exports = {
           );
         });
         message.reply({
-          content: 'Bạn đã cancel đơn đặt hàng',
+          content: 'Bạn đã hủy đơn đặt hàng!!!',
           ephemeral: true,
         });
       } else if (args[0] === 'finish') {
@@ -49,12 +49,12 @@ module.exports = {
             );
           });
           message.reply({
-            content: 'Bạn đã finish đơn đặt hàng',
+            content: 'Chốt đơn!!!',
             ephemeral: true,
           });
         } else {
           message.reply({
-            content: 'Bạn không có quyền finish đơn đặt hàng',
+            content: 'Bạn không thể chốt đơn!!!',
             ephemeral: true,
           });
         }
