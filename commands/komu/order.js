@@ -17,19 +17,47 @@ module.exports = {
           username: username,
         });
         userCancel.map(async (item) => {
-          console.log(item);
           await orderData.updateOne(
             {
               _id: item._id,
             },
             { $set: { isCancel: true } }
-            // { isCancel: true }
           );
         });
         message.reply({
           content: 'Bạn đã cancel đơn đặt hàng',
           ephemeral: true,
         });
+      } else if (args[0] === 'finish') {
+        const userCancel = await orderData.find({
+          userId: author,
+          isCancel: { $ne: true },
+          channelId: channel,
+          username: username,
+        });
+        if (userCancel && userCancel.length > 0) {
+          const reportOrder = await orderData.find({
+            isCancel: { $ne: true },
+            channelId: channel,
+          });
+          reportOrder.map(async (item) => {
+            await orderData.updateOne(
+              {
+                _id: item._id,
+              },
+              { $set: { isCancel: true } }
+            );
+          });
+          message.reply({
+            content: 'Bạn đã finish đơn đặt hàng',
+            ephemeral: true,
+          });
+        } else {
+          message.reply({
+            content: 'Bạn không có quyền finish đơn đặt hàng',
+            ephemeral: true,
+          });
+        }
       } else {
         const list = args.slice(0, args.length).join(' ');
         await new orderData({
