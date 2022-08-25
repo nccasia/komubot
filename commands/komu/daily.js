@@ -214,11 +214,31 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         } else {
-          message
-            .reply({ content: '`✅` Daily saved.', ephemeral: true })
-            .catch((err) => {
-              sendErrorToDevTest(client, authorId, err);
-            });
+          const timesheetUrl = `${client.config.submitTimesheet.api_url_logTimesheetByKomu}`
+          const timesheetPayload = {
+            'emailAddress': `${authorUsername}@ncc.asia`,
+            'note': daily
+          }
+          try {
+            await axios.post(timesheetUrl, timesheetPayload, {
+              headers: {
+                securitycode: process.env.WFH_API_KEY_SECRET,
+              },
+            })
+            message
+              .reply({ content: '✅ Daily saved.', ephemeral: true })
+              .catch((err) => {
+                sendErrorToDevTest(client, authorId, err);
+              });
+          } catch (err) {
+            console.log(err)
+            //TODO
+            message
+              .reply({ content: ' Daily failed.', ephemeral: true })
+              .catch((err) => {
+                sendErrorToDevTest(client, authorId, err);
+              });
+          }
         }
       } else {
         await new dailyData({

@@ -74,6 +74,7 @@ module.exports = {
   },
   submitTimesheet: {
     api_url_getListUserLogTimesheet: `${process.env.TIMESHEET_API}Public/GetListUserLogTimesheetThisWeekNotOk`,
+    api_url_logTimesheetByKomu: `${process.env.TIMESHEET_API}MyTimesheets/CreateByKomu`,
   },
   wiki: {
     api_url: `${process.env.PROJECT_API}User/GetEmployeeInformation?email=`,
