@@ -1,6 +1,13 @@
 const axios = require('axios');
 const { sendErrorToDevTest } = require('../../util/komubotrest');
-const DEBUG = false
+const {
+   checkLogTimeFormat,
+   extractLogTimeValue,
+   validateFields,
+   debug,
+   getDebug,
+   TIMESHEET_MESSAGE_HELP,
+} = require('../../util/timesheet')
 /* CreateTimesheetDto
    {
       dateAt: "2022-08-25"
@@ -29,68 +36,15 @@ const DEBUG = false
    }
 */
 // TODO
-const messHelp =
-   '```' +
-   'Please log timesheet follow this template' +
-   '\n' +
-   '*logTimesheet dd/mm/yyyy' +
-   '\n' +
-   '- project:' +
-   '\n' +
-   '- note:' +
-   '\n' +
-   '- workingTime: ' +
-   '\n' +
-   '- task: ' +
-   '```';
-const getProjectByName = async (prjName) => { if (DEBUG) return 1 }
-const LOG_TIMESHEET_REQUIRED_FILEDS = ["- project:", "- note:", "- workingTime:", "- task:"]
-const checkLogTimeFormat = (contentArray) => {
-   for (let field of LOG_TIMESHEET_REQUIRED_FILEDS) {
-      let isValid = false
-      for (let line of contentArray) {
-         if (line.includes(field)) {
-            isValid = true
-            break
-         }
-      }
-      if (!isValid) return false
-   }
-   return true
-}
-const extractLogTimeValue = (contentArray) => {
-   const contentObj = {}
-   for (let field of LOG_TIMESHEET_REQUIRED_FILEDS) {
-      for (let line of contentArray) {
-         if (line.includes(field)) {
-            contentObj[field] = line.replace(field, '').trim()
-            break
-         }
-      }
-   }
-   return contentObj
-}
-const validateFields = (contentObj) => {
-   const NORMAL_WORKING_TIME = 8
-   if (Object.values(contentObj).length !== LOG_TIMESHEET_REQUIRED_FILEDS.length)
-      return false
-   for (let value of Object.values(contentObj))
-      if (value === '') return false
-   if (!contentObj['- workingTime:'] || contentObj['- workingTime:'] === '')
-      contentObj['- workingTime:'] = NORMAL_WORKING_TIME
-   if (isNaN(parseFloat(contentObj['- workingTime:'])))
-      return false
-   contentObj['- workingTime:'] = parseFloat(contentObj['- workingTime:'])
-   return true
-}
+
+const getProjectByName = async (prjName) => { }
 const createTimesheetPayload = (username, contentObj) => {
-   if (DEBUG) return console.log('Validate template successfully', contentObj)
    return ({
       username,
       projectTaskId,
       projectId: contentObj['projectId'],
-      note: contentObj['- note:'],
-      workingTime: contentObj['- workingTime:'],
+      note: contentObj['note'],
+      workingTime: contentObj['workingTime'],
       targetUserWorkingTime: 0,
       typeOfWork: 0,
       isCharged: true,
@@ -100,20 +54,15 @@ const createTimesheetPayload = (username, contentObj) => {
       isTemp: true,
    })
 }
-const inValidSynctax = async (message, messageContent) => {
+const replyMesage = async (message, messageContent) => {
    console.log(`[Reply user]: ${messageContent}`)
    return message
       .reply({
          content: messageContent,
          ephemeral: true,
       })
-      .catch((err) => {
-         sendErrorToDevTest(client, authorId, err);
-      });
 }
-const debug = (...messages) => {
-   if (DEBUG) console.log(...messages)
-}
+
 module.exports = {
    name: 'logTimesheet',
    description: 'Log timesheet komu',
@@ -124,23 +73,34 @@ module.exports = {
       const logTimeContent = args.join(' ').split('\n');
       debug('[Check arguments length]')
       if (!logTimeContent.length)
-         return inValidSynctax(message, messHelp)
+         return replyMesage(message, TIMESHEET_MESSAGE_HELP).catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+         });
       debug('[Check valid format]')
-      if (!checkLogTimeFormat(logTimeContent))
-         return inValidSynctax(message, messHelp)
+      const requiredFields = checkLogTimeFormat(logTimeContent)
+      if (requiredFields.length)
+         return replyMesage(message, `Mising required fields "${requiredFields.join(' ')}"\n${TIMESHEET_MESSAGE_HELP}`).catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+         });
       debug('[extract value from template]')
       const contentObj = extractLogTimeValue(logTimeContent)
       debug({ contentObj })
-      if (!validateFields(contentObj))
-         return inValidSynctax(message, messHelp)
+      debug('[Validate fields]')
+      const invalidFieldsErrr = validateFields(contentObj)
+      if (invalidFieldsErrr.length)
+         return replyMesage(message, invalidFieldsErrr + TIMESHEET_MESSAGE_HELP).catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+         });
+      if (getDebug()) return debug('[Success !!!]')
+
       try {
-         const projectName = contentObj['- project:']
+         const projectName = contentObj['project']
          const projectId = await getProjectByName(projectName)
-         if (!projectId) return inValidSynctax(message, 'Project not found')
+         if (!projectId) return replyMesage(message, 'Project not found')
          contentObj['projectId'] = projectId
       } catch (err) {
          console.log(err)
-         return inValidSynctax(message, 'Get project failed')
+         return replyMesage(message, 'Get project failed')
       }
 
       const timesheetPayload = await createTimesheetPayload(username, contentObj)
@@ -152,14 +112,12 @@ module.exports = {
                securitycode: process.env.WFH_API_KEY_SECRET,
             },
          })
-         return inValidSynctax('✅ Timesheet saved.')
+         return replyMesage(message, '✅ Timesheet saved.').catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+         });
       } catch (err) {
          console.log(err)
-         message
-            .reply({ content: 'Log timsheet failed', ephemeral: true })
-            .catch((err) => {
-               sendErrorToDevTest(client, authorId, err);
-            });
+         replyMesage(mesage, 'Log timsheet failed')
       }
    },
 };

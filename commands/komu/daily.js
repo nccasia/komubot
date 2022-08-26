@@ -6,6 +6,19 @@ function setTime(date, hours, minute, second, msValue) {
   return date.setHours(hours, minute, second, msValue);
 }
 
+const extractLogTimeValue = (contentArray) => {
+  const contentObj = {}
+  for (let field of ['yesterday', 'today', 'block']) {
+    for (let line of contentArray) {
+      if (line.includes(`- ${field}:`)) {
+        contentObj[field] = line.replace(`- ${field}:`, '').trim()
+        break
+      }
+    }
+  }
+  return contentObj
+}
+
 function checkTimeSheet() {
   let result = false;
   const time = new Date();
@@ -118,14 +131,17 @@ module.exports = {
       let authorId = message.author.id;
       let authorUsername = message.author.username;
       const daily = args.join(' ');
-
       let checkDaily = false;
       const wordInString = (s, word) =>
         new RegExp('\\b' + word + '\\b', 'i').test(s);
       ['yesterday', 'today', 'block'].forEach((q) => {
         if (!wordInString(daily, q)) return (checkDaily = true);
       });
-
+      const timesheetUrl = `${client.config.submitTimesheet.api_url_logTimesheetByKomu}`
+      const timesheetPayload = {
+        'emailAddress': `${authorUsername}@ncc.asia`,
+        'note': extractLogTimeValue(daily.split('\n'))?.daily ?? daily
+      }
       if (checkDaily) {
         return message
           .reply({
@@ -203,6 +219,12 @@ module.exports = {
         })
           .save()
           .catch((err) => console.log(err));
+        await axios.post(timesheetUrl, timesheetPayload, {
+          headers: {
+            securitycode: process.env.WFH_API_KEY_SECRET,
+          },
+        }).catch((err) => console.log(err))
+
         if (!checkTimeSheet()) {
           message
             .reply({
@@ -214,31 +236,11 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         } else {
-          const timesheetUrl = `${client.config.submitTimesheet.api_url_logTimesheetByKomu}`
-          const timesheetPayload = {
-            'emailAddress': `${authorUsername}@ncc.asia`,
-            'note': daily
-          }
-          try {
-            await axios.post(timesheetUrl, timesheetPayload, {
-              headers: {
-                securitycode: process.env.WFH_API_KEY_SECRET,
-              },
-            })
-            message
-              .reply({ content: '✅ Daily saved.', ephemeral: true })
-              .catch((err) => {
-                sendErrorToDevTest(client, authorId, err);
-              });
-          } catch (err) {
-            console.log(err)
-            //TODO
-            message
-              .reply({ content: ' Daily failed.', ephemeral: true })
-              .catch((err) => {
-                sendErrorToDevTest(client, authorId, err);
-              });
-          }
+          message
+            .reply({ content: '✅ Daily saved.', ephemeral: true })
+            .catch((err) => {
+              sendErrorToDevTest(client, authorId, err);
+            });
         }
       } else {
         await new dailyData({
@@ -253,6 +255,11 @@ module.exports = {
         })
           .save()
           .catch((err) => console.log(err));
+        await axios.post(timesheetUrl, timesheetPayload, {
+          headers: {
+            securitycode: process.env.WFH_API_KEY_SECRET,
+          },
+        }).catch((err) => console.log(err))
         if (!checkTimeNotWFH()) {
           message
             .reply({
