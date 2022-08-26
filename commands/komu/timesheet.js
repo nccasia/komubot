@@ -1,5 +1,6 @@
 const axios = require('axios');
-const { sendErrorToDevTest } = require('./komubotrest.js');
+const { sendErrorToDevTest } = require('../../util/komubotrest');
+const DEBUG = false
 /* CreateTimesheetDto
    {
       dateAt: "2022-08-25"
@@ -42,14 +43,13 @@ const messHelp =
    '\n' +
    '- task: ' +
    '```';
-const getProjectByName = async (prjName) => { }
-// const wordInString = (s, word) => new RegExp('\b' + word + '\b', 'i').test(s);
+const getProjectByName = async (prjName) => { if (DEBUG) return 1 }
 const LOG_TIMESHEET_REQUIRED_FILEDS = ["- project:", "- note:", "- workingTime:", "- task:"]
 const checkLogTimeFormat = (contentArray) => {
    for (let field of LOG_TIMESHEET_REQUIRED_FILEDS) {
       let isValid = false
       for (let line of contentArray) {
-         if (line.include(field)) {
+         if (line.includes(field)) {
             isValid = true
             break
          }
@@ -62,8 +62,8 @@ const extractLogTimeValue = (contentArray) => {
    const contentObj = {}
    for (let field of LOG_TIMESHEET_REQUIRED_FILEDS) {
       for (let line of contentArray) {
-         if (line.include(field)) {
-            contentObj[field] = line.replace(field).trim()
+         if (line.includes(field)) {
+            contentObj[field] = line.replace(field, '').trim()
             break
          }
       }
@@ -71,18 +71,20 @@ const extractLogTimeValue = (contentArray) => {
    return contentObj
 }
 const validateFields = (contentObj) => {
-   if (Object.values(contentObj).length !== LOG_TIMESHEET_REQUIRED_FILEDS)
+   const NORMAL_WORKING_TIME = 8
+   if (Object.values(contentObj).length !== LOG_TIMESHEET_REQUIRED_FILEDS.length)
       return false
    for (let value of Object.values(contentObj))
       if (value === '') return false
    if (!contentObj['- workingTime:'] || contentObj['- workingTime:'] === '')
-      contentObj['- workingTime:'] = 8
+      contentObj['- workingTime:'] = NORMAL_WORKING_TIME
    if (isNaN(parseFloat(contentObj['- workingTime:'])))
       return false
    contentObj['- workingTime:'] = parseFloat(contentObj['- workingTime:'])
    return true
 }
 const createTimesheetPayload = (username, contentObj) => {
+   if (DEBUG) return console.log('Validate template successfully', contentObj)
    return ({
       username,
       projectTaskId,
@@ -98,15 +100,20 @@ const createTimesheetPayload = (username, contentObj) => {
       isTemp: true,
    })
 }
-const inValidSynctax = async (message, messageContent) => message
-   .reply({
-      content: messageContent,
-      ephemeral: true,
-   })
-   .catch((err) => {
-      sendErrorToDevTest(client, authorId, err);
-   });
-
+const inValidSynctax = async (message, messageContent) => {
+   console.log(`[Reply user]: ${messageContent}`)
+   return message
+      .reply({
+         content: messageContent,
+         ephemeral: true,
+      })
+      .catch((err) => {
+         sendErrorToDevTest(client, authorId, err);
+      });
+}
+const debug = (...messages) => {
+   if (DEBUG) console.log(...messages)
+}
 module.exports = {
    name: 'logTimesheet',
    description: 'Log timesheet komu',
@@ -115,12 +122,15 @@ module.exports = {
       let authorId = message.author.id;
       let username = message.author.username;
       const logTimeContent = args.join(' ').split('\n');
+      debug('[Check arguments length]')
       if (!logTimeContent.length)
          return inValidSynctax(message, messHelp)
-      let isValidContent = checkLogTimeFormat(logTimeContent);
-      if (!isValidContent)
+      debug('[Check valid format]')
+      if (!checkLogTimeFormat(logTimeContent))
          return inValidSynctax(message, messHelp)
+      debug('[extract value from template]')
       const contentObj = extractLogTimeValue(logTimeContent)
+      debug({ contentObj })
       if (!validateFields(contentObj))
          return inValidSynctax(message, messHelp)
       try {
@@ -132,6 +142,7 @@ module.exports = {
          console.log(err)
          return inValidSynctax(message, 'Get project failed')
       }
+
       const timesheetPayload = await createTimesheetPayload(username, contentObj)
       const timesheetUrl = `${client.config.submitTimesheet.api_url_logTimesheetByKomu}`
 
@@ -141,6 +152,7 @@ module.exports = {
                securitycode: process.env.WFH_API_KEY_SECRET,
             },
          })
+         return inValidSynctax('✅ Timesheet saved.')
       } catch (err) {
          console.log(err)
          message
