@@ -52,12 +52,14 @@ const messHelp =
   '*report timesheet weekly' +
   '```';
 
-async function reportCheckout(message, args) {
+async function reportCheckout(message, args, client) {
   if (!args[1]) {
     try {
       const lists = await axios
         .get(
-          `${process.env.API_CHECKIN_CHECKOUT.toString()}?startDate=${getyesterdaydate()}&endDate=${getyesterdaydate()}`
+          `${
+            client.config.checkinTimesheet.api_url
+          }?startDate=${getyesterdaydate()}&endDate=${getyesterdaydate()}`
         )
         .then((result) => result.data.result);
       const checkTimesheet = dateCalculate(lists);
@@ -114,7 +116,7 @@ async function reportCheckout(message, args) {
         startDate = startDate[2] + '-' + startDate[0] + '-' + startDate[1];
         const lists = await axios
           .get(
-            `${process.env.API_CHECKIN_CHECKOUT.toString()}?startDate=${startDate}&endDate=${startDate}`
+            `${client.config.checkinTimesheet.api_url}?startDate=${startDate}&endDate=${startDate}`
           )
           .then((result) => result.data.result);
         const checkTimesheet = dateCalculate(lists);
@@ -152,7 +154,7 @@ async function reportCheckout(message, args) {
     try {
       const lists = await axios
         .get(
-          `${process.env.API_CHECKIN_CHECKOUT.toString()}?startDate=${startDate}&endDate=${startDate}`
+          `${client.config.checkinTimesheet.api_url}?startDate=${startDate}&endDate=${startDate}`
         )
         .then((result) => result.data.result);
       const checkTimesheet = dateCalculate(lists);

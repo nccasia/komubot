@@ -97,7 +97,7 @@ module.exports = {
       } else if (args[0] === 'holiday') {
         await reportHoliday(message, args, client);
       } else if (args[0] === 'checkout') {
-        await reportCheckout(message, args);
+        await reportCheckout(message, args, client);
       } else if (args[0] === 'help') {
         return message
           .reply(
