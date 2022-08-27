@@ -45,11 +45,11 @@ const dateCalculate = (lists) => {
 
 const messHelp =
   '```' +
-  '*report timesheet' +
+  '*report ts' +
   '\n' +
-  '*report timesheet dd/mm/yyyy' +
+  '*report ts dd/mm/yyyy' +
   '\n' +
-  '*report timesheet weekly' +
+  '*report ts weekly' +
   '```';
 
 async function reportCheckout(message, args, client) {

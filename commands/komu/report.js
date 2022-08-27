@@ -96,7 +96,7 @@ module.exports = {
         await reportTracker(message, args, client);
       } else if (args[0] === 'holiday') {
         await reportHoliday(message, args, client);
-      } else if (args[0] === 'checkout') {
+      } else if (args[0] === 'ts') {
         await reportCheckout(message, args, client);
       } else if (args[0] === 'help') {
         return message
@@ -140,7 +140,7 @@ module.exports = {
                   des: 'show report holiday',
                 },
                 {
-                  name: 'timesheet',
+                  name: 'ts',
                   des: 'show report timesheet',
                 },
               ]
