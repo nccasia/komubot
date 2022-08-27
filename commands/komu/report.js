@@ -11,6 +11,7 @@ const { handleKomuWeeklyReport } = require('../../util/odin-report');
 const { reportTracker } = require('../../util/reportTracker');
 const { reportHoliday } = require('../../util/reportHoliday');
 const { util } = require('prettier');
+const reportCheckout = require('../../util/checkout');
 
 const messHelpDaily =
   '```' +
@@ -95,6 +96,8 @@ module.exports = {
         await reportTracker(message, args, client);
       } else if (args[0] === 'holiday') {
         await reportHoliday(message, args, client);
+      } else if (args[0] === 'checkout') {
+        await reportCheckout(message, args);
       } else if (args[0] === 'help') {
         return message
           .reply(
@@ -135,6 +138,10 @@ module.exports = {
                 {
                   name: 'holiday',
                   des: 'show report holiday',
+                },
+                {
+                  name: 'timesheet',
+                  des: 'show report timesheet',
                 },
               ]
                 .map((item) => `- ${item.name} : ${item.des}`)
