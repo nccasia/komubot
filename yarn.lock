@@ -484,6 +484,7 @@
   "version" "0.4.0"
 
 "aw-client@github:nccasia/aw-client-js":
+  "integrity" "sha512-SqInHT/cPms3dVRNW7lqR1Bj/ZM3XCqpweV5P905/v4Y3O920wmrxFvmb0GVCDO9q5tiCgmkwE2m7eNTBaaY4w=="
   "resolved" "git+ssh://git@github.com/nccasia/aw-client-js.git#b4c5dbbdb0e80b4d2f2e8c5b7b32511a49d91990"
   "version" "0.3.2"
   dependencies:
@@ -730,6 +731,13 @@
   "integrity" "sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ=="
   "resolved" "https://registry.npmjs.org/chownr/-/chownr-2.0.0.tgz"
   "version" "2.0.0"
+
+"chrono-node@^2.4.1":
+  "integrity" "sha512-23lqpMF2i0lr6dAVpVyYmvVGgX/EtkHBEIgFUd6LQiP7CHLzYeROYvl5X59ZBK73KAV+FGPo4rQv0Fym8CIktw=="
+  "resolved" "https://registry.npmjs.org/chrono-node/-/chrono-node-2.4.1.tgz"
+  "version" "2.4.1"
+  dependencies:
+    "dayjs" "^1.10.0"
 
 "cidr-regex@^1.0.7":
   "integrity" "sha1-N4L++3nIHX0zBpDN4xoP40Rf05s="
@@ -999,6 +1007,11 @@
   "integrity" "sha512-8d35hViGYx/QH0icHYCeLmsLmMUheMmTyV9Fcm6gvNwdw31yXXH+O85sOBJ+OLnLQMKZowvpKb6FgMIQjcpvQw=="
   "resolved" "https://registry.npmjs.org/date-fns/-/date-fns-2.28.0.tgz"
   "version" "2.28.0"
+
+"dayjs@^1.10.0":
+  "integrity" "sha512-CAdX5Q3YW3Gclyo5Vpqkgpj8fSdLQcRuzfX6mC6Phy0nfJ0eGYOeS7m4mt2plDWLAtA4TqTakvbboHvUxfe4iA=="
+  "resolved" "https://registry.npmjs.org/dayjs/-/dayjs-1.11.5.tgz"
+  "version" "1.11.5"
 
 "dblapi.js@^2.4.1":
   "integrity" "sha512-g+u1inF/qOLit5qPK4hBGk5pKL1vy09uBLV+nukkRMvw2S9D1PyiyO70n4fboUXOgbExPp6Sho/Y782OqQOUiQ=="
@@ -2390,7 +2403,7 @@
   dependencies:
     "chalk" "^2.4.2"
 
-"loose-envify@^1.4.0":
+"loose-envify@^1.1.0", "loose-envify@^1.4.0":
   "integrity" "sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q=="
   "resolved" "https://registry.npmjs.org/loose-envify/-/loose-envify-1.4.0.tgz"
   "version" "1.4.0"
@@ -2888,6 +2901,11 @@
   "resolved" "https://registry.npmjs.org/parse-cache-control/-/parse-cache-control-1.0.1.tgz"
   "version" "1.0.1"
 
+"parse-duration@^1.0.2":
+  "integrity" "sha512-Dg27N6mfok+ow1a2rj/nRjtCfaKrHUZV2SJpEn/s8GaVUSlf4GGRCRP1c13Hj+wfPKVMrFDqLMLITkYKgKxyyg=="
+  "resolved" "https://registry.npmjs.org/parse-duration/-/parse-duration-1.0.2.tgz"
+  "version" "1.0.2"
+
 "parse5-htmlparser2-tree-adapter@^6.0.1":
   "integrity" "sha512-qPuWvbLgvDGilKc5BoicRovlT4MtYT6JfJyBOMDsKoiT+GiuP5qyrPCnR9HcPECIJJmZh5jRndyNThnhhb/vlA=="
   "resolved" "https://registry.npmjs.org/parse5-htmlparser2-tree-adapter/-/parse5-htmlparser2-tree-adapter-6.0.1.tgz"
@@ -3153,6 +3171,15 @@
     "iconv-lite" "0.4.24"
     "unpipe" "1.0.0"
 
+"react-dom@^0.14 || ^15.0.0 || ^16.0.0 || ^17.0.0":
+  "integrity" "sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA=="
+  "resolved" "https://registry.npmjs.org/react-dom/-/react-dom-17.0.2.tgz"
+  "version" "17.0.2"
+  dependencies:
+    "loose-envify" "^1.1.0"
+    "object-assign" "^4.1.1"
+    "scheduler" "^0.20.2"
+
 "react-is@^16.13.1":
   "integrity" "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ=="
   "resolved" "https://registry.npmjs.org/react-is/-/react-is-16.13.1.tgz"
@@ -3164,6 +3191,14 @@
   "version" "4.9.1"
   dependencies:
     "prop-types" "^15.7.2"
+
+"react@^0.14 || ^15.0.0 || ^16.0.0 || ^17.0.0", "react@17.0.2":
+  "integrity" "sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA=="
+  "resolved" "https://registry.npmjs.org/react/-/react-17.0.2.tgz"
+  "version" "17.0.2"
+  dependencies:
+    "loose-envify" "^1.1.0"
+    "object-assign" "^4.1.1"
 
 "readable-stream@^2.0.0":
   "integrity" "sha512-Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw=="
@@ -3390,6 +3425,14 @@
   "version" "5.0.1"
   dependencies:
     "xmlchars" "^2.2.0"
+
+"scheduler@^0.20.2":
+  "integrity" "sha512-2eWfGgAqqWFGqtdMmcL5zCMK1U8KlXv8SQFGglL3CEtd0aDVDWgeF/YoCmvln55m5zSk3J/20hTaSBeSObsQDQ=="
+  "resolved" "https://registry.npmjs.org/scheduler/-/scheduler-0.20.2.tgz"
+  "version" "0.20.2"
+  dependencies:
+    "loose-envify" "^1.1.0"
+    "object-assign" "^4.1.1"
 
 "semver@^6.0.0":
   "integrity" "sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw=="
