@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { intervalToDuration } = require('date-fns');
 const { MessageEmbed } = require('discord.js');
 
 function withoutLastTime(dateTime) {
@@ -31,7 +32,7 @@ const dateCalculate = (lists) => {
   lists.map((list) => {
     list.listDate.map((item) => {
       const timeWork = item.timeSheetMinute - item.checkOutInMinute;
-      if (timeWork > 0) {
+      if (timeWork > 30) {
         result.push({
           email: getUserNameByEmail(list.emailAddress),
           time: timeWork,
@@ -75,7 +76,10 @@ async function reportCheckout(message, args, client) {
           if (checkTimesheet.slice(i * 50, (i + 1) * 50).length === 0) break;
           mess = checkTimesheet
             .slice(i * 50, (i + 1) * 50)
-            .map((list) => `<${list.email}> chênh lệch ${list.time} phút`)
+            .map(
+              (list) =>
+                `<${list.email}> chênh lệch ${showTrackerTime(list.time)}`
+            )
             .join('\n');
           const Embed = new MessageEmbed()
             .setTitle('Danh sách vi phạm')
@@ -135,7 +139,10 @@ async function reportCheckout(message, args, client) {
             if (checkTimesheet.slice(i * 50, (i + 1) * 50).length === 0) break;
             mess = checkTimesheet
               .slice(i * 50, (i + 1) * 50)
-              .map((list) => `<${list.email}> chênh lệch ${list.time} phút`)
+              .map(
+                (list) =>
+                  `<${list.email}> chênh lệch ${showTrackerTime(list.time)}`
+              )
               .join('\n');
             const Embed = new MessageEmbed()
               .setTitle(`Danh sách vi phạm ngày ${formatDate}`)
@@ -170,7 +177,10 @@ async function reportCheckout(message, args, client) {
           if (checkTimesheet.slice(i * 50, (i + 1) * 50).length === 0) break;
           mess = checkTimesheet
             .slice(i * 50, (i + 1) * 50)
-            .map((list) => `<${list.email}> chênh lệch ${list.time} phút`)
+            .map(
+              (list) =>
+                `<${list.email}> chênh lệch ${showTrackerTime(list.time)}`
+            )
             .join('\n');
           const Embed = new MessageEmbed()
             .setTitle(`Danh sách vi phạm ngày ${args[1]}`)
@@ -183,6 +193,11 @@ async function reportCheckout(message, args, client) {
       console.log(err);
     }
   }
+}
+
+function showTrackerTime(spentTime) {
+  const duration = intervalToDuration({ start: 0, end: spentTime * 1000 * 60 });
+  return `${duration.hours}h ${duration.minutes}m ${duration.seconds}s`;
 }
 
 module.exports = reportCheckout;
