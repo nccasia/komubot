@@ -1,6 +1,7 @@
 const dailyData = require('../../models/dailyData.js');
 const { sendErrorToDevTest } = require('../../util/komubotrest.js');
 const axios = require('axios');
+const { logTimeSheetFromDaily } = require('../../util/timesheet.js');
 
 function setTime(date, hours, minute, second, msValue) {
   return date.setHours(hours, minute, second, msValue);
@@ -57,45 +58,6 @@ function getUserNameByEmail(string) {
   }
 }
 
-// function findPeriod(daily) {
-//   let period = false;
-//   let dailyReplace = daily.replace('\n', ' ');
-//   const arrDaily = dailyReplace.split(' ');
-//   arrDaily.map((item) => {
-//     if (item.length > 15) {
-//       period = true;
-//       return period;
-//     }
-//     if (!period) {
-//       for (let i = 1; i < 6; i++) {
-//         for (let j = 0; j < item.length; j++) {
-//           let currChar = item.slice(j, j + i).toLowerCase();
-//           let comparator = item.slice(j + i, j + i + i).toLowerCase();
-//           let twoComparator = item
-//             .slice(j + i + i, j + i + i + i)
-//             .toLowerCase();
-//           if (i === 1 || i === 2) {
-//             if (currChar === comparator && currChar === twoComparator) {
-//               period = true;
-//               return period;
-//             } else {
-//               period = false;
-//             }
-//           } else {
-//             if (currChar === comparator) {
-//               period = true;
-//               return period;
-//             } else {
-//               period = false;
-//             }
-//           }
-//         }
-//       }
-//     }
-//   });
-//   return period;
-// }
-
 const messHelp =
   '```' +
   'Please daily follow this template' +
@@ -118,13 +80,15 @@ module.exports = {
       const authorId = message.author.id;
       const authorUsername = message.author.username;
       const daily = args.join(' ');
-
+      const content = message.content;
       let checkDaily = false;
       const wordInString = (s, word) =>
         new RegExp('\\b' + word + '\\b', 'i').test(s);
       ['yesterday', 'today', 'block'].forEach((q) => {
         if (!wordInString(daily, q)) return (checkDaily = true);
       });
+      const timesheetUrl = `${client.config.submitTimesheet.api_url_logTimesheetByKomu}`;
+      const emailAddress = `${authorUsername}@ncc.asia`;
 
       if (checkDaily) {
         return message
@@ -185,6 +149,7 @@ module.exports = {
       } catch (error) {
         console.log(error);
       }
+
       const wfhUserEmail = wfhGetApi
         ? wfhGetApi.data.result.map((item) =>
             getUserNameByEmail(item.emailAddress)
@@ -204,6 +169,12 @@ module.exports = {
         })
           .save()
           .catch((err) => console.log(err));
+
+        await logTimeSheetFromDaily({
+          emailAddress,
+          content: content,
+        });
+
         if (!checkTimeSheet()) {
           message
             .reply({
@@ -216,7 +187,7 @@ module.exports = {
             });
         } else {
           message
-            .reply({ content: '`✅` Daily saved.', ephemeral: true })
+            .reply({ content: '✅ Daily saved.', ephemeral: true })
             .catch((err) => {
               sendErrorToDevTest(client, authorId, err);
             });
@@ -234,6 +205,12 @@ module.exports = {
         })
           .save()
           .catch((err) => console.log(err));
+
+        await logTimeSheetFromDaily({
+          emailAddress,
+          content: content,
+        });
+
         if (!checkTimeNotWFH()) {
           message
             .reply({
