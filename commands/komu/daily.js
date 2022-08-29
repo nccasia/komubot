@@ -77,7 +77,8 @@ module.exports = {
     try {
       const authorId = message.author.id
       const authorUsername = message.author.username
-      const daily = args.join(' ')
+      const daily = args.join(' ');
+      const content = message.content;
       let checkDaily = false
       const wordInString = (s, word) =>
         new RegExp('\\b' + word + '\\b', 'i').test(s)
@@ -166,10 +167,8 @@ module.exports = {
           .catch((err) => console.log(err))
 
         await logTimeSheetFromDaily({
-          token: process.env.WFH_API_KEY_SECRET,
           emailAddress,
-          content: daily,
-          url: timesheetUrl,
+          content: content,
         });
 
         if (!checkTimeSheet()) {
@@ -204,10 +203,8 @@ module.exports = {
           .catch((err) => console.log(err))
 
         await logTimeSheetFromDaily({
-          token: process.env.WFH_API_KEY_SECRET,
           emailAddress,
-          content: daily,
-          url: timesheetUrl,
+          content: content,
         });
 
         if (!checkTimeNotWFH()) {

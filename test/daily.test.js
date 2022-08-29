@@ -84,3 +84,16 @@ const result9 = parseDailyMessage(`
 `);
 debug(result9);
 debug('===========================================[Should be success]======================================')
+
+
+debug('[Test case 10]')
+const result10 = parseDailyMessage(`
+*daily esg 26/08/2022
+- Yesterday: Support refactor ESGTECH-6410 - 2h; + ESGTECH-3 customize color of font page background
+- Today:
+    + ESGTECH-3 Apply corporate color for export report; 2h, nt, coding
+    + ESGTECH-3 Apply corporate color for export report; 4h, ot, testing
+- Block: no
+`);
+debug(result10);
+debug('===========================================[Should be success]======================================')
