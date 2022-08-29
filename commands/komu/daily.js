@@ -115,8 +115,8 @@ module.exports = {
   cat: 'komu',
   async execute(message, args, client) {
     try {
-      let authorId = message.author.id;
-      let authorUsername = message.author.username;
+      const authorId = message.author.id;
+      const authorUsername = message.author.username;
       const daily = args.join(' ');
 
       let checkDaily = false;
@@ -185,10 +185,11 @@ module.exports = {
       } catch (error) {
         console.log(error);
       }
-
-      const wfhUserEmail = wfhGetApi.data.result.map((item) =>
-        getUserNameByEmail(item.emailAddress)
-      );
+      const wfhUserEmail = wfhGetApi
+        ? wfhGetApi.data.result.map((item) =>
+            getUserNameByEmail(item.emailAddress)
+          )
+        : [];
 
       if (wfhUserEmail.includes(authorUsername)) {
         await new dailyData({
