@@ -27,15 +27,17 @@ module.exports = {
       const username = message.author.username
       const content = message.content;
       const timesheetObj = parseTimesheetMessage(content)
+      debug('timesheetObj', timesheetObj)
       const IS_HELP_MESSAGE = checkHelpMessage(timesheetObj)
       if (IS_HELP_MESSAGE) {
          try {
+            debug('=> Input syntax is help syntax')
             const projects = await getProjectOfUser(`${username}@ncc.asia`)
             let replyMessage = `Các dự án mà bạn tham gia:\n`
             projects.forEach(item => {
                if (item.projectName &&
                   item.projectCode)
-                  message += `  - Dự án: ${item.projectName}, code: ${item.projectCode}\n`
+                  replyMessage += `  - Dự án: ${item.projectName}, code: ${item.projectCode}\n`
             });
             return message
                .reply({
@@ -46,7 +48,7 @@ module.exports = {
                   sendErrorToDevTest(client, authorId, err)
                })
          } catch (error) {
-            console.log(e)
+            console.log(error)
             return message
                .reply({
                   content: 'Lấy danh sách dự án lỗi',

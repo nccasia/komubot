@@ -79,11 +79,10 @@ const parseTimesheetMessage = (message) => {
 
 const validateTimesheetFormat = (contentObj) => {
   const INVALID_TIME = !contentObj.timeStamp
-  const EMPTY_TASKS = !contentObj.length
-  const INVALID_TASKS = validateTasks(contentObj.tasks)
+  const EMPTY_TASKS = !contentObj.tasks.length
+  const INVALID_TASKS = !validateTasks(contentObj.tasks)
   if (
-    INVALID_TIME || PROJECT_CODE_NOT_NUMBER ||
-    EMPTY_TASKS || INVALID_TASKS ||
+    INVALID_TIME || EMPTY_TASKS || INVALID_TASKS ||
     !contentObj.projectCode ||
     contentObj.projectCode === ''
   )
@@ -106,12 +105,12 @@ const validateTasks = (tasks) => {
 
 const checkHelpMessage = (contentObj) => {
   if (contentObj?.date === 'help' &&
-    contentObj?.projectCodenull === null &&
+    contentObj?.projectCode === null &&
     contentObj?.timeStamp === null &&
     !contentObj?.tasks.length
   )
     return true
-  return fasle
+  return false
 }
 
 const logTimeSheetForTask = async ({ task, projectCode, emailAddress }) => {
@@ -140,13 +139,15 @@ const logTimeSheetForTask = async ({ task, projectCode, emailAddress }) => {
 }
 
 const getProjectOfUser = async (email) => {
-  const url = config.project.api_url_getListProjectOfUser
-  const projects = await axios.get(`${url}?email=${email}`, timesheetPayload, {
+  const url = getDebug() ?
+    'http://timesheetapi.nccsoft.vn/api/services/app/Public/GetPMsOfUser' :
+    config.project.api_url_getListProjectOfUser
+  const projects = (await axios.get(`${url}?email=${email}`, {
     headers: {
       headers: { 'X-Secret-Key': process.env.WIKI_API_KEY_SECRET },
     },
-  })
-  return projects.result.map(item => ({
+  }))?.data?.result || []
+  return projects.map(item => ({
     projectName: item?.projectName || '',
     projectCode: item?.projectCode || '',
   }))
