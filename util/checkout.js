@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { intervalToDuration } = require('date-fns');
 const { MessageEmbed } = require('discord.js');
+const getUserOffWork = require('./getUserOffWork');
 
 function withoutLastTime(dateTime) {
   const date = new Date(dateTime);
@@ -27,14 +28,20 @@ function getUserNameByEmail(string) {
   }
 }
 
-const dateCalculate = (lists) => {
+const dateCalculate = async (lists, date) => {
   const result = [];
+  const dateCheck = new Date(date);
+  const { userOffFullday } = date
+    ? await getUserOffWork(dateCheck)
+    : await getUserOffWork();
+
   lists.map((list) => {
     list.listDate.map((item) => {
       const timeWork = item.timeSheetMinute - item.checkOutInMinute;
-      if (timeWork > 30) {
+      const email = getUserNameByEmail(list.emailAddress);
+      if (timeWork > 30 && !userOffFullday.includes(email)) {
         result.push({
-          email: getUserNameByEmail(list.emailAddress),
+          email: email,
           time: timeWork,
         });
       }
@@ -63,7 +70,7 @@ async function reportCheckout(message, args, client) {
           }?startDate=${getyesterdaydate()}&endDate=${getyesterdaydate()}`
         )
         .then((result) => result.data.result);
-      const checkTimesheet = dateCalculate(lists);
+      const checkTimesheet = await dateCalculate(lists, getyesterdaydate());
 
       let mess;
       if (!checkTimesheet) {
@@ -123,7 +130,7 @@ async function reportCheckout(message, args, client) {
             `${client.config.checkinTimesheet.api_url}?startDate=${startDate}&endDate=${startDate}`
           )
           .then((result) => result.data.result);
-        const checkTimesheet = dateCalculate(lists);
+        const checkTimesheet = await dateCalculate(lists, startDate);
 
         let mess;
         if (!checkTimesheet) {
@@ -164,7 +171,7 @@ async function reportCheckout(message, args, client) {
           `${client.config.checkinTimesheet.api_url}?startDate=${startDate}&endDate=${startDate}`
         )
         .then((result) => result.data.result);
-      const checkTimesheet = dateCalculate(lists);
+      const checkTimesheet = await dateCalculate(lists, startDate);
 
       let mess;
       if (!checkTimesheet) {
