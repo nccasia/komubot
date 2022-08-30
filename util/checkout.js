@@ -1,5 +1,7 @@
 const axios = require('axios');
+const { intervalToDuration } = require('date-fns');
 const { MessageEmbed } = require('discord.js');
+const getUserOffWork = require('./getUserOffWork');
 
 function withoutLastTime(dateTime) {
   const date = new Date(dateTime);
@@ -26,14 +28,20 @@ function getUserNameByEmail(string) {
   }
 }
 
-const dateCalculate = (lists) => {
+const dateCalculate = async (lists, date) => {
   const result = [];
+  const dateCheck = new Date(date);
+  const { userOffFullday } = date
+    ? await getUserOffWork(dateCheck)
+    : await getUserOffWork();
+
   lists.map((list) => {
     list.listDate.map((item) => {
       const timeWork = item.timeSheetMinute - item.checkOutInMinute;
-      if (timeWork > 0) {
+      const email = getUserNameByEmail(list.emailAddress);
+      if (timeWork > 30 && !userOffFullday.includes(email)) {
         result.push({
-          email: getUserNameByEmail(list.emailAddress),
+          email: email,
           time: timeWork,
         });
       }
@@ -62,7 +70,7 @@ async function reportCheckout(message, args, client) {
           }?startDate=${getyesterdaydate()}&endDate=${getyesterdaydate()}`
         )
         .then((result) => result.data.result);
-      const checkTimesheet = dateCalculate(lists);
+      const checkTimesheet = await dateCalculate(lists, getyesterdaydate());
 
       let mess;
       if (!checkTimesheet) {
@@ -75,7 +83,10 @@ async function reportCheckout(message, args, client) {
           if (checkTimesheet.slice(i * 50, (i + 1) * 50).length === 0) break;
           mess = checkTimesheet
             .slice(i * 50, (i + 1) * 50)
-            .map((list) => `<${list.email}> chênh lệch ${list.time} phút`)
+            .map(
+              (list) =>
+                `<${list.email}> chênh lệch ${showTrackerTime(list.time)}`
+            )
             .join('\n');
           const Embed = new MessageEmbed()
             .setTitle('Danh sách vi phạm')
@@ -119,7 +130,7 @@ async function reportCheckout(message, args, client) {
             `${client.config.checkinTimesheet.api_url}?startDate=${startDate}&endDate=${startDate}`
           )
           .then((result) => result.data.result);
-        const checkTimesheet = dateCalculate(lists);
+        const checkTimesheet = await dateCalculate(lists, startDate);
 
         let mess;
         if (!checkTimesheet) {
@@ -135,7 +146,10 @@ async function reportCheckout(message, args, client) {
             if (checkTimesheet.slice(i * 50, (i + 1) * 50).length === 0) break;
             mess = checkTimesheet
               .slice(i * 50, (i + 1) * 50)
-              .map((list) => `<${list.email}> chênh lệch ${list.time} phút`)
+              .map(
+                (list) =>
+                  `<${list.email}> chênh lệch ${showTrackerTime(list.time)}`
+              )
               .join('\n');
             const Embed = new MessageEmbed()
               .setTitle(`Danh sách vi phạm ngày ${formatDate}`)
@@ -157,7 +171,7 @@ async function reportCheckout(message, args, client) {
           `${client.config.checkinTimesheet.api_url}?startDate=${startDate}&endDate=${startDate}`
         )
         .then((result) => result.data.result);
-      const checkTimesheet = dateCalculate(lists);
+      const checkTimesheet = await dateCalculate(lists, startDate);
 
       let mess;
       if (!checkTimesheet) {
@@ -170,7 +184,10 @@ async function reportCheckout(message, args, client) {
           if (checkTimesheet.slice(i * 50, (i + 1) * 50).length === 0) break;
           mess = checkTimesheet
             .slice(i * 50, (i + 1) * 50)
-            .map((list) => `<${list.email}> chênh lệch ${list.time} phút`)
+            .map(
+              (list) =>
+                `<${list.email}> chênh lệch ${showTrackerTime(list.time)}`
+            )
             .join('\n');
           const Embed = new MessageEmbed()
             .setTitle(`Danh sách vi phạm ngày ${args[1]}`)
@@ -183,6 +200,11 @@ async function reportCheckout(message, args, client) {
       console.log(err);
     }
   }
+}
+
+function showTrackerTime(spentTime) {
+  const duration = intervalToDuration({ start: 0, end: spentTime * 1000 * 60 });
+  return `${duration.hours}h ${duration.minutes}m ${duration.seconds}s`;
 }
 
 module.exports = reportCheckout;
