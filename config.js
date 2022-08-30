@@ -77,6 +77,9 @@ module.exports = {
     api_url_logTimesheetByKomu: `${process.env.TIMESHEET_API}MyTimesheets/CreateByKomu`,
     api_url_logTimesheetFullByKomu: `${process.env.TIMESHEET_API}MyTimesheets/CreateFullByKomu`,
   },
+  project: {
+    api_url_getListProjectOfUser: `${process.env.TIMESHEET_API}Public/GetPMsOfUser`,
+  },
   checkinTimesheet: {
     api_url: `${process.env.TIMESHEET_API}Public/GetTimesheetAndCheckInOutAllUser`,
   },

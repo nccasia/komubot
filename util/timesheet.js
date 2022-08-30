@@ -53,19 +53,67 @@ const parseDailyMessage = (message) => {
     block: normalizeString(block),
     tasks,
   }
-
   return contentObj
 }
 
+const parseTimesheetMessage = (message) => {
+  const [, metaRaw, ...taskRaw] = message.split(
+    new RegExp('\\*timesheet|\\+', 'ig'),
+  )
+  const [projectRaw, dateRaw] = metaRaw.trim().split(/\s+/)
+  const dateStr = dateRaw
+    ? normalizeString(dateRaw)
+    : normalizeString(projectRaw)
+  const projectCode = dateRaw ? normalizeString(projectRaw) : null
+  const date = chrono.parseDate(dateStr)
+  const tasks = taskRaw.filter((chunk) => chunk.trim())
+    .map((chunk) => parseTimeSheetTask(chunk))
+  const contentObj = {
+    date: dateStr,
+    projectCode,
+    timeStamp: date,
+    tasks,
+  }
+  return contentObj
+}
+
+const validateTimesheetFormat = (contentObj) => {
+  const INVALID_TIME = !contentObj.timeStamp
+  const EMPTY_TASKS = !contentObj.tasks.length
+  const INVALID_TASKS = !validateTasks(contentObj.tasks)
+  if (
+    INVALID_TIME || EMPTY_TASKS || INVALID_TASKS ||
+    !contentObj.projectCode ||
+    contentObj.projectCode === ''
+  )
+    return false
+  return true
+}
+
+const validateTasks = (tasks) => {
+  for (let task of tasks) {
+    if (task.note === '' ||
+      task.time === '' ||
+      task.type === '' ||
+      task.name === '' ||
+      !task.duration ||
+      !['ot', 'nt'].includes(task.type))
+      return false
+  }
+  return true
+}
+
+const checkHelpMessage = (contentObj) => {
+  if (contentObj?.date === 'help' &&
+    contentObj?.projectCode === null &&
+    contentObj?.timeStamp === null &&
+    !contentObj?.tasks.length
+  )
+    return true
+  return false
+}
+
 const logTimeSheetForTask = async ({ task, projectCode, emailAddress }) => {
-  // {
-  //   "emailAddress": "string",
-  //   "projectCode": "string",
-  //   "taskName": "string",
-  //   "hour": 0,
-  //   "typeOfWork": 0,
-  //   "note": "string"
-  // }
   const typeOfWork = task.type === 'ot' ? 1 : 0
   const hour = task.duration ? task.duration / 3600000 : 0
   const taskName = task.name
@@ -80,14 +128,29 @@ const logTimeSheetForTask = async ({ task, projectCode, emailAddress }) => {
 
   const url =
     !hour || !projectCode
-      ? config.api_url_logTimesheetByKomu
-      : config.api_url_logTimesheetFullByKomu
+      ? config.submitTimesheet.api_url_logTimesheetByKomu
+      : config.submitTimesheet.api_url_logTimesheetFullByKomu
 
   return await axios.post(url, timesheetPayload, {
     headers: {
       headers: { 'X-Secret-Key': process.env.WIKI_API_KEY_SECRET },
     },
   })
+}
+
+const getProjectOfUser = async (email) => {
+  const url = getDebug() ?
+    'http://timesheetapi.nccsoft.vn/api/services/app/Public/GetPMsOfUser' :
+    config.project.api_url_getListProjectOfUser
+  const projects = (await axios.get(`${url}?email=${email}`, {
+    headers: {
+      headers: { 'X-Secret-Key': process.env.WIKI_API_KEY_SECRET },
+    },
+  }))?.data?.result || []
+  return projects.map(item => ({
+    projectName: item?.projectName || '',
+    projectCode: item?.projectCode || '',
+  }))
 }
 
 const logTimeSheetFromDaily = async ({ content, emailAddress }) => {
@@ -114,6 +177,11 @@ module.exports = {
   parseTimeSheetSentence,
   parseDailyMessage,
   logTimeSheetFromDaily,
+  logTimeSheetForTask,
+  checkHelpMessage,
+  getProjectOfUser,
+  parseTimesheetMessage,
+  validateTimesheetFormat,
   debug,
   setDebug,
   getDebug,
