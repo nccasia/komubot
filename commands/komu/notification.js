@@ -20,18 +20,6 @@ module.exports = {
         ],
       });
 
-      if (checkRole.length === 0) {
-        return message
-          .reply({
-            content:
-              '```You do not have permission to execute this command!```',
-            ephemeral: true,
-          })
-          .catch((err) => {
-            sendErrorToDevTest(client, authorId, err);
-          });
-      }
-
       if (!noti || noti == undefined) {
         return message
           .reply({
@@ -43,44 +31,56 @@ module.exports = {
           });
       }
 
-      await axios.post(
-        client.config.noti.api_url_quickNews,
-        {
-          content: noti,
-        },
-        {
-          headers: {
-            securityCode: process.env.IMS_KEY_SECRET,
+      if (checkRole.length > 0 || authorId === '871713984670216273') {
+        await axios.post(
+          client.config.noti.api_url_quickNews,
+          {
+            content: noti,
           },
-        }
-      );
-      message
-        .reply({ content: '`✅` Notification saved.', ephemeral: true })
-        .catch((err) => {
-          sendErrorToDevTest(client, authorId, err);
-        });
-      const fetchChannel = [
-        '922135616962068520',
-        '922402247260909569',
-        '935151571581423626',
-        '921686261943635988',
-        '921652536933499002',
-        '969511102885019688',
-        '921239541388554240',
-        '990141662665777172',
-      ];
+          {
+            headers: {
+              securityCode: process.env.IMS_KEY_SECRET,
+            },
+          }
+        );
+        message
+          .reply({ content: '`✅` Notification saved.', ephemeral: true })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
+        const fetchChannel = [
+          '922135616962068520',
+          '922402247260909569',
+          '935151571581423626',
+          '921686261943635988',
+          '921652536933499002',
+          '969511102885019688',
+          '921239541388554240',
+          '990141662665777172',
+        ];
 
-      fetchChannel.map(async (channel) => {
-        const userDiscord = await client.channels.fetch(channel);
-        if (message.attachments && message.attachments.first())
-          userDiscord
-            .send({
-              content: `${noti}`,
-              files: [message.attachments.first().url],
-            })
-            .catch(console.error);
-        else userDiscord.send(`${noti} `).catch(console.error);
-      });
+        fetchChannel.map(async (channel) => {
+          const userDiscord = await client.channels.fetch(channel);
+          if (message.attachments && message.attachments.first())
+            userDiscord
+              .send({
+                content: `${noti}`,
+                files: [message.attachments.first().url],
+              })
+              .catch(console.error);
+          else userDiscord.send(`${noti} `).catch(console.error);
+        });
+      } else {
+        return message
+          .reply({
+            content:
+              '```You do not have permission to execute this command!```',
+            ephemeral: true,
+          })
+          .catch((err) => {
+            sendErrorToDevTest(client, authorId, err);
+          });
+      }
     } catch (err) {
       console.log(err);
     }
