@@ -2051,6 +2051,16 @@ async function remindCheckout(client) {
   }
 }
 
+async function sendMessagePMs(client) {
+  if (await checkHoliday()) return;
+  const userDiscord = await client.channels.fetch('921787088830103593');
+  userDiscord
+    .send(
+      `Đã đến giờ report, PMs hãy nhanh chóng hoàn thành report tuần này đi.`
+    )
+    .catch(console.error);
+}
+
 function cronJobOneMinute(client) {
   sendMesageRemind(client);
   kickMemberVoiceChannel(client);
@@ -2061,6 +2071,13 @@ exports.scheduler = {
   run(client) {
     new cron.CronJob(
       '00 18 * * 1-5',
+      () => sendMessagePMs(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '00 15 * * 2',
       () => remindCheckout(client),
       null,
       false,
