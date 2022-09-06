@@ -62,11 +62,11 @@ const messHelp =
   '```' +
   'Please daily follow this template' +
   '\n' +
-  '*daily dd/mm/yyyy' +
+  '*daily dd/mm/yyyy [projectCode]' +
   '\n' +
-  '- yesterday:' +
+  '- yesterday: what you had done; 8h' +
   '\n' +
-  '- today:' +
+  '- today: what you about to do' +
   '\n' +
   '- block: ' +
   '```';
@@ -169,7 +169,7 @@ module.exports = {
           .save()
           .catch((err) => console.log(err));
 
-        await logTimeSheetFromDaily({
+        const timeSheetResults = await logTimeSheetFromDaily({
           emailAddress,
           content: content,
         });
@@ -185,8 +185,10 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         } else {
+          const timeSheetReport = timeSheetResults.map(res => res && res.result).join('\n');
+          const report = '`✅` Daily saved.' + '\n' + timeSheetReport;
           message
-            .reply({ content: '✅ Daily saved.', ephemeral: true })
+            .reply({ content: report, ephemeral: true })
             .catch((err) => {
               sendErrorToDevTest(client, authorId, err);
             });
@@ -205,7 +207,7 @@ module.exports = {
           .save()
           .catch((err) => console.log(err));
 
-        await logTimeSheetFromDaily({
+        const timeSheetResults = await logTimeSheetFromDaily({
           emailAddress,
           content: content,
         });
@@ -221,8 +223,10 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         } else {
+          const timeSheetReport = timeSheetResults.map(res => res && res.result).join('\n');
+          const report = '`✅` Daily saved.' + '\n' + timeSheetReport;
           message
-            .reply({ content: '`✅` Daily saved.', ephemeral: true })
+            .reply({ content:  report, ephemeral: true })
             .catch((err) => {
               sendErrorToDevTest(client, authorId, err);
             });
