@@ -139,10 +139,8 @@ const logTimeSheetForTask = async ({ task, projectCode, emailAddress }) => {
 
   const response = await axios.post(url, timesheetPayload, {
     headers: {
-      headers: {
-        'X-Secret-Key': process.env.WFH_API_KEY_SECRET,
-        'Content-Type': 'application/json'
-      },
+      'X-Secret-Key': process.env.WFH_API_KEY_SECRET,
+      'Content-Type': 'application/json'
     },
   });
   console.log(response.data);
