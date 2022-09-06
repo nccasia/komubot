@@ -26,6 +26,7 @@ module.exports = {
     const authorId = message.author.id;
     const username = message.author.username;
     const content = message.content;
+    console.log('content timesheet', content);
     const timesheetObj = parseTimesheetMessage(content);
     debug('timesheetObj', timesheetObj);
     const IS_HELP_MESSAGE = checkHelpMessage(timesheetObj);
@@ -69,7 +70,9 @@ module.exports = {
       .catch((err) => {
         sendErrorToDevTest(client, authorId, err);
       });};
+
     if (getDebug()) return debug('Successfully');
+
     const results = [];
 
     for (const task of timesheetObj.tasks) {
@@ -89,6 +92,7 @@ module.exports = {
         });
       }
     }
+
     const resultsReport = results.map(res => res && res.result).join('\n');
 
     return message
