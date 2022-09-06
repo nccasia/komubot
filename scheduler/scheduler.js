@@ -2070,14 +2070,14 @@ function cronJobOneMinute(client) {
 exports.scheduler = {
   run(client) {
     new cron.CronJob(
-      '00 18 * * 1-5',
+      '00 15 * * 2',
       () => sendMessagePMs(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
     ).start();
     new cron.CronJob(
-      '00 15 * * 2',
+      '00 18 * * 1-5',
       () => remindCheckout(client),
       null,
       false,
