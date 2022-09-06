@@ -139,7 +139,10 @@ const logTimeSheetForTask = async ({ task, projectCode, emailAddress }) => {
 
   const response = await axios.post(url, timesheetPayload, {
     headers: {
-      headers: { 'X-Secret-Key': process.env.WIKI_API_KEY_SECRET },
+      headers: {
+        'X-Secret-Key': process.env.WFH_API_KEY_SECRET,
+        'Content-Type': 'application/json'
+      },
     },
   });
   console.log(response.data);
@@ -155,7 +158,7 @@ const getProjectOfUser = async (email) => {
     (
       await axios.get(`${url}?email=${email}`, {
         headers: {
-          headers: { 'X-Secret-Key': process.env.WIKI_API_KEY_SECRET },
+          headers: { 'X-Secret-Key': process.env.WFH_API_KEY_SECRET },
         },
       })
     )?.data?.result || [];
