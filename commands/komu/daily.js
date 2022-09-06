@@ -87,7 +87,6 @@ module.exports = {
       ['yesterday', 'today', 'block'].forEach((q) => {
         if (!wordInString(daily, q)) return (checkDaily = true);
       });
-      const timesheetUrl = `${client.config.submitTimesheet.api_url_logTimesheetByKomu}`;
       const emailAddress = `${authorUsername}@ncc.asia`;
 
       if (checkDaily) {
@@ -152,8 +151,8 @@ module.exports = {
 
       const wfhUserEmail = wfhGetApi
         ? wfhGetApi.data.result.map((item) =>
-            getUserNameByEmail(item.emailAddress)
-          )
+          getUserNameByEmail(item.emailAddress)
+        )
         : [];
 
       if (wfhUserEmail.includes(authorUsername)) {
