@@ -26,7 +26,7 @@ module.exports = {
     const authorId = message.author.id;
     const username = message.author.username;
     const content = message.content;
-    console.log('content timesheet', content);
+
     const timesheetObj = parseTimesheetMessage(content);
     debug('timesheetObj', timesheetObj);
     const IS_HELP_MESSAGE = checkHelpMessage(timesheetObj);
