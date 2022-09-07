@@ -12,7 +12,7 @@ const messHelp = `
 Please log timesheet follow this template:
    *timesheet help
   -------------------------------------
-   *timesheet [projectCode] dd/mm/yyyy
+   *timesheet dd/mm/yyyy [projectCode]
       + task description; 2h, nt, coding
       + task description; 2h, nt, coding
       + task description; 2h, nt, coding
