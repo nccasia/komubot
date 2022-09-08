@@ -33,27 +33,24 @@ const parseTimeSheetSentence = (sentence) => {
 };
 
 const parseDailyMessage = (message) => {
-  const [, metaRaw, yesterdayRaw, todayRaw, block] = message.split(
+  const [, metaRaw, yesterday, todayRaw, block] = message.split(
     new RegExp('\\*daily|- yesterday:|- today:|- block:', 'ig'),
   );
-  const [dateRaw, projectRaw] = metaRaw.trim().split(/\s+/);
-  const dateStr = normalizeString(dateRaw);
+  const [projectRaw, dateRaw] = metaRaw.trim().split(/\s+/);
+  const dateStr = dateRaw
+    ? normalizeString(dateRaw)
+    : normalizeString(projectRaw);
   const projectCode = dateRaw ? normalizeString(projectRaw) : null;
   const todayStr = normalizeString(todayRaw);
   const date = chrono.parseDate(dateStr);
-  const yesterdayStr = normalizeString(yesterdayRaw);
-  const yesterdayTasks = parseTimeSheetSentence(yesterdayStr);
-  const todayTasks = parseTimeSheetSentence(todayStr);
-  const tasks = yesterdayTasks;
+  const tasks = parseTimeSheetSentence(todayStr);
   const contentObj = {
     date: dateStr,
     projectCode,
     timeStamp: date,
-    yesterday: yesterdayStr,
+    yesterday: normalizeString(yesterday),
     today: todayStr,
     block: normalizeString(block),
-    todayTasks,
-    yesterdayTasks,
     tasks,
   };
   return contentObj;
@@ -63,8 +60,10 @@ const parseTimesheetMessage = (message) => {
   const [, metaRaw, ...taskRaw] = message.split(
     new RegExp('\\*timesheet|\\+', 'ig'),
   );
-  const [dateRaw, projectRaw] = metaRaw.trim().split(/\s+/);
-  const dateStr = normalizeString(dateRaw);
+  const [projectRaw, dateRaw] = metaRaw.trim().split(/\s+/);
+  const dateStr = dateRaw
+    ? normalizeString(dateRaw)
+    : normalizeString(projectRaw);
   const projectCode = dateRaw ? normalizeString(projectRaw) : null;
   const date = chrono.parseDate(dateStr);
   const tasks = taskRaw
@@ -134,9 +133,9 @@ const logTimeSheetForTask = async ({ task, projectCode, emailAddress }) => {
   };
 
   const url =
-    hour && !projectCode
-      ? config.submitTimesheet.api_url_logTimesheetFullByKomu
-      : config.submitTimesheet.api_url_logTimesheetByKomu;
+    !hour || !projectCode
+      ? config.submitTimesheet.api_url_logTimesheetByKomu
+      : config.submitTimesheet.api_url_logTimesheetFullByKomu;
 
   const response = await axios.post(url, timesheetPayload, {
     headers: {
