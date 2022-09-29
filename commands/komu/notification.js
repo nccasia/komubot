@@ -10,7 +10,7 @@ module.exports = {
   async execute(message, args, client) {
     try {
       const authorId = message.author.id;
-      const noti = args.join(' ');
+      const noti = message.content.slice(10, message.content.length);
       const checkRole = await userData.find({
         id: authorId,
         deactive: { $ne: true },
