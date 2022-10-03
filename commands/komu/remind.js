@@ -36,9 +36,11 @@ module.exports = {
       const month = datetime.slice(3, 5);
       const year = datetime.slice(6);
 
-      const fomat = `${month}/${day}/${year}`;
-      const dateObject = new Date(fomat);
+      const format = `${month}/${day}/${year}`;
+      const dateObject = new Date(format);
       const whenTime = dateObject.getTime();
+      const currentweekday = new Date(whenTime * 1000);
+      const weekday = currentweekday.getDay();
 
       await new remindData({
         channelId: channel,
@@ -46,7 +48,7 @@ module.exports = {
         authorId: author,
         content: messageRemind,
         cancel: false,
-        createdTimestamp: whenTime,
+        createdTimestamp: whenTime || weekday,
       })
         .save()
         .catch((err) => console.log(err));

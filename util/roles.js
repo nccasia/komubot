@@ -49,7 +49,7 @@ const updateRoleDiscord = async (client) => {
     .select('id -_id');
   const userids = user.map((item) => item.id);
 
-  let guild = await client.guilds.fetch('921239248991055882');
+  let guild = await client.guilds.fetch('1019615919204483072');
 
   for (let userid of userids) {
     let member;

@@ -20,6 +20,8 @@ const messHelpDaily =
   '*report weekly' +
   '\n' +
   '*report daily dd/MM/YYYY' +
+  '\n' +
+  '*report monthly DDD' +
   '```';
 
 function getTimeWeekMondayToFriday(dayNow) {
@@ -72,6 +74,10 @@ module.exports = {
         for (const day of getTimeWeekMondayToFriday(new Date().getDay())) {
           await reportDaily(day, message, args, client, guildDB);
         }
+      } else if (args[0] === 'monthly') {
+        for (const month of getTimeWeekMondayToFriday(new Date().getDay().toLocaleString('en', { weekday: 'short' }))) {
+          await reportDaily(month, message, args, client, guildDB);
+        }
       } else if (args[0] === 'mention') {
         await reportMention(message, args, client, guildDB);
       } else if (args[0] === 'checkcamera') {
@@ -109,6 +115,7 @@ module.exports = {
               [
                 { name: 'daily', des: 'show daily today' },
                 { name: 'weekly', des: 'show daily weekly' },
+                { name: 'montly', des: 'show last weekday monthly' },
                 { name: 'mention', des: 'show check mention day' },
                 { name: 'checkcamera', des: 'show checkcamera day' },
                 {

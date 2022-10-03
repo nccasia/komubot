@@ -44,7 +44,7 @@ function getTimeWeek() {
     date.setHours(0, 0, 0, 0);
     return date;
   };
-  let curr = new Date();
+  const curr = new Date();
   // current date of week
   const currentWeekDay = curr.getDay();
   const lessDays = currentWeekDay == 0 ? 6 : currentWeekDay - 1;
@@ -88,7 +88,7 @@ function checkTime(time) {
 }
 
 async function checkHoliday() {
-  let data = [];
+  const data = [];
   let result = false;
   const today = new Date();
   const time =
@@ -137,10 +137,13 @@ function getTimeToDay() {
   };
 }
 
+
+
+
 function checkTimeMeeting() {
   const dateTimeNow = new Date();
-  dateTimeNow.setHours(dateTimeNow.getHours() + 7);
-  let day = dateTimeNow.getDay();
+  dateTimeNow.setHours(dateTimeNow.getHours());
+  const day = dateTimeNow.getDay();
   const hourDateNow = dateTimeNow.getHours();
   const dateNow = dateTimeNow.toLocaleDateString('en-US');
   const minuteDateNow = dateTimeNow.getMinutes();
@@ -178,7 +181,7 @@ function isSameMinute(minuteDb, dateScheduler) {
   if (minuteDb >= 0 && minuteDb <= 4) {
     checkFiveMinute = minuteDb + 60 - checkTimeMeeting().minuteDateNow;
     const hourDb = dateScheduler;
-    setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+    const setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
     hourTimestamp = new Date(setHourTimestamp).getHours();
   } else {
     checkFiveMinute = minuteDb - checkTimeMeeting().minuteDateNow;
@@ -186,7 +189,7 @@ function isSameMinute(minuteDb, dateScheduler) {
   }
   if (
     checkTimeMeeting().hourDateNow === hourTimestamp &&
-    0 <= checkFiveMinute &&
+    checkFiveMinute >= 0 &&
     checkFiveMinute <= 5
   ) {
     result = true;
@@ -271,6 +274,9 @@ function formatDateTimeReminder(date) {
   return `${d} ${t}`;
 }
 
+
+
+
 async function sendMessageReminder(
   client,
   channelId,
@@ -284,30 +290,27 @@ async function sendMessageReminder(
     await fetchUser
       .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
       .catch((err) => {});
-  } else {
-    if (fetchChannel.type === 'GUILD_PUBLIC_THREAD') {
-      fetchChannel.members.fetch().then((members) => {
-        members.forEach(async (member) => {
-          const fetchUser = await client.users.fetch(member.user.id);
-          await fetchUser
-            .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
-            .catch((err) => {});
-        });
-      });
-    } else {
-      fetchChannel.members.map(async (item) => {
-        const fetchUserChannel = await client.users.fetch(item.user.id);
-        await fetchUserChannel
+  } else if (fetchChannel.type === 'GUILD_PUBLIC_THREAD') {
+    fetchChannel.members.fetch().then((members) => {
+      members.forEach(async (member) => {
+        const fetchUser = await client.users.fetch(member.user.id);
+        await fetchUser
           .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
           .catch((err) => {});
       });
-    }
+    });
+  } else {
+    fetchChannel.members.map(async (item) => {
+      const fetchUserChannel = await client.users.fetch(item.user.id);
+      await fetchUserChannel
+        .send(`${fetchChannel.name}: ${task} - deadline: ${dateTime}`)
+        .catch((err) => {});
+    });
   }
 }
 
 async function remindDailyMorning(client) {
   if (await checkHoliday()) return;
-  console.log('[Scheduler] Run');
   try {
     const { notDailyMorning, notDailyFullday } = await getUserNotDaily(
       null,
@@ -334,7 +337,6 @@ async function remindDailyMorning(client) {
 
 async function remindDailyAfternoon(client) {
   if (await checkHoliday()) return;
-  console.log('[Scheduler] Run');
   try {
     const { notDailyAfternoon, notDailyFullday } = await getUserNotDaily(
       null,
@@ -359,6 +361,32 @@ async function remindDailyAfternoon(client) {
   }
 }
 
+async function remindMeetingMonthly(client) {
+  if (await checkHoliday()) return;
+  try {
+    const { notDailyMorning, notDailyFullday } = await getUserNotDaily(
+      null,
+      null,
+      null,
+      client
+    );
+    // send message komu to user
+
+    const userNotDaily = [...notDailyMorning, ...notDailyFullday];
+    await Promise.all(
+      userNotDaily.map((email) =>
+        sendMessageKomuToUser(
+          client,
+          "Just remind you we have a meeting today, dude! Don't forget your money!",
+          email
+        )
+      )
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 function getUserNameByEmail(string) {
   if (string.includes('@ncc.asia')) {
     return string.slice(0, string.length - 9);
@@ -367,7 +395,6 @@ function getUserNameByEmail(string) {
 async function pingWfh(client) {
   try {
     if (await checkHoliday()) return;
-    console.log('[Scheduler run]');
     if (checkTime(new Date())) return;
     let userOff = [];
     try {
@@ -475,13 +502,11 @@ async function pingWfh(client) {
       let result = false;
       if (!user.message_bot_timestamp || !user.message_timestamp) {
         result = true;
-      } else {
-        if (
-          Date.now() - user.message_bot_timestamp >= 1800000 &&
-          Date.now() - user.message_timestamp >= 1800000
-        ) {
-          result = true;
-        }
+      } else if (
+        Date.now() - user.message_bot_timestamp >= 1800000 &&
+        Date.now() - user.message_timestamp >= 1800000
+      ) {
+        result = true;
       }
       return result;
     };
@@ -567,7 +592,6 @@ async function punish(client) {
     },
   ]);
 
-  console.log('sendmachleo', users);
   users.map(async (user) => {
     if (
       Date.now() - user.createdTimestamp >= 1800000 &&
@@ -598,7 +622,6 @@ async function punish(client) {
         { id: user.id, deactive: { $ne: true } },
         { botPing: false }
       );
-      console.log('update botping punish', user.id);
       await channel.send(message).catch(console.error);
     }
   });
@@ -628,7 +651,7 @@ async function checkMention(client) {
           mentionChannel = await client.channels.fetch(mentionChannel.parentId);
         }
 
-        let mentionName = await client.users.fetch(user.authorId);
+        const mentionName = await client.users.fetch(user.authorId);
 
         const userDiscord = await client.users.fetch(user.mentionUserId);
         userDiscord
@@ -763,7 +786,7 @@ async function sendQuiz(client) {
       filterFindUser({ $nin: userOff })
     );
 
-    let arrayUser = userSendQuiz.filter(
+    const arrayUser = userSendQuiz.filter(
       (user) =>
         !user.last_message_time ||
         Date.now() - user.last_message_time >= 1000 * 60 * 60 * 2
@@ -777,31 +800,27 @@ async function sendQuiz(client) {
 }
 
 async function tagMeeting(client) {
-  if (await checkHoliday()) return;
-  console.log('start meeting');
-  let guild = client.guilds.fetch('921239248991055882');
+  // if (await checkHoliday()) return;
+  const guild = client.guilds.fetch('1019615919204483072');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
-      guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
+      guild.type === 'GUILD_VOICE' && guild.parentId === '1019615919204483074'
   );
   const repeatMeet = await meetingData.find({
     cancel: { $ne: true },
     reminder: { $ne: true },
   });
-  console.log('repeatMeet', repeatMeet);
 
   const voiceChannel = getAllVoice.map((item) => item.id);
 
   let countVoice = 0;
-  let roomMap = [];
-  let voiceNow = [];
+  const roomMap = [];
+  const voiceNow = [];
 
   const findVoice = await voiceChannelData.find({ status: 'start' });
   findVoice.map((item) => {
     voiceNow.push(item.id);
   });
-  console.log('find voice start');
-
   const newList = voiceChannel.map(async (voice, index) => {
     const userDiscord = await client.channels.fetch(voice);
 
@@ -811,7 +830,7 @@ async function tagMeeting(client) {
     if (userDiscord.members.size === 0) {
       roomMap.push(userDiscord.id);
     }
-    let roomVoice = roomMap.filter((room) => !voiceNow.includes(room));
+    const roomVoice = roomMap.filter((room) => !voiceNow.includes(room));
 
     if (index === voiceChannel.length - 1) {
       const timeCheck = repeatMeet.map(async (item) => {
@@ -828,7 +847,7 @@ async function tagMeeting(client) {
         ) {
           const fetchChannelFull = await client.channels.fetch(item.channelId);
           await fetchChannelFull
-            .send(`@here voice channel full`)
+            .send('@here voice channel full')
             .catch(console.error);
         } else {
           const newDateTimestamp = new Date(+item.createdTimestamp.toString());
@@ -837,278 +856,348 @@ async function tagMeeting(client) {
           currentDate.setDate(today.getDate());
           currentDate.setMonth(today.getMonth());
           switch (item.repeat) {
-            case 'once':
-              if (
-                isSameDate(dateCreatedTimestamp) &&
+          case 'once':
+            if (
+              isSameDate(dateCreatedTimestamp) &&
                 isSameMinute(minuteDb, dateScheduler)
-              ) {
-                const onceFetchChannel = await client.channels.fetch(
-                  item.channelId
+            ) {
+              const onceFetchChannel = await client.channels.fetch(
+                item.channelId
+              );
+              if (roomVoice.length !== 0) {
+                onceFetchChannel
+                  .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                  .catch(console.error);
+                const onceShift = roomVoice.shift(roomVoice[0]);
+                const channelNameOnce = await client.channels.fetch(
+                  onceShift
                 );
-                if (roomVoice.length !== 0) {
-                  onceFetchChannel
-                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
-                    .catch(console.error);
-                  const onceShift = roomVoice.shift(roomVoice[0]);
-                  const channelNameOnce = await client.channels.fetch(
-                    onceShift
-                  );
-                  let originalNameOnce = channelNameOnce.name;
-                  const searchTermOnce = '(';
-                  const indexOfFirstOnce =
+                let originalNameOnce = channelNameOnce.name;
+                const searchTermOnce = '(';
+                const indexOfFirstOnce =
                     originalNameOnce.indexOf(searchTermOnce);
-                  if (indexOfFirstOnce > 0) {
-                    originalNameOnce = originalNameOnce.slice(
-                      0,
-                      indexOfFirstOnce - 1
-                    );
-                    await channelNameOnce.setName(
-                      `${originalNameOnce} (${item.task})`
-                    );
-                  } else
-                    await channelNameOnce.setName(
-                      `${channelNameOnce.name} (${item.task})`
-                    );
-                  const newRoomOnce = channelNameOnce.name;
-                  await new voiceChannelData({
-                    id: channelNameOnce.id,
-                    originalName: originalNameOnce,
-                    newRoomName: newRoomOnce,
-                    createdTimestamp: Date.now(),
-                  })
-                    .save()
-                    .catch((err) => console.log(err));
-                } else
-                  await onceFetchChannel
-                    .send(`@here voice channel full`)
-                    .catch(console.error);
-                await meetingData
-                  .updateOne({ _id: item._id }, { reminder: true })
-                  .catch((err) => console.log('updateone error once', err));
+                if (indexOfFirstOnce > 0) {
+                  originalNameOnce = originalNameOnce.slice(
+                    0,
+                    indexOfFirstOnce - 1
+                  );
+                  await channelNameOnce.setName(
+                    `${originalNameOnce} (${item.task})`
+                  );
+                } else {
+                  await channelNameOnce.setName(
+                    `${channelNameOnce.name} (${item.task})`
+                  );
+                }
+                const newRoomOnce = channelNameOnce.name;
+                await new voiceChannelData({
+                  id: channelNameOnce.id,
+                  originalName: originalNameOnce,
+                  newRoomName: newRoomOnce,
+                  createdTimestamp: Date.now(),
+                })
+                  .save()
+                  .catch((err) => console.log(err));
+              } else {
+                await onceFetchChannel
+                  .send('@here voice channel full')
+                  .catch(console.error);
               }
-              return;
-            case 'daily':
-              if (isSameDay()) return;
-              if (isSameMinute(minuteDb, dateScheduler)) {
-                const dailyFetchChannel = await client.channels.fetch(
-                  item.channelId
+              await meetingData
+                .updateOne({ _id: item._id }, { reminder: true })
+                .catch((err) => console.log('updateone error once', err));
+            }
+            return;
+          case 'daily':
+            if (isSameDay()) return;
+            if (isSameMinute(minuteDb, dateScheduler)) {
+              const dailyFetchChannel = await client.channels.fetch(
+                item.channelId
+              );
+              if (roomVoice.length !== 0) {
+                dailyFetchChannel
+                  .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                  .catch(console.error);
+                const dailyShift = roomVoice.shift(roomVoice[0]);
+                const channelNameDaily = await client.channels.fetch(
+                  dailyShift
                 );
-                if (roomVoice.length !== 0) {
-                  dailyFetchChannel
-                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
-                    .catch(console.error);
-                  const dailyShift = roomVoice.shift(roomVoice[0]);
-                  const channelNameDaily = await client.channels.fetch(
-                    dailyShift
-                  );
-                  let originalNameDaily = channelNameDaily.name;
-                  const searchTermDaily = '(';
-                  const indexOfFirstDaily =
+                let originalNameDaily = channelNameDaily.name;
+                const searchTermDaily = '(';
+                const indexOfFirstDaily =
                     originalNameDaily.indexOf(searchTermDaily);
-                  if (indexOfFirstDaily > 0) {
-                    originalNameDaily = originalNameDaily.slice(
-                      0,
-                      indexOfFirstDaily - 1
-                    );
-                    await channelNameDaily.setName(
-                      `${originalNameDaily} (${item.task})`
-                    );
-                  } else
-                    await channelNameDaily.setName(
-                      `${channelNameDaily.name} (${item.task})`
-                    );
-                  console.log(`setname ${item.task} daily ${item.channelId}`);
-                  const newRoomDaily = channelNameDaily.name;
-                  await new voiceChannelData({
-                    id: channelNameDaily.id,
-                    originalName: originalNameDaily,
-                    newRoomName: newRoomDaily,
-                    createdTimestamp: Date.now(),
-                  })
-                    .save()
-                    .catch((err) => console.log(err));
-                  console.log(
-                    `wait for update ${item.task} daily ${item.channelId}`
+                if (indexOfFirstDaily > 0) {
+                  originalNameDaily = originalNameDaily.slice(
+                    0,
+                    indexOfFirstDaily - 1
                   );
-                } else
-                  await dailyFetchChannel
-                    .send(`@here voice channel full`)
-                    .catch(console.error);
+                  await channelNameDaily.setName(
+                    `${originalNameDaily} (${item.task})`
+                  );
+                } else {
+                  await channelNameDaily.setName(
+                    `${channelNameDaily.name} (${item.task})`
+                  );
+                }
+                const newRoomDaily = channelNameDaily.name;
+                await new voiceChannelData({
+                  id: channelNameDaily.id,
+                  originalName: originalNameDaily,
+                  newRoomName: newRoomDaily,
+                  createdTimestamp: Date.now(),
+                })
+                  .save()
+                  .catch((err) => console.log(err));
+                console.log(
+                  `wait for update ${item.task} daily ${item.channelId}`
+                );
+              } else {
+                await dailyFetchChannel
+                  .send('@here voice channel full')
+                  .catch(console.error);
+              }
 
-                let newCreatedTimestamp = item.createdTimestamp;
+              let newCreatedTimestamp = item.createdTimestamp;
+              newCreatedTimestamp = currentDate.setDate(
+                currentDate.getDate() + 1
+              );
+
+              while (await checkHolidayMeeting(currentDate)) {
                 newCreatedTimestamp = currentDate.setDate(
                   currentDate.getDate() + 1
                 );
-
-                while (await checkHolidayMeeting(currentDate)) {
-                  newCreatedTimestamp = currentDate.setDate(
-                    currentDate.getDate() + 1
-                  );
-                }
-                console.log(
-                  `checkholiday set timestamp ${item.task} ${item.channelId}`
-                );
-                await meetingData
-                  .updateOne(
-                    { _id: item._id },
-                    { reminder: true, createdTimestamp: newCreatedTimestamp }
-                  )
-                  .catch((err) => console.log('updateone error daily', err));
-                console.log(
-                  `update daily ${item.task} successfully ${item.channelId}`
-                );
-
-                const findMeetingAfter = await meetingData.find({
-                  channelId: item.channelId,
-                  task: item.task,
-                  repeat: item.repeat,
-                });
-                console.log(findMeetingAfter, 'findMeetingAfterUpdate');
               }
-              return;
-            case 'weekly':
-              if (
-                isSameMinute(minuteDb, dateScheduler) &&
+              await meetingData
+                .updateOne(
+                  { _id: item._id },
+                  { reminder: true, createdTimestamp: newCreatedTimestamp }
+                )
+                .catch((err) => console.log('updateone error daily', err));
+
+              const findMeetingAfter = await meetingData.find({
+                channelId: item.channelId,
+                task: item.task,
+                repeat: item.repeat,
+              });
+              console.log(findMeetingAfter, 'findMeetingAfterUpdate');
+            }
+            return;
+          case 'weekly':
+            if (
+              isSameMinute(minuteDb, dateScheduler) &&
                 isDiffDay(dateScheduler, 7) &&
                 isTimeDay(dateScheduler)
-              ) {
-                const weeklyFetchChannel = await client.channels.fetch(
-                  item.channelId
+            ) {
+              const weeklyFetchChannel = await client.channels.fetch(
+                item.channelId
+              );
+              if (roomVoice.length !== 0) {
+                weeklyFetchChannel
+                  .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                  .catch(console.error);
+                const weeklyShift = roomVoice.shift(roomVoice[0]);
+                const channelNameWeekly = await client.channels.fetch(
+                  weeklyShift
                 );
-                if (roomVoice.length !== 0) {
-                  weeklyFetchChannel
-                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
-                    .catch(console.error);
-                  const weeklyShift = roomVoice.shift(roomVoice[0]);
-                  const channelNameWeekly = await client.channels.fetch(
-                    weeklyShift
-                  );
-                  let originalNameWeekly = channelNameWeekly.name;
-                  const searchTermWeekly = '(';
-                  const indexOfFirstWeekly =
+                let originalNameWeekly = channelNameWeekly.name;
+                const searchTermWeekly = '(';
+                const indexOfFirstWeekly =
                     originalNameWeekly.indexOf(searchTermWeekly);
-                  if (indexOfFirstWeekly > 0) {
-                    originalNameWeekly = originalNameWeekly.slice(
-                      0,
-                      indexOfFirstWeekly - 1
-                    );
-                    await channelNameWeekly.setName(
-                      `${originalNameWeekly} (${item.task})`
-                    );
-                  } else
-                    await channelNameWeekly.setName(
-                      `${channelNameWeekly.name} (${item.task})`
-                    );
-                  const newRoomWeekly = channelNameWeekly.name;
-                  await new voiceChannelData({
-                    id: channelNameWeekly.id,
-                    originalName: originalNameWeekly,
-                    newRoomName: newRoomWeekly,
-                    createdTimestamp: Date.now(),
-                  })
-                    .save()
-                    .catch((err) => console.log(err));
-                } else
-                  await weeklyFetchChannel
-                    .send(`@here voice channel full`)
-                    .catch(console.error);
-                let newCreatedTimestampWeekly = item.createdTimestamp;
+                if (indexOfFirstWeekly > 0) {
+                  originalNameWeekly = originalNameWeekly.slice(
+                    0,
+                    indexOfFirstWeekly - 1
+                  );
+                  await channelNameWeekly.setName(
+                    `${originalNameWeekly} (${item.task})`
+                  );
+                } else {
+                  await channelNameWeekly.setName(
+                    `${channelNameWeekly.name} (${item.task})`
+                  );
+                }
+                const newRoomWeekly = channelNameWeekly.name;
+                await new voiceChannelData({
+                  id: channelNameWeekly.id,
+                  originalName: originalNameWeekly,
+                  newRoomName: newRoomWeekly,
+                  createdTimestamp: Date.now(),
+                })
+                  .save()
+                  .catch((err) => console.log(err));
+              } else {
+                await weeklyFetchChannel
+                  .send('@here voice channel full')
+                  .catch(console.error);
+              }
+              let newCreatedTimestampWeekly = item.createdTimestamp;
+              newCreatedTimestampWeekly = currentDate.setDate(
+                currentDate.getDate() + 7
+              );
+              while (await checkHolidayMeeting(currentDate)) {
                 newCreatedTimestampWeekly = currentDate.setDate(
                   currentDate.getDate() + 7
                 );
-                while (await checkHolidayMeeting(currentDate)) {
-                  newCreatedTimestampWeekly = currentDate.setDate(
-                    currentDate.getDate() + 7
+              }
+
+              await meetingData
+                .updateOne(
+                  { _id: item._id },
+                  {
+                    reminder: true,
+                    createdTimestamp: newCreatedTimestampWeekly,
+                  }
+                )
+                .catch((err) => console.log('updateone error weekly', err));
+            }
+            return;
+          case 'monthly':
+            if (
+              isSameMinute(minuteDb, dateScheduler) &&
+                isDiffDay(dateScheduler, 30) &&
+                isTimeDay(dateScheduler)
+            ) {
+              const monthlyFetchChannel = await client.channels.fetch(
+                item.channelId
+              );
+              if (roomVoice.length !== 0) {
+                monthlyFetchChannel
+                  .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                  .catch(console.error);
+                const monthlyShift = roomVoice.shift(roomVoice[0]);
+                const channelNameMonthly = await client.channels.fetch(
+                  monthlyShift
+                );
+                let originalNameMonthly = channelNameMonthly.name;
+                const searchTermMonthly = '(';
+                const indexOfFirstMonthly =
+                    originalNameMonthly.indexOf(searchTermMonthly);
+                if (indexOfFirstMonthly > 0) {
+                  originalNameMonthly = originalNameMonthly.slice(
+                    0,
+                    indexOfFirstMonthly - 1
+                  );
+                  await channelNameMonthly.setName(
+                    `${originalNameMonthly} (${item.task})`
+                  );
+                } else {
+                  await channelNameMonthly.setName(
+                    `${channelNameMonthly.name} (${item.task})`
                   );
                 }
-
-                await meetingData
-                  .updateOne(
-                    { _id: item._id },
-                    {
-                      reminder: true,
-                      createdTimestamp: newCreatedTimestampWeekly,
-                    }
-                  )
-                  .catch((err) => console.log('updateone error weekly', err));
+                const newRoomMonthly = channelNameMonthly.name;
+                await new voiceChannelData({
+                  id: channelNameMonthly.id,
+                  originalName: originalNameMonthly,
+                  newRoomName: newRoomMonthly,
+                  createdTimestamp: Date.now(),
+                })
+                  .save()
+                  .catch((err) => console.log(err));
+              } else {
+                await monthlyFetchChannel
+                  .send('@here voice channel full')
+                  .catch(console.error);
               }
-              return;
-            case 'repeat':
-              if (
-                isSameMinute(minuteDb, dateScheduler) &&
+              let newCreatedTimestampMonthly = Number(item.createdTimestamp);
+
+              newCreatedTimestampMonthly = currentDate.setMonth(
+                currentDate.getMonth() + 1
+              );
+              while (await checkHolidayMeeting(currentDate)) {
+                newCreatedTimestampMonthly = currentDate.setMonth(
+                  currentDate.getMonth() + 1
+                );
+              }
+              await meetingData
+                .updateOne(
+                  { _id: item._id },
+                  {
+                    reminder: true,
+                    createdTimestamp: newCreatedTimestampMonthly,
+                  }
+                )
+                .catch((err) => console.log('updateone error monthly', err));
+            }
+            return;
+          case 'repeat':
+            if (
+              isSameMinute(minuteDb, dateScheduler) &&
                 isDiffDay(dateScheduler, item.repeatTime) &&
                 isTimeDay(dateScheduler)
-              ) {
-                const repeatFetchChannel = await client.channels.fetch(
-                  item.channelId
+            ) {
+              const repeatFetchChannel = await client.channels.fetch(
+                item.channelId
+              );
+              if (roomVoice.length !== 0) {
+                repeatFetchChannel
+                  .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                  .catch(console.error);
+                const repeatShift = roomVoice.shift(roomVoice[0]);
+                const channelNameRepeat = await client.channels.fetch(
+                  repeatShift
                 );
-                if (roomVoice.length !== 0) {
-                  repeatFetchChannel
-                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
-                    .catch(console.error);
-                  const repeatShift = roomVoice.shift(roomVoice[0]);
-                  const channelNameRepeat = await client.channels.fetch(
-                    repeatShift
-                  );
-                  let originalNameRepeat = channelNameRepeat.name;
-                  const searchTermRepeat = '(';
-                  const indexOfFirstRepeat =
+                let originalNameRepeat = channelNameRepeat.name;
+                const searchTermRepeat = '(';
+                const indexOfFirstRepeat =
                     originalNameRepeat.indexOf(searchTermRepeat);
-                  if (indexOfFirstRepeat > 0) {
-                    originalNameRepeat = originalNameRepeat.slice(
-                      0,
-                      indexOfFirstRepeat - 1
-                    );
-                    await channelNameRepeat.setName(
-                      `${originalNameRepeat} (${item.task})`
-                    );
-                  } else
-                    await channelNameRepeat.setName(
-                      `${channelNameRepeat.name} (${item.task})`
-                    );
-                  const newRoomRepeat = channelNameRepeat.name;
-                  await new voiceChannelData({
-                    id: channelNameRepeat.id,
-                    originalName: originalNameRepeat,
-                    newRoomName: newRoomRepeat,
-                    createdTimestamp: Date.now(),
-                  })
-                    .save()
-                    .catch((err) => console.log(err));
-                } else
-                  await repeatFetchChannel
-                    .send(`@here voice channel full`)
-                    .catch(console.error);
-                let newCreatedTimestampRepeat = item.createdTimestamp;
+                if (indexOfFirstRepeat > 0) {
+                  originalNameRepeat = originalNameRepeat.slice(
+                    0,
+                    indexOfFirstRepeat - 1
+                  );
+                  await channelNameRepeat.setName(
+                    `${originalNameRepeat} (${item.task})`
+                  );
+                } else {
+                  await channelNameRepeat.setName(
+                    `${channelNameRepeat.name} (${item.task})`
+                  );
+                }
+                const newRoomRepeat = channelNameRepeat.name;
+                await new voiceChannelData({
+                  id: channelNameRepeat.id,
+                  originalName: originalNameRepeat,
+                  newRoomName: newRoomRepeat,
+                  createdTimestamp: Date.now(),
+                })
+                  .save()
+                  .catch((err) => console.log(err));
+              } else {
+                await repeatFetchChannel
+                  .send('@here voice channel full')
+                  .catch(console.error);
+              }
+
+              let newCreatedTimestampRepeat = item.createdTimestamp;
+              newCreatedTimestampRepeat = currentDate.setDate(
+                currentDate.getDate() + item.repeatTime
+              );
+
+              while (await checkHolidayMeeting(currentDate)) {
                 newCreatedTimestampRepeat = currentDate.setDate(
                   currentDate.getDate() + item.repeatTime
                 );
-
-                while (await checkHolidayMeeting(currentDate)) {
-                  newCreatedTimestampRepeat = currentDate.setDate(
-                    currentDate.getDate() + item.repeatTime
-                  );
-                }
-
-                await meetingData
-                  .updateOne(
-                    { _id: item._id },
-                    {
-                      reminder: true,
-                      createdTimestamp: newCreatedTimestampRepeat,
-                    }
-                  )
-                  .catch((err) => console.log('updateone error repeat', err));
               }
-              return;
-            default:
-              break;
+
+              await meetingData
+                .updateOne(
+                  { _id: item._id },
+                  {
+                    reminder: true,
+                    createdTimestamp: newCreatedTimestampRepeat,
+                  }
+                )
+                .catch((err) => console.log('updateone error repeat', err));
+            }
+            return;
+          default:
+            break;
           }
         }
       });
     }
   });
-  console.log('end meeting');
 }
 
 async function updateReminderMeeting(client) {
@@ -1118,7 +1207,7 @@ async function updateReminderMeeting(client) {
   });
 
   const dateTimeNow = new Date();
-  dateTimeNow.setHours(dateTimeNow.getHours() + 7);
+  dateTimeNow.setHours(dateTimeNow.getHours());
   const hourDateNow = dateTimeNow.getHours();
   const minuteDateNow = dateTimeNow.getMinutes();
 
@@ -1131,18 +1220,19 @@ async function updateReminderMeeting(client) {
     if (minuteDb >= 0 && minuteDb <= 4) {
       checkFiveMinute = minuteDb + 60 - minuteDateNow;
       const hourDb = dateScheduler;
-      setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+      let setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
       hourTimestamp = new Date(setHourTimestamp).getHours();
     } else {
       checkFiveMinute = minuteDateNow - minuteDb;
       hourTimestamp = dateScheduler.getHours();
     }
-    if (hourDateNow === hourTimestamp && checkFiveMinute > 5)
+    if (hourDateNow === hourTimestamp && checkFiveMinute > 5) {
       if (item.repeat === 'once') {
         await meetingData.updateOne({ _id: item._id }, { cancel: true });
       } else {
         await meetingData.updateOne({ _id: item._id }, { reminder: false });
       }
+    }
   });
 }
 
@@ -1190,7 +1280,7 @@ async function sendSubmitTimesheet(client) {
         .catch(console.error);
       userDiscord
         .send(
-          `Nhớ submit timesheet cuối tuần tránh bị phạt bạn nhé!!! Nếu bạn có tham gia opentalk bạn hãy log timesheet vào project company activities nhé.`
+          'Nhớ submit timesheet cuối tuần tránh bị phạt bạn nhé!!! Nếu bạn có tham gia opentalk bạn hãy log timesheet vào project company activities nhé.'
         )
         .catch(console.error);
     });
@@ -1199,7 +1289,6 @@ async function sendSubmitTimesheet(client) {
 
 async function checkJoinCall(client) {
   if (await checkHoliday()) return;
-  console.log(['Schulder run']);
   const now = new Date();
   const HOURS = 2;
   const beforeHours = new Date(now.getTime() - 1000 * 60 * 60 * HOURS);
@@ -1220,23 +1309,23 @@ async function checkJoinCall(client) {
   );
 }
 async function turnOffBot(client) {
-  const fetchVoiceNcc8 = await client.channels.fetch('921323636491710504');
+  const fetchVoiceNcc8 = await client.channels.fetch('1019615919204483072');
   const target = await fetchVoiceNcc8.guild.members.fetch('922003239887581205');
   target.voice.disconnect().catch(console.error);
 }
 
 async function kickMemberVoiceChannel(client) {
   if (await checkHoliday()) return;
-  let guild = client.guilds.fetch('921239248991055882');
+  const guild = client.guilds.fetch('1019615919204483072');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
-      guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
+      guild.type === 'GUILD_VOICE' && guild.parentId === '1019615919204483072'
   );
   const voiceChannel = getAllVoice.map((item) => item.id);
 
   const timeNow = Date.now();
-  let roomMap = [];
-  let voiceNow = [];
+  const roomMap = [];
+  const voiceNow = [];
 
   const timeVoiceAlone = await timeVoiceAloneData.find({
     status: { $ne: true },
@@ -1247,8 +1336,9 @@ async function kickMemberVoiceChannel(client) {
       const fetchVoiceNcc8 = await client.channels.fetch(item.channelId);
       if (fetchVoiceNcc8.members.first) {
         const target = fetchVoiceNcc8.members.first();
-        if (target && target.voice)
+        if (target && target.voice) {
           target.voice.disconnect().catch(console.error);
+        }
       }
 
       await timeVoiceAloneData.updateMany(
@@ -1271,7 +1361,7 @@ async function kickMemberVoiceChannel(client) {
       roomMap.push(userDiscord.id);
     }
 
-    let roomVoice = roomMap.filter((room) => !voiceNow.includes(room));
+    const roomVoice = roomMap.filter((room) => !voiceNow.includes(room));
 
     if (index === voiceChannel.length - 1) {
       roomVoice.map(async (item) => {
@@ -1290,15 +1380,15 @@ async function kickMemberVoiceChannel(client) {
 async function dating(client) {
   if (await checkHoliday()) return;
   const now = new Date();
-  let minute = now.getMinutes();
-  let dating = [];
-  let datingIdMan = [];
-  let datingIdWoman = [];
-  let datingEmailMAn = [];
-  let datingEmailWoman = [];
-  let resCheckUserMan = [];
-  let resCheckUserWoman = [];
-  let listJoinCall = [];
+  const minute = now.getMinutes();
+  const dating = [];
+  const datingIdMan = [];
+  const datingIdWoman = [];
+  const datingEmailMAn = [];
+  const datingEmailWoman = [];
+  const resCheckUserMan = [];
+  const resCheckUserWoman = [];
+  const listJoinCall = [];
 
   if (minute === 0) {
     const response = await axios.get(
@@ -1306,23 +1396,25 @@ async function dating(client) {
     );
     if (!response.data || !response.data.result) return;
 
-    let userMan = [];
-    let userWomen = [];
+    const userMan = [];
+    const userWomen = [];
     response.data.result.map((item) => {
-      if (item.sex === 0)
+      if (item.sex === 0) {
         userMan.push({
           email: getUserNameByEmail(item.emailAddress),
           branch: item.branch,
         });
-      if (item.sex === 1)
+      }
+      if (item.sex === 1) {
         userWomen.push({
           email: getUserNameByEmail(item.emailAddress),
           branch: item.branch,
         });
+      }
     });
 
-    let emailUserMan = [];
-    let emailUserWomen = [];
+    const emailUserMan = [];
+    const emailUserWomen = [];
     userMan.map((item) => {
       if (!item.email) return;
       emailUserMan.push(item.email);
@@ -1332,7 +1424,7 @@ async function dating(client) {
       emailUserWomen.push(item.email);
     });
 
-    let result = [];
+    const result = [];
     const userDating = await datingData.find();
     userDating.map(async (item) => {
       result.push(item.email);
@@ -1363,34 +1455,34 @@ async function dating(client) {
 
     if (!checkUserMan || !checkUserWoman) return;
 
-    let guild = client.guilds.fetch('921239248991055882');
+    const guild = client.guilds.fetch('1019615919204483072');
     const getAllVoice = client.channels.cache.filter(
       (guild) =>
-        guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
+        guild.type === 'GUILD_VOICE' && guild.parentId === '1024971003580928000'
     );
     const voiceChannel = getAllVoice.map((item) => item.id);
-    let roomMap = [];
+    const roomMap = [];
     let countVoice = 0;
 
     for (let i = 0; i < 5; i++) {
-      let checkCaseMan = [];
-      let checkCaseWoman = [];
+      const checkCaseMan = [];
+      const checkCaseWoman = [];
       const arr = [0, 1, 2, 3];
       randomOne = Math.floor(Math.random() * arr.length);
       arrMan = arr[randomOne];
       arr.splice(arrMan, 1);
       randomTwo = Math.floor(Math.random() * arr.length);
       arrWoman = arr[randomTwo];
-      console.log(arrMan);
-      console.log(arrWoman);
+
 
       userMan.map((man) => {
         if (man.branch === arrMan && man.email) checkCaseMan.push(man.email);
       });
 
       userWomen.map((women) => {
-        if (women.branch === arrWoman && women.email)
+        if (women.branch === arrWoman && women.email) {
           checkCaseWoman.push(women.email);
+        }
       });
 
       checkUserMan.map((item) => {
@@ -1431,7 +1523,9 @@ async function dating(client) {
             }
           });
         });
-      } else continue;
+      } else {
+        continue;
+      }
     }
 
     voiceChannel.map(async (voice, index) => {
@@ -1449,7 +1543,7 @@ async function dating(client) {
             const fetchChannelFull = await client.channels.fetch(
               '956782882226073610'
             );
-            fetchChannelFull.send(`Voice channel full`).catch(console.error);
+            fetchChannelFull.send('Voice channel full').catch(console.error);
           }
         } else {
           const nowFetchChannel = await client.channels.fetch(
@@ -1484,8 +1578,9 @@ async function dating(client) {
                 .save()
                 .catch((err) => console.log(err));
               roomMap.shift(roomMap[0]);
-            } else
-              nowFetchChannel.send(`Voice channel full`).catch(console.error);
+            } else {
+              nowFetchChannel.send('Voice channel full').catch(console.error);
+            }
           }
         }
       }
@@ -1493,9 +1588,9 @@ async function dating(client) {
   }
 
   if (minute > 0 && minute < 15) {
-    let idManPrivate = [];
-    let idWomanPrivate = [];
-    let idVoice = [];
+    const idManPrivate = [];
+    const idWomanPrivate = [];
+    const idVoice = [];
 
     const timeNow = new Date();
     const timeStart = timeNow.setHours(0, 0, 0, 0);
@@ -1513,16 +1608,18 @@ async function dating(client) {
       if (item.sex === 0) {
         idManPrivate.push(item.userId);
         idVoice.push(item.channelId);
-      } else idWomanPrivate.push(item.userId);
+      } else {
+        idWomanPrivate.push(item.userId);
+      }
     });
 
-    let fetchGuild = client.guilds.fetch('921239248991055882');
+    const fetchGuild = client.guilds.fetch('1019615919204483072');
     const getAllVoicePrivate = client.channels.cache.filter(
       (guild) =>
-        guild.type === 'GUILD_VOICE' && guild.parentId === '956767420377346088'
+        guild.type === 'GUILD_VOICE' && guild.parentId === '1024971003580928000'
     );
     const voiceChannelPrivate = getAllVoicePrivate.map((item) => item.id);
-    let roomMapPrivate = [];
+    const roomMapPrivate = [];
 
     voiceChannelPrivate.map(async (voice, index) => {
       const userDiscordPrivate = await client.channels.fetch(voice);
@@ -1540,8 +1637,9 @@ async function dating(client) {
               targetMan.voice &&
               targetWoman.voice.channelId &&
               targetMan.voice.channelId !== roomMapPrivate[i]
-            )
+            ) {
               targetMan.voice.setChannel(roomMapPrivate[i]);
+            }
             const targetWoman = await fetchVoiceNcc8.guild.members.fetch(
               idWomanPrivate[i]
             );
@@ -1550,8 +1648,9 @@ async function dating(client) {
               targetWoman.voice &&
               targetWoman.voice.channelId &&
               targetWoman.voice.channelId !== roomMapPrivate[i]
-            )
+            ) {
               targetWoman.voice.setChannel(roomMapPrivate[i]);
+            }
           }
         }
       }
@@ -1593,7 +1692,7 @@ async function sendMesageRemind(client) {
     const data = await remindData.find({ cancel: false });
 
     const now = new Date();
-    now.setHours(now.getHours() + 7);
+    now.setHours(now.getHours());
     const hourDateNow = now.getHours();
     const dateNow = now.toLocaleDateString('en-US');
     const minuteDateNow = now.getMinutes();
@@ -1608,7 +1707,7 @@ async function sendMesageRemind(client) {
       if (minuteDb >= 0 && minuteDb <= 4) {
         checkFiveMinute = minuteDb + 60 - minuteDateNow;
         const hourDb = dateScheduler;
-        setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
+        const setHourTimestamp = hourDb.setHours(hourDb.getHours() - 1);
         hourTimestamp = new Date(setHourTimestamp).getHours();
       } else {
         checkFiveMinute = minuteDb - minuteDateNow;
@@ -1621,7 +1720,7 @@ async function sendMesageRemind(client) {
 
       if (
         hourDateNow === hourTimestamp &&
-        0 <= checkFiveMinute &&
+        checkFiveMinute >= 0 &&
         checkFiveMinute <= 5 &&
         dateCreatedTimestamp === dateNow
       ) {
@@ -1776,13 +1875,11 @@ async function pingOpenTalk(client) {
       let result = false;
       if (!user.message_bot_timestamp || !user.message_timestamp) {
         result = true;
-      } else {
-        if (
-          Date.now() - user.message_bot_timestamp >= 1800000 &&
-          Date.now() - user.message_timestamp >= 1800000
-        ) {
-          result = true;
-        }
+      } else if (
+        Date.now() - user.message_bot_timestamp >= 1800000 &&
+        Date.now() - user.message_timestamp >= 1800000
+      ) {
+        result = true;
       }
       return result;
     };
@@ -1922,19 +2019,8 @@ async function pingReminder(client) {
         new Date(Number(item.createdTimestamp))
       );
       switch (item.repeat) {
-        case 'once':
-          if (isSameDate(dateCreatedTimestamp)) {
-            await sendMessageReminder(
-              client,
-              item.channelId,
-              item.task,
-              dateTime,
-              null
-            );
-          }
-          return;
-        case 'daily':
-          if (isSameDay()) return;
+      case 'once':
+        if (isSameDate(dateCreatedTimestamp)) {
           await sendMessageReminder(
             client,
             item.channelId,
@@ -1942,40 +2028,62 @@ async function pingReminder(client) {
             dateTime,
             null
           );
-          return;
-        case 'weekly':
-          if (isDiffDay(dateScheduler, 7) && isTimeDay(dateScheduler)) {
-            await sendMessageReminder(
-              client,
-              item.channelId,
-              item.task,
-              dateTime,
-              null
-            );
-          }
-          return;
-        case 'repeat':
-          if (
-            isDiffDay(dateScheduler, item.repeatTime) &&
-            isTimeDay(dateScheduler)
-          ) {
-            await sendMessageReminder(
-              client,
-              item.channelId,
-              item.task,
-              dateTime,
-              null
-            );
-          }
-          return;
-        default:
+        }
+        return;
+      case 'daily':
+        if (isSameDay()) return;
+        await sendMessageReminder(
+          client,
+          item.channelId,
+          item.task,
+          dateTime,
+          null
+        );
+        return;
+      case 'weekly':
+        if (isDiffDay(dateScheduler, 7) && isTimeDay(dateScheduler)) {
           await sendMessageReminder(
             client,
             item.channelId,
-            item.content,
+            item.task,
             dateTime,
-            item.mentionUserId
+            null
           );
+        }
+        return;
+      case 'montly':
+        if (isDiffDay(dateScheduler, 30) && isTimeDay(dateScheduler)) {
+          await sendMessageReminder(
+            client,
+            item.channelId,
+            item.task,
+            dateTime,
+            item.repeatTime,
+          );
+        }
+        return;
+      case 'repeat':
+        if (
+          isDiffDay(dateScheduler, item.repeatTime) &&
+            isTimeDay(dateScheduler)
+        ) {
+          await sendMessageReminder(
+            client,
+            item.channelId,
+            item.task,
+            dateTime,
+            item.repeatTime
+          );
+        }
+        return;
+      default:
+        await sendMessageReminder(
+          client,
+          item.channelId,
+          item.content,
+          dateTime,
+          item.mentionUserId
+        );
       }
     });
   }
@@ -2004,7 +2112,6 @@ async function moveChannel(client) {
         .select('-_id createdTimestamp');
 
       if (Date.now() - messData.createdTimestamp >= TIME) {
-        console.log(messData);
         channel.setParent(CATEGORY_ACHIEVED_CHANNEL_ID);
         channelData.updateOne(
           { id: channelId },
@@ -2042,7 +2149,7 @@ async function remindCheckout(client) {
       if (checkUser && checkUser !== null) {
         const userDiscord = await client.users.fetch(checkUser.id);
         userDiscord
-          .send(`Đừng quên checkout trước khi ra về nhé!!!`)
+          .send('Đừng quên checkout trước khi ra về nhé!!!')
           .catch(console.error);
       }
     });
@@ -2056,7 +2163,7 @@ async function sendMessagePMs(client) {
   const userDiscord = await client.channels.fetch('921787088830103593');
   userDiscord
     .send(
-      `Đã đến giờ report, PMs hãy nhanh chóng hoàn thành report tuần này đi.`
+      'Đã đến giờ report, PMs hãy nhanh chóng hoàn thành report tuần này đi.'
     )
     .catch(console.error);
 }
@@ -2069,194 +2176,201 @@ function cronJobOneMinute(client) {
 
 exports.scheduler = {
   run(client) {
-    new cron.CronJob(
-      '00 15 * * 2',
-      () => sendMessagePMs(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '00 18 * * 1-5',
-      () => remindCheckout(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
     // new cron.CronJob(
-    //   '00 23 * * 0-6',
-    //   () => moveChannel(client),
+    //   '00 15 * * 2',
+    //   () => sendMessagePMs(client),
     //   null,
     //   false,
     //   'Asia/Ho_Chi_Minh'
     // ).start();
+    // new cron.CronJob(
+    //   '00 18 * * 1-5',
+    //   () => remindCheckout(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // // new cron.CronJob(
+    // //   '00 23 * * 0-6',
+    // //   () => moveChannel(client),
+    // //   null,
+    // //   false,
+    // //   'Asia/Ho_Chi_Minh'
+    // // ).start();
     new cron.CronJob(
-      '*/2 * * * *',
+      '*/1 * * * *',
       () => tagMeeting(client),
       null,
       false,
       'Asia/Ho_Chi_Minh'
     ).start();
-    new cron.CronJob(
-      '30 08 * * 0-6',
-      () => pingReminder(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
     // new cron.CronJob(
-    //   '*/15 10-11 * * 6',
-    //   () => pingOpenTalk(client),
+    //   '30 08 * * 0-6',
+    //   () => pingReminder(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // // new cron.CronJob(
+    // //   '*/15 10-11 * * 6',
+    // //   () => pingOpenTalk(client),
+    // //   null,
+    // //   false,
+    // //   'Asia/Ho_Chi_Minh'
+    // // ).start();
+    // // new cron.CronJob(
+    // //   '*/1 10-12 * * 6',
+    // //   () => punishOpenTalk(client),
+    // //   null,
+    // //   false,
+    // //   'Asia/Ho_Chi_Minh'
+    // // ).start();
+    // new cron.CronJob(
+    //   '*/1 * * * *',
+    //   () => cronJobOneMinute(client),
     //   null,
     //   false,
     //   'Asia/Ho_Chi_Minh'
     // ).start();
     // new cron.CronJob(
-    //   '*/1 10-12 * * 6',
-    //   () => punishOpenTalk(client),
+    //   '0-15/1 17 * * 5',
+    //   () => dating(client),
     //   null,
     //   false,
     //   'Asia/Ho_Chi_Minh'
     // ).start();
-    new cron.CronJob(
-      '*/1 * * * *',
-      () => cronJobOneMinute(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0-15/1 17 * * 5',
-      () => dating(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '15 13 * * 5',
-      () => audioPlayer(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '00 9 * * 1-5',
-      () => remindDailyMorning(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '00 13 * * 1-5',
-      () => remindDailyAfternoon(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/5 9-11,13-17 * * 1-5',
-      () => pingWfh(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 9-11,13-17 * * 1-5',
-      () => punish(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '00 09 * * 0-6',
-      () => happyBirthday(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '*/1 9-11,13-17 * * 1-5',
-      () => checkMention(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '45 08 * * 1-5',
-      async () => await topTracker(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '30 17 * * 1-5',
-      () => sendMessTurnOffPc(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '00 12 * * 0',
-      () => sendSubmitTimesheet(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0 0 * * 1',
-      () => updateRoleProject(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0 * * * *',
-      () => updateRoleDiscord(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0 9-11,13-17 * * 1-5',
-      () => checkJoinCall(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0 9,11,13,15 * * 1-5',
-      () => sendQuiz(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '15 14 * * 5',
-      () => turnOffBot(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '0 9,11,14,16 * * 1-5',
-      () => sendQuizEnglish(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '14 00 * * 1',
-      () => sendOdinReport(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
-    new cron.CronJob(
-      '23 00 * * 0-6',
-      () => renameVoiceChannel(client),
-      null,
-      false,
-      'Asia/Ho_Chi_Minh'
-    ).start();
+    // new cron.CronJob(
+    //   '15 13 * * 5',
+    //   () => audioPlayer(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '00 9 * * 1-5',
+    //   () => remindDailyMorning(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '00 13 * * 1-5',
+    //   () => remindDailyAfternoon(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '*/5 9-11,13-17 * * 1-5',
+    //   () => pingWfh(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '*/1 9-11,13-17 * * 1-5',
+    //   () => punish(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '00 09 * * 0-6',
+    //   () => happyBirthday(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '*/1 9-11,13-17 * * 1-5',
+    //   () => checkMention(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '45 08 * * 1-5',
+    //   async () => await topTracker(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '30 17 * * 1-5',
+    //   () => sendMessTurnOffPc(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '00 12 * * 0',
+    //   () => sendSubmitTimesheet(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '0 0 * * 1',
+    //   () => updateRoleProject(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '0 * * * *',
+    //   () => updateRoleDiscord(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '0 9-11,13-17 * * 1-5',
+    //   () => checkJoinCall(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '0 9,11,13,15 * * 1-5',
+    //   () => sendQuiz(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '15 14 * * 5',
+    //   () => turnOffBot(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '0 9,11,14,16 * * 1-5',
+    //   () => sendQuizEnglish(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '14 00 * * 1',
+    //   () => sendOdinReport(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '23 00 * * 0-6',
+    //   () => renameVoiceChannel(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
+    // new cron.CronJob(
+    //   '00 9 * * 1-5',
+    //   () => remindMeetingMonthly(client),
+    //   null,
+    //   false,
+    //   'Asia/Ho_Chi_Minh'
+    // ).start();
   },
 };
