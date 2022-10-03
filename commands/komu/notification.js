@@ -10,7 +10,7 @@ module.exports = {
   async execute(message, args, client) {
     try {
       const authorId = message.author.id;
-      const noti = args.join(' ');
+      const noti = message.content.slice(10, message.content.length);
       const checkRole = await userData.find({
         id: authorId,
         deactive: { $ne: true },
@@ -57,6 +57,7 @@ module.exports = {
           '969511102885019688',
           '921239541388554240',
           '990141662665777172',
+          '1022323179563270244',
         ];
 
         fetchChannel.map(async (channel) => {
