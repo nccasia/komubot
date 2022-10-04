@@ -45,21 +45,25 @@ function formatDate(date) {
   return `${d} ${t}`;
 }
 
-function getLastWeekDay(year, month, day) {
-  const d = new Date();
-  d.setDate(1);
-  d.setMonth(month || d.getMonth() + 1);
-  for (let i = 1; i < 32; i++) {
-    if (d.getDay() < day) {
-      d.setDate(d.getDate() + 1);
-    } else if (d.getDay() == day) {
-      return d;
-    } else {
-      d.setDate(d.getDate() - 1);
-    }
-  }
-  console.log('get d -0--', d);
+function getLastDayOfMonth(year, month, dayOfWeek) {
+  // 0 for sunday, 1 for monday ...
+  let d = new Date(year, month + 1, 0);
+  d.setDate(d.getDate() - d.getDay() - (7 - dayOfWeek));
   return d;
+}
+
+// Get all last Sundays for current year
+
+function getLastWeekDay(dayOfWeek) {
+  const getYearNow = new Date().getFullYear();
+  const getMonthNow = new Date().getMonth();
+  let arrDayOfWeek = getLastDayOfMonth(
+    getYearNow,
+    getMonthNow,
+    dayOfWeek
+  ).toString();
+  console.log('get arrDayOfWeek', arrDayOfWeek);
+  return arrDayOfWeek;
 }
 
 module.exports = {
@@ -378,13 +382,15 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         }
+
+        const day = datetime.slice(0, 2);
+        const month = datetime.slice(3, 5);
+        const year = datetime.slice(6);
+        const format = `${month}/${day}/${year}`;
         if (getDatetime.length == 1) {
-          const year = datetime.slice(6);
-          const weekday = new Date();
-          const monthOfWeekday = weekday.getMonth() + 1;
-          console.log('monthOfWeekday', monthOfWeekday);
-          let date = getLastWeekDay(year, monthOfWeekday, getDatetime);
-          const dateTime = date.getTime();
+          const date = getLastWeekDay(getDatetime);
+          const dateObject = new Date(date);
+          const dateTime = dateObject.getTime();
           const response = await meetingData({
             channelId: channel_id,
             task: task,
@@ -398,12 +404,6 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         } else {
-          const day = datetime.slice(0, 2);
-          const month = datetime.slice(3, 5);
-          const year = datetime.slice(6);
-
-          console.log('get date -- ' + day + '/' + month + '/' + year);
-          const format = `${month}/${day}/${year}`;
           const dateObject = new Date(format);
           const timestamp = dateObject.getTime();
 
