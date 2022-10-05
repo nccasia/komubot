@@ -1319,7 +1319,7 @@ async function kickMemberVoiceChannel(client) {
   const guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
-      guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
+      guild.type === 'GUILD_VOICE' && guild.parentId === '1022413213062672445'
   );
   const voiceChannel = getAllVoice.map((item) => item.id);
 

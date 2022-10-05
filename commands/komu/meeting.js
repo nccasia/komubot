@@ -4,6 +4,7 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const { sendErrorToDevTest } = require('../../util/komubotrest');
 const { formatISO } = require('date-fns');
+const { weekdays } = require('moment');
 
 const messHelp =
   '```' +
@@ -45,20 +46,26 @@ function formatDate(date) {
   return `${d} ${t}`;
 }
 
-function getLastDayOfMonth(year, month, dayOfWeek) {
-  let d = new Date(year, month + 1, 0);
-  d.setDate(d.getDate() - d.getDay() - (7 - dayOfWeek));
+function getLastDayOfMonth(year, month, dayOfWeek, h, m) {
+  const d = new Date(year, month + 1, 0);
+  d.setDate(d.getDate() - d.getDay() - (7 - dayOfWeek)).toString();
+  d.setTime(d.getTime() + h * 60 * 60 * 1000 + m * 60 * 1000);
+
+  console.log('get day', d);
   return d;
 }
 
-function getLastWeekDay(dayOfWeek) {
+function getLastWeekDay(dayOfWeek, h, m) {
   const getYearNow = new Date().getFullYear();
   const getMonthNow = new Date().getMonth();
   let arrDayOfWeek = getLastDayOfMonth(
     getYearNow,
     getMonthNow,
-    dayOfWeek
-  ).toString();
+    dayOfWeek,
+    h,
+    m
+  );
+
   console.log('get arrDayOfWeek', arrDayOfWeek);
   return arrDayOfWeek;
 }
@@ -114,6 +121,7 @@ module.exports = {
                   const dateTime = formatDate(
                     new Date(Number(item.createdTimestamp))
                   );
+                  console.log('dateTime: ' + dateTime);
                   if (item.repeatTime) {
                     return `- ${item.task} ${dateTime} (ID: ${item._id}) ${item.repeat} ${item.repeatTime}`;
                   } else {
@@ -147,11 +155,11 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         } else {
-          const guild = await client.guilds.fetch('921239248991055882');
+          const guild = await client.guilds.fetch('1019615919204483072');
           const getAllVoice = client.channels.cache.filter(
             (guild) =>
               guild.type === 'GUILD_VOICE' &&
-              guild.parentId === '921239248991055884'
+              guild.parentId === '1022413213062672445'
           );
           const voiceChannel = getAllVoice.map((item) => item.id);
 
@@ -344,7 +352,14 @@ module.exports = {
       } else {
         const task = args.slice(0, 1).join(' ');
         const datetime = args.slice(1, 3).join(' ');
+        console.log('datetime', datetime);
         const getDatetime = args.slice(1, 2).join(' ');
+        const getTime = args.slice(2, 3).toString();
+        const timef = getTime.split(':');
+        console.log('timef', timef);
+        // const getTime = getTime.split(':');
+        // console.log('arrTime', arrTime);
+        console.log('getTime', getTime);
         let repeat = args.slice(3, 4).join(' ');
         const repeatTime = args.slice(4, args.length).join(' ');
         const checkDate = args.slice(1, 2).join(' ');
@@ -385,13 +400,20 @@ module.exports = {
         const year = datetime.slice(6);
         const format = `${month}/${day}/${year}`;
         if (getDatetime.length == 1) {
-          const date = getLastWeekDay(getDatetime);
+          const hour = Number(timef[0]);
+          const min = Number(timef[1]);
+          const date = Number(getLastWeekDay(getDatetime, hour, min));
+          console.log('date:', Number(date));
           const dateObject = new Date(date);
-          const dateTime = dateObject.getTime();
+          console.log('dateObject: ', dateObject);
+          const timestamp = dateObject.getTime();
+          console.log('timestamp: ', timestamp);
+          // const dateObject = new Date(date);
+          // const dateTime = dateObject.getTime();
           const response = await meetingData({
             channelId: channel_id,
             task: task,
-            createdTimestamp: dateTime,
+            createdTimestamp: timestamp,
             repeat: repeat,
             repeatTime: repeatTime,
           }).save();
@@ -402,6 +424,7 @@ module.exports = {
             });
         } else {
           const dateObject = new Date(format);
+          console.log('dateObject: ', dateObject);
           const timestamp = dateObject.getTime();
 
           const response = await meetingData({
