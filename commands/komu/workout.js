@@ -175,10 +175,47 @@ module.exports = {
                 .setStyle('DANGER')
             );
 
-            message.reply({
-              content: '`✅` workout daily saved.',
-              ephemeral: true,
-              components: [row],
+            const workoutButton = await message
+              .reply({
+                content: '`✅` workout daily saved.',
+                ephemeral: true,
+                components: [row],
+              })
+              .catch();
+            const collector = workoutButton.createMessageComponentCollector({
+              time: 15000,
+              max: 1,
+            });
+
+            collector.on('collect', async (i) => {
+              const iCollect = i.customId.split('#');
+              if (iCollect[0] === 'workout_approve') {
+                const row = new MessageActionRow().addComponents(
+                  new MessageButton()
+                    .setCustomId('workout_approve_deactive#')
+                    .setLabel('APPROVED✅')
+                    .setStyle('PRIMARY')
+                    .setDisabled(true)
+                );
+                await i.update({
+                  content: '`✅` workout daily saved.',
+                  components: [row],
+                });
+              } else {
+                const row = new MessageActionRow().addComponents(
+                  new MessageButton()
+                    .setCustomId('workout_reject_deactive#')
+                    .setLabel('REJECTED❌')
+                    .setStyle('DANGER')
+                    .setDisabled(true)
+                );
+
+                await i.update({
+                  content: '`✅` workout daily saved.',
+                  components: [row],
+                });
+              }
+              return;
             });
           }
         } else {
