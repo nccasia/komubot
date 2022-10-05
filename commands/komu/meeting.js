@@ -46,13 +46,10 @@ function formatDate(date) {
 }
 
 function getLastDayOfMonth(year, month, dayOfWeek) {
-  // 0 for sunday, 1 for monday ...
   let d = new Date(year, month + 1, 0);
   d.setDate(d.getDate() - d.getDay() - (7 - dayOfWeek));
   return d;
 }
-
-// Get all last Sundays for current year
 
 function getLastWeekDay(dayOfWeek) {
   const getYearNow = new Date().getFullYear();
