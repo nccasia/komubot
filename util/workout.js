@@ -80,14 +80,6 @@ const workout = async (interaction, client) => {
           }
         )
         .catch(console.error);
-
-      await interaction
-        .reply({
-          content: `You just confirmed workout reject for ${labelImageEmail}`,
-          ephemeral: true,
-          fetchReply: true,
-        })
-        .catch(console.error);
       return;
     } else if (
       arrIds.length > 2 &&
@@ -148,13 +140,6 @@ const workout = async (interaction, client) => {
         await client.channels.cache
           .get(arrIds[3])
           .send(message)
-          .catch(console.error);
-        await interaction
-          .reply({
-            content: `You just confirmed workout approve for ${labelImageEmail}`,
-            ephemeral: true,
-            fetchReply: true,
-          })
           .catch(console.error);
       }
       return;

@@ -1,4 +1,5 @@
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const userData = require('../../models/userData');
 const workoutData = require('../../models/workoutData');
 const { sendErrorToDevTest } = require('../../util/komubotrest');
 
@@ -37,6 +38,9 @@ module.exports = {
     try {
       const authorId = message.author.id;
       if (args[0] === 'summary') {
+        if (!args[1]) {
+          args[1] = `${new Date().getMonth() + 1}`;
+        }
         if (monthSupport.includes(args[1].toUpperCase())) {
           const date = new Date();
           let dateFormat;
@@ -89,7 +93,7 @@ module.exports = {
             Array.isArray(userCheckWorkout) &&
             userCheckWorkout.length === 0
           ) {
-            mess = '```' + 'No one workout this month' + '```';
+            mess = '```' + 'No results' + '```';
             return message.reply(mess).catch((err) => {
               sendErrorToDevTest(client, m, err);
             });
@@ -107,7 +111,7 @@ module.exports = {
                 .map((item) => `${item.email} (${item.total})`)
                 .join('\n');
               const Embed = new MessageEmbed()
-                .setTitle('People who workout this month')
+                .setTitle('Top workout')
                 .setColor('RED')
                 .setDescription(`${mess}`);
               await message.reply({ embeds: [Embed] }).catch((err) => {
@@ -182,41 +186,64 @@ module.exports = {
                 components: [row],
               })
               .catch();
-            const collector = workoutButton.createMessageComponentCollector({
-              time: 15000,
-              max: 1,
+
+            const checkRole = await userData.find({
+              id: message.author.id,
+              deactive: { $ne: true },
+              $or: [{ roles_discord: { $all: ['HR'] } }],
             });
+            if (
+              checkRole.length > 0 ||
+              message.author.id === '921261168088190997' ||
+              message.author.id === '868040521136873503'
+            ) {
+              const collector = workoutButton.createMessageComponentCollector({
+                time: 15000,
+                max: 1,
+              });
 
-            collector.on('collect', async (i) => {
-              const iCollect = i.customId.split('#');
-              if (iCollect[0] === 'workout_approve') {
-                const row = new MessageActionRow().addComponents(
-                  new MessageButton()
-                    .setCustomId('workout_approve_deactive#')
-                    .setLabel('APPROVED✅')
-                    .setStyle('PRIMARY')
-                    .setDisabled(true)
-                );
-                await i.update({
-                  content: '`✅` workout daily saved.',
-                  components: [row],
-                });
-              } else {
-                const row = new MessageActionRow().addComponents(
-                  new MessageButton()
-                    .setCustomId('workout_reject_deactive#')
-                    .setLabel('REJECTED❌')
-                    .setStyle('DANGER')
-                    .setDisabled(true)
-                );
+              collector.on('collect', async (i) => {
+                const iCollect = i.customId.split('#');
+                if (iCollect[0] === 'workout_approve') {
+                  const row = new MessageActionRow().addComponents(
+                    new MessageButton()
+                      .setCustomId('workout_approve_deactive#')
+                      .setLabel('APPROVED ✅')
+                      .setStyle('PRIMARY')
+                      .setDisabled(true)
+                  );
+                  await i.update({
+                    content: '`✅` workout daily saved.',
+                    components: [row],
+                  });
+                } else {
+                  const row = new MessageActionRow().addComponents(
+                    new MessageButton()
+                      .setCustomId('workout_reject_deactive#')
+                      .setLabel('REJECTED ❌')
+                      .setStyle('DANGER')
+                      .setDisabled(true)
+                  );
 
-                await i.update({
-                  content: '`✅` workout daily saved.',
-                  components: [row],
+                  await i.update({
+                    content: '`✅` workout daily saved.',
+                    components: [row],
+                  });
+                }
+                return;
+              });
+            } else {
+              message
+                .reply({
+                  content: 'You do not have permission to execute this workout',
+                  ephemeral: true,
+                  fetchReply: true,
+                })
+                .catch((err) => {
+                  sendErrorToDevTest(client, authorId, err);
                 });
-              }
               return;
-            });
+            }
           }
         } else {
           message.reply('Please send the file attachment').catch(console.error);

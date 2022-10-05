@@ -2125,7 +2125,7 @@ async function sendReportWorkout(client) {
         .map((list) => `${list.email} (${list.total})`)
         .join('\n');
       const Embed = new MessageEmbed()
-        .setTitle(`People who workout this month`)
+        .setTitle('Top workout')
         .setColor('RED')
         .setDescription(`${mess}`);
       const userDiscord = await client.channels.fetch(item);
