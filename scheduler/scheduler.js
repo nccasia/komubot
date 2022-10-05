@@ -2087,7 +2087,7 @@ async function sendReportWorkout(client) {
           $gte: firstDay.getTime(),
           $lte: lastDay.getTime(),
         },
-        status: true,
+        status: 'approve',
       },
     },
     {

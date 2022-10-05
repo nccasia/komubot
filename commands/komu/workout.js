@@ -59,7 +59,7 @@ module.exports = {
                   $gte: firstDay.getTime(),
                   $lte: lastDay.getTime(),
                 },
-                status: true,
+                status: 'approve',
               },
             },
             {
@@ -140,7 +140,7 @@ module.exports = {
                   : message.author.username,
               createdTimestamp: Date.now(),
               attachment: true,
-              status: false,
+              status: 'pending',
               channelId: message.channel.id,
             })
               .save()

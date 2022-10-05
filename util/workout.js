@@ -18,8 +18,7 @@ const workout = async (interaction, client) => {
   if (
     checkRole.length > 0 ||
     interaction.user.id === '921261168088190997' ||
-    interaction.user.id === '868040521136873503' ||
-    interaction.user.id === '922148445626716182'
+    interaction.user.id === '868040521136873503'
   ) {
     if (
       arrIds.length > 2 &&
@@ -32,18 +31,23 @@ const workout = async (interaction, client) => {
         .catch(console.error);
       if (!workoutDb) {
         interaction
-          .reply({ content: 'No workout found', ephemeral: true })
+          .reply({
+            content: 'No workout found',
+            ephemeral: true,
+            fetchReply: true,
+          })
           .catch((err) => {
             sendErrorToDevTest(client, authorId, err);
           });
         return;
       }
 
-      if (!workoutDb.status) {
+      if (workoutDb.status === 'reject') {
         interaction
           .reply({
             content: 'You have already rejected.',
             ephemeral: true,
+            fetchReply: true,
           })
           .catch((err) => {
             sendErrorToDevTest(client, authorId, err);
@@ -55,7 +59,11 @@ const workout = async (interaction, client) => {
         .catch(console.error);
       if (!userdb) {
         return interaction
-          .reply({ content: '`User is not valid`', ephemeral: true })
+          .reply({
+            content: '`User is not valid`',
+            ephemeral: true,
+            fetchReply: true,
+          })
           .catch(console.error);
       }
       const message = `${interaction.user.username} just confirmed workout reject from ${labelImageEmail}`;
@@ -68,7 +76,7 @@ const workout = async (interaction, client) => {
         .updateOne(
           { _id: workourid },
           {
-            status: false,
+            status: 'reject',
           }
         )
         .catch(console.error);
@@ -77,9 +85,10 @@ const workout = async (interaction, client) => {
         .reply({
           content: `You just confirmed workout reject for ${labelImageEmail}`,
           ephemeral: true,
+          fetchReply: true,
         })
         .catch(console.error);
-      return;
+      // return;
     } else if (
       arrIds.length > 2 &&
       arrIds[0] == 'workout_approve' &&
@@ -92,18 +101,23 @@ const workout = async (interaction, client) => {
           .catch(console.error);
         if (!workoutDb) {
           interaction
-            .reply({ content: 'No workout found', ephemeral: true })
+            .reply({
+              content: 'No workout found',
+              ephemeral: true,
+              fetchReply: true,
+            })
             .catch((err) => {
               sendErrorToDevTest(client, authorId, err);
             });
           return;
         }
 
-        if (workoutDb.status) {
+        if (workoutDb.status === 'approve') {
           interaction
             .reply({
               content: 'You have already approved.',
               ephemeral: true,
+              fetchReply: true,
             })
             .catch((err) => {
               sendErrorToDevTest(client, authorId, err);
@@ -115,7 +129,11 @@ const workout = async (interaction, client) => {
           .catch(console.error);
         if (!userdb) {
           return interaction
-            .reply({ content: '`User is not valid`', ephemeral: true })
+            .reply({
+              content: '`User is not valid`',
+              ephemeral: true,
+              fetchReply: true,
+            })
             .catch(console.error);
         }
         const message = `${interaction.user.username} just confirmed workout approve from ${labelImageEmail}`;
@@ -123,7 +141,7 @@ const workout = async (interaction, client) => {
           .updateOne(
             { _id: workourid },
             {
-              status: true,
+              status: 'approve',
             }
           )
           .catch(console.error);
@@ -135,16 +153,72 @@ const workout = async (interaction, client) => {
           .reply({
             content: `You just confirmed workout approve for ${labelImageEmail}`,
             ephemeral: true,
+            fetchReply: true,
           })
           .catch(console.error);
       }
-      return;
+      // return;
     }
+
+    const collector = interaction.channel.createMessageComponentCollector({
+      time: 15000,
+      max: 1,
+    });
+
+    collector.on('collect', async (i) => {
+      const iCollect = i.customId.split('#');
+      if (iCollect[0] === 'workout_approve') {
+        const row = new MessageActionRow().addComponents(
+          new MessageButton()
+            .setCustomId(
+              'workout_approve_deactive#'
+              // workout.email +
+              // '#' +
+              // workout._id +
+              // '#' +
+              // workout.channelId +
+              // '#' +
+              // message.author.id
+            )
+            .setLabel('APPROVED✅')
+            .setStyle('PRIMARY')
+            .setDisabled(true)
+        );
+        await i.update({
+          content: '`✅` workout daily saved.',
+          components: [row],
+        });
+      } else {
+        const row = new MessageActionRow().addComponents(
+          new MessageButton()
+            .setCustomId(
+              'workout_reject_deactive#'
+              // workout.email +
+              // '#' +
+              // workout._id +
+              // '#' +
+              // workout.channelId +
+              // '#' +
+              // message.author.id
+            )
+            .setLabel('REJECTED❌')
+            .setStyle('DANGER')
+            .setDisabled(true)
+        );
+
+        await i.update({
+          content: '`✅` workout daily saved.',
+          components: [row],
+        });
+      }
+      return;
+    });
   } else {
     interaction
       .reply({
         content: 'You do not have permission to execute this workout',
         ephemeral: true,
+        fetchReply: true,
       })
       .catch((err) => {
         sendErrorToDevTest(client, authorId, err);

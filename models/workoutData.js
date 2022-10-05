@@ -4,7 +4,7 @@ const workoutDb = new mongoose.Schema({
   userId: { type: String, required: true },
   email: { type: String, required: true },
   attachment: { type: Boolean, defaul: false },
-  status: { type: Boolean, defaul: false },
+  status: { type: String, required: true },
   createdTimestamp: { type: mongoose.Decimal128, required: true },
   channelId: { type: String, required: true },
 });
