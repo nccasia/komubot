@@ -147,11 +147,11 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         } else {
-          const guild = await client.guilds.fetch('1019615919204483072');
+          const guild = await client.guilds.fetch('921239248991055882');
           const getAllVoice = client.channels.cache.filter(
             (guild) =>
               guild.type === 'GUILD_VOICE' &&
-              guild.parentId === '1024971003580928000'
+              guild.parentId === '921239248991055884'
           );
           const voiceChannel = getAllVoice.map((item) => item.id);
 

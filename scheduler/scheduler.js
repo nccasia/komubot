@@ -801,10 +801,10 @@ async function sendQuiz(client) {
 
 async function tagMeeting(client) {
   // if (await checkHoliday()) return;
-  const guild = client.guilds.fetch('1019615919204483072');
+  const guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
-      guild.type === 'GUILD_VOICE' && guild.parentId === '1019615919204483074'
+      guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
   );
   const repeatMeet = await meetingData.find({
     cancel: { $ne: true },
@@ -1309,17 +1309,17 @@ async function checkJoinCall(client) {
   );
 }
 async function turnOffBot(client) {
-  const fetchVoiceNcc8 = await client.channels.fetch('1019615919204483072');
+  const fetchVoiceNcc8 = await client.channels.fetch('921239248991055882');
   const target = await fetchVoiceNcc8.guild.members.fetch('922003239887581205');
   target.voice.disconnect().catch(console.error);
 }
 
 async function kickMemberVoiceChannel(client) {
   if (await checkHoliday()) return;
-  const guild = client.guilds.fetch('1019615919204483072');
+  const guild = client.guilds.fetch('921239248991055882');
   const getAllVoice = client.channels.cache.filter(
     (guild) =>
-      guild.type === 'GUILD_VOICE' && guild.parentId === '1019615919204483072'
+      guild.type === 'GUILD_VOICE' && guild.parentId === '921239248991055884'
   );
   const voiceChannel = getAllVoice.map((item) => item.id);
 
@@ -1455,7 +1455,7 @@ async function dating(client) {
 
     if (!checkUserMan || !checkUserWoman) return;
 
-    const guild = client.guilds.fetch('1019615919204483072');
+    const guild = client.guilds.fetch('921239248991055882');
     const getAllVoice = client.channels.cache.filter(
       (guild) =>
         guild.type === 'GUILD_VOICE' && guild.parentId === '1024971003580928000'
@@ -1613,7 +1613,7 @@ async function dating(client) {
       }
     });
 
-    const fetchGuild = client.guilds.fetch('1019615919204483072');
+    const fetchGuild = client.guilds.fetch('921239248991055882');
     const getAllVoicePrivate = client.channels.cache.filter(
       (guild) =>
         guild.type === 'GUILD_VOICE' && guild.parentId === '1024971003580928000'
