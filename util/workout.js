@@ -18,8 +18,7 @@ const workout = async (interaction, client) => {
   if (
     checkRole.length > 0 ||
     interaction.user.id === '921261168088190997' ||
-    interaction.user.id === '868040521136873503' ||
-    interaction.user.id === '922148445626716182'
+    interaction.user.id === '868040521136873503'
   ) {
     if (
       arrIds.length > 2 &&
