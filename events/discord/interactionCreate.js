@@ -13,6 +13,7 @@ const {
   sendMessageToNhaCuaChung,
   sendErrorToDevTest,
 } = require('../../util/komubotrest');
+const workout = require('../../util/workout.js');
 const newEmbed = (message, color) =>
   new MessageEmbed().setTitle(message).setColor(color);
 
@@ -23,6 +24,10 @@ module.exports = {
       if (interaction.customId.startsWith('komu_')) {
         await wfh(interaction, client).catch(console.error);
         console.log(interaction, 'interaction wfh');
+        return;
+      }
+      if (interaction.customId.startsWith('workout_')) {
+        await workout(interaction, client).catch(console.error);
         return;
       }
       if (interaction.customId.startsWith('question_')) {
