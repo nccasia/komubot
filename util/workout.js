@@ -42,7 +42,7 @@ const workout = async (interaction, client) => {
       if (!workoutDb.status) {
         interaction
           .reply({
-            content: 'You have already complained.',
+            content: 'You have already rejected.',
             ephemeral: true,
           })
           .catch((err) => {
@@ -58,7 +58,7 @@ const workout = async (interaction, client) => {
           .reply({ content: '`User is not valid`', ephemeral: true })
           .catch(console.error);
       }
-      const message = `${interaction.user.username} just rejected workout reject from ${labelImageEmail}`;
+      const message = `${interaction.user.username} just confirmed workout reject from ${labelImageEmail}`;
 
       await client.channels.cache
         .get(arrIds[3])
@@ -75,7 +75,7 @@ const workout = async (interaction, client) => {
 
       await interaction
         .reply({
-          content: `You just rejected workout reject for ${labelImageEmail}`,
+          content: `You just confirmed workout reject for ${labelImageEmail}`,
           ephemeral: true,
         })
         .catch(console.error);
@@ -102,7 +102,7 @@ const workout = async (interaction, client) => {
         if (workoutDb.status) {
           interaction
             .reply({
-              content: 'You have already complained.',
+              content: 'You have already approved.',
               ephemeral: true,
             })
             .catch((err) => {
@@ -118,7 +118,7 @@ const workout = async (interaction, client) => {
             .reply({ content: '`User is not valid`', ephemeral: true })
             .catch(console.error);
         }
-        const message = `${interaction.user.username} just confirmed workout complain from ${labelImageEmail}`;
+        const message = `${interaction.user.username} just confirmed workout approve from ${labelImageEmail}`;
         await workoutData
           .updateOne(
             { _id: workourid },
@@ -133,7 +133,7 @@ const workout = async (interaction, client) => {
           .catch(console.error);
         await interaction
           .reply({
-            content: `You just confirmed workout complain for ${labelImageEmail}`,
+            content: `You just confirmed workout approve for ${labelImageEmail}`,
             ephemeral: true,
           })
           .catch(console.error);

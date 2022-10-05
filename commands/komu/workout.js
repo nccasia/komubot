@@ -59,7 +59,7 @@ module.exports = {
                   $gte: firstDay.getTime(),
                   $lte: lastDay.getTime(),
                 },
-                status: false,
+                status: true,
               },
             },
             {
@@ -89,7 +89,7 @@ module.exports = {
             Array.isArray(userCheckWorkout) &&
             userCheckWorkout.length === 0
           ) {
-            mess = '```' + 'Không có ai vi phạm trong tháng' + '```';
+            mess = '```' + 'No one workout this month' + '```';
             return message.reply(mess).catch((err) => {
               sendErrorToDevTest(client, m, err);
             });
@@ -107,7 +107,7 @@ module.exports = {
                 .map((item) => `${item.email} (${item.total})`)
                 .join('\n');
               const Embed = new MessageEmbed()
-                .setTitle('Những người không workout trong tháng')
+                .setTitle('People who workout this month')
                 .setColor('RED')
                 .setDescription(`${mess}`);
               await message.reply({ embeds: [Embed] }).catch((err) => {
@@ -182,7 +182,7 @@ module.exports = {
             });
           }
         } else {
-          message.reply('Vui lòng gửi tệp đính kèm').catch(console.error);
+          message.reply('Please send the file attachment').catch(console.error);
         }
       }
     } catch (err) {
