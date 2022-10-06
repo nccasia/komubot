@@ -66,7 +66,7 @@ const workout = async (interaction, client) => {
           })
           .catch(console.error);
       }
-      const message = `${interaction.user.username} just confirmed workout reject from ${labelImageEmail}`;
+      const message = `${interaction.user.username} just rejected workout from ${labelImageEmail}`;
 
       await client.channels.cache
         .get(arrIds[3])
@@ -128,7 +128,7 @@ const workout = async (interaction, client) => {
             })
             .catch(console.error);
         }
-        const message = `${interaction.user.username} just confirmed workout approve from ${labelImageEmail}`;
+        const message = `${interaction.user.username} just approved workout from ${labelImageEmail}`;
         await workoutData
           .updateOne(
             { _id: workourid },
