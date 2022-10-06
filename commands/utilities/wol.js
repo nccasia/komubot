@@ -68,6 +68,9 @@ function sendCMDToPfsense(branch, identity, ipAddress) {
     case 'hn2':
       host = '10.10.40.1';
       break;
+    case 'hn3':
+      host = '10.10.70.1';
+      break;
     case 'dn':
       host = '10.10.30.1';
       break;

@@ -31,8 +31,20 @@ const channelData = require('../models/channelData');
 const msgData = require('../models/msgData');
 // Deepai
 const deepai = require('deepai');
+const workoutData = require('../models/workoutData');
 const API_KEY_DEEPAI = '9763204a-9c9a-4657-b393-5bbf4010217d';
 deepai.setApiKey(API_KEY_DEEPAI);
+
+function groupBy(arr, criteria) {
+  const newObj = arr.reduce(function (acc, currentValue) {
+    if (!acc[currentValue[criteria]]) {
+      acc[currentValue[criteria]] = [];
+    }
+    acc[currentValue[criteria]].push(currentValue);
+    return acc;
+  }, {});
+  return newObj;
+}
 
 function setTime(date, hours, minute, second, msValue) {
   return date.setHours(hours, minute, second, msValue);
@@ -2168,6 +2180,67 @@ async function sendMessagePMs(client) {
     .catch(console.error);
 }
 
+async function sendReportWorkout(client) {
+  const date = new Date();
+  const y = date.getFullYear();
+  const m = date.getMonth();
+  const firstDay = new Date(y, m - 1, 1);
+  const lastDay = new Date(y, m, 0);
+
+  const userCheckWorkout = await workoutData.aggregate([
+    {
+      $match: {
+        createdTimestamp: {
+          $gte: firstDay.getTime(),
+          $lte: lastDay.getTime(),
+        },
+        status: 'approve',
+      },
+    },
+    {
+      $group: {
+        _id: {
+          channelId: '$channelId',
+          userId: '$userId',
+        },
+        total: { $sum: 1 },
+        email: { $first: '$email' },
+        channelId: { $first: '$channelId' },
+        userId: { $first: '$userId' },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        total: 1,
+        email: 1,
+        channelId: 1,
+        userId: 1,
+      },
+    },
+  ]);
+
+  let mess;
+  const data = groupBy(userCheckWorkout, 'channelId');
+  Object.keys(data).forEach(async function (item) {
+    for (let i = 0; i <= Math.ceil(userCheckWorkout.length / 50); i += 1) {
+      if (userCheckWorkout.slice(i * 50, (i + 1) * 50).length === 0) {
+        break;
+      }
+      mess = data[item]
+        .slice(i * 50, (i + 1) * 50)
+        .map((list) => `${list.email} (${list.total})`)
+        .join('\n');
+      const Embed = new MessageEmbed()
+        .setTitle('Top workout')
+        .setColor('RED')
+        .setDescription(`${mess}`);
+      const userDiscord = await client.channels.fetch(item);
+      userDiscord.send({ embeds: [Embed] }).catch(console.error);
+    }
+  });
+}
+
 function cronJobOneMinute(client) {
   sendMesageRemind(client);
   kickMemberVoiceChannel(client);
@@ -2176,6 +2249,27 @@ function cronJobOneMinute(client) {
 
 exports.scheduler = {
   run(client) {
+    new cron.CronJob(
+      '0 0 1 * *',
+      () => sendReportWorkout(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '00 15 * * 2',
+      () => sendMessagePMs(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
+    new cron.CronJob(
+      '00 18 * * 1-5',
+      () => remindCheckout(client),
+      null,
+      false,
+      'Asia/Ho_Chi_Minh'
+    ).start();
     // new cron.CronJob(
     //   '00 15 * * 2',
     //   () => sendMessagePMs(client),
