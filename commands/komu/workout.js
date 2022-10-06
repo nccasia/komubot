@@ -188,7 +188,7 @@ module.exports = {
               .catch();
 
             const collector = workoutButton.createMessageComponentCollector({
-              time: 15000,
+              time: 10800000,
               max: 10,
             });
 
