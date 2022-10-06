@@ -30,7 +30,7 @@ const wfh = async (interaction, client) => {
       interaction
         .reply({ content: 'Thanks!!!', ephemeral: true })
         .catch((err) => {
-          sendErrorToDevTest(client, authorId, err);
+          sendErrorToDevTest(client, interaction.user.id, err);
         });
       return;
     }
@@ -42,7 +42,7 @@ const wfh = async (interaction, client) => {
         interaction
           .reply({ content: 'No WFH found', ephemeral: true })
           .catch((err) => {
-            sendErrorToDevTest(client, authorId, err);
+            sendErrorToDevTest(client, interaction.user.id, err);
           });
         return;
       }
@@ -54,7 +54,7 @@ const wfh = async (interaction, client) => {
             ephemeral: true,
           })
           .catch((err) => {
-            sendErrorToDevTest(client, authorId, err);
+            sendErrorToDevTest(client, interaction.user.id, err);
           });
         return;
       }
@@ -66,7 +66,7 @@ const wfh = async (interaction, client) => {
             ephemeral: true,
           })
           .catch((err) => {
-            sendErrorToDevTest(client, authorId, err);
+            sendErrorToDevTest(client, interaction.user.id, err);
           });
         return;
       }
