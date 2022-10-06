@@ -187,22 +187,22 @@ module.exports = {
               })
               .catch();
 
-            const checkRole = await userData.find({
-              id: message.author.id,
-              deactive: { $ne: true },
-              $or: [{ roles_discord: { $all: ['HR'] } }],
+            const collector = workoutButton.createMessageComponentCollector({
+              time: 15000,
+              max: 10,
             });
-            if (
-              checkRole.length > 0 ||
-              message.author.id === '921261168088190997' ||
-              message.author.id === '868040521136873503'
-            ) {
-              const collector = workoutButton.createMessageComponentCollector({
-                time: 15000,
-                max: 1,
-              });
 
-              collector.on('collect', async (i) => {
+            collector.on('collect', async (i) => {
+              const checkRole = await userData.find({
+                id: i.user,
+                deactive: { $ne: true },
+                $or: [{ roles_discord: { $all: ['HR'] } }],
+              });
+              if (
+                checkRole.length > 0 ||
+                i.user.id === '921261168088190997' ||
+                i.user.id === '868040521136873503'
+              ) {
                 const iCollect = i.customId.split('#');
                 if (iCollect[0] === 'workout_approve') {
                   const row = new MessageActionRow().addComponents(
@@ -231,19 +231,8 @@ module.exports = {
                   });
                 }
                 return;
-              });
-            } else {
-              message
-                .reply({
-                  content: 'You do not have permission to execute this workout',
-                  ephemeral: true,
-                  fetchReply: true,
-                })
-                .catch((err) => {
-                  sendErrorToDevTest(client, authorId, err);
-                });
-              return;
-            }
+              }
+            });
           }
         } else {
           message.reply('Please send the file attachment').catch(console.error);
