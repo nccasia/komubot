@@ -47,28 +47,52 @@ function formatDate(date) {
 }
 
 function getLastDayOfMonth(year, month, dayOfWeek, h, m) {
-  const d = new Date(year, month + 1, 0);
+  const d = new Date(year, month + 1);
   d.setDate(d.getDate() - d.getDay() - (7 - dayOfWeek)).toString();
   d.setTime(d.getTime() + h * 60 * 60 * 1000 + m * 60 * 1000);
-
-  console.log('get day', d);
+  console.log('get d', d);
   return d;
 }
 
 function getLastWeekDay(dayOfWeek, h, m) {
   const getYearNow = new Date().getFullYear();
   const getMonthNow = new Date().getMonth();
-  let arrDayOfWeek = getLastDayOfMonth(
+  const arrDayOfWeek = getLastDayOfMonth(
     getYearNow,
     getMonthNow,
     dayOfWeek,
     h,
     m
   );
-
-  console.log('get arrDayOfWeek', arrDayOfWeek);
+  console.log('arrDayOfWeek', arrDayOfWeek);
   return arrDayOfWeek;
 }
+
+// function getFirstWeekDay(dayOfWeek, h, m) {
+//   const getYearNow = new Date().getFullYear();
+//   const getMonthNow = new Date().getMonth();
+//   let arrDayOfWeek = getFirstDayOfMonth(
+//     getYearNow,
+//     getMonthNow,
+//     dayOfWeek,
+//     h,
+//     m
+//   );
+// }
+
+// function getFirstDayOfMonth(year, month, dayOfWeek, h, m) {
+//   let d = new Date(year, month, 1);
+//   const curdate = new Date();
+//   d.setDate((7 + dayOfWeek + 1 - d.getDay()) % 7);
+//   d.setTime(d.getTime() + h * 60 * 60 * 1000 + m * 60 * 1000);
+//   if (d < curdate) {
+//     d = new Date(year, month + 1, 1);
+//     d.setDate((7 + dayOfWeek - d.getDay()) % 7);
+//     return d;
+//   } else {
+//     return d;
+//   }
+// }
 
 module.exports = {
   name: 'meeting',
@@ -352,24 +376,24 @@ module.exports = {
       } else {
         const task = args.slice(0, 1).join(' ');
         const datetime = args.slice(1, 3).join(' ');
-        console.log('datetime', datetime);
-        const getDatetime = args.slice(1, 2).join(' ');
-        const getTime = args.slice(2, 3).toString();
-        const timef = getTime.split(':');
-        console.log('timef', timef);
-        // const getTime = getTime.split(':');
-        // console.log('arrTime', arrTime);
-        console.log('getTime', getTime);
+
         let repeat = args.slice(3, 4).join(' ');
         const repeatTime = args.slice(4, args.length).join(' ');
         const checkDate = args.slice(1, 2).join(' ');
         const checkTime = args.slice(2, 3).join(' ');
+
+        const getDatetime = args.slice(1, 2).join(' ');
+        const getTime = args.slice(2, 3).toString();
+        const getOption = args.slice(4, 5).join(' ');
+        console.log('getOption', getOption);
+        const timef = getTime.split(':');
         const monthly = args.slice(3, 4).join('');
+        console.log('monthly', monthly);
         if (
           !/^(((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((19|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((19|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((19|[2-9]\d)\d{2}))|(29\/02\/((1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|(([1][26]|[2468][048]|[3579][26])00))))$/.test(
             checkDate
           ) &&
-          monthly != 'monthly'
+          monthly.includes('monthly') === false
         ) {
           return message
             .reply({ content: messHelp, ephemeral: true })
@@ -394,22 +418,14 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         }
-
-        const day = datetime.slice(0, 2);
-        const month = datetime.slice(3, 5);
-        const year = datetime.slice(6);
-        const format = `${month}/${day}/${year}`;
         if (getDatetime.length == 1) {
           const hour = Number(timef[0]);
           const min = Number(timef[1]);
           const date = Number(getLastWeekDay(getDatetime, hour, min));
-          console.log('date:', Number(date));
+          console.log('Date', date);
           const dateObject = new Date(date);
-          console.log('dateObject: ', dateObject);
+          console.log('dateObject', dateObject);
           const timestamp = dateObject.getTime();
-          console.log('timestamp: ', timestamp);
-          // const dateObject = new Date(date);
-          // const dateTime = dateObject.getTime();
           const response = await meetingData({
             channelId: channel_id,
             task: task,
@@ -423,10 +439,13 @@ module.exports = {
               sendErrorToDevTest(client, authorId, err);
             });
         } else {
+          const day = datetime.slice(0, 2);
+          const month = datetime.slice(3, 5);
+          const year = datetime.slice(6);
+          const format = `${month}/${day}/${year}`;
           const dateObject = new Date(format);
           console.log('dateObject: ', dateObject);
           const timestamp = dateObject.getTime();
-
           const response = await meetingData({
             channelId: channel_id,
             task: task,
