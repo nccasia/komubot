@@ -81,68 +81,6 @@ const workout = async (interaction, client) => {
         )
         .catch(console.error);
       return;
-    } else if (
-      arrIds.length > 2 &&
-      arrIds[0] == 'workout_approve' &&
-      // labelImageId == interaction.user.id &&
-      authorId == client.user.id
-    ) {
-      if (arrIds.length === 5) {
-        const workoutDb = await workoutData
-          .findOne({ _id: workourid })
-          .catch(console.error);
-        if (!workoutDb) {
-          interaction
-            .reply({
-              content: 'No workout found',
-              ephemeral: true,
-              fetchReply: true,
-            })
-            .catch((err) => {
-              sendErrorToDevTest(client, authorId, err);
-            });
-          return;
-        }
-
-        if (workoutDb.status === 'approve') {
-          interaction
-            .reply({
-              content: 'You have already approved.',
-              ephemeral: true,
-              fetchReply: true,
-            })
-            .catch((err) => {
-              sendErrorToDevTest(client, authorId, err);
-            });
-          return;
-        }
-        const userdb = await userData
-          .findOne({ id: labelImageId, deactive: { $ne: true } })
-          .catch(console.error);
-        if (!userdb) {
-          return interaction
-            .reply({
-              content: '`User is not valid`',
-              ephemeral: true,
-              fetchReply: true,
-            })
-            .catch(console.error);
-        }
-        const message = `${interaction.user.username} just approved workout from ${labelImageEmail}`;
-        await workoutData
-          .updateOne(
-            { _id: workourid },
-            {
-              status: 'approve',
-            }
-          )
-          .catch(console.error);
-        await client.channels.cache
-          .get(arrIds[3])
-          .send(message)
-          .catch(console.error);
-      }
-      return;
     }
   } else {
     interaction

@@ -144,26 +144,13 @@ module.exports = {
                   : message.author.username,
               createdTimestamp: Date.now(),
               attachment: true,
-              status: 'pending',
+              status: 'approve',
               channelId: message.channel.id,
             })
               .save()
               .catch((err) => console.log(err));
 
             const row = new MessageActionRow().addComponents(
-              new MessageButton()
-                .setCustomId(
-                  'workout_approve#' +
-                    workout.email +
-                    '#' +
-                    workout._id +
-                    '#' +
-                    workout.channelId +
-                    '#' +
-                    message.author.id
-                )
-                .setLabel('APPROVE')
-                .setStyle('PRIMARY'),
               new MessageButton()
                 .setCustomId(
                   'workout_reject#' +
@@ -188,7 +175,7 @@ module.exports = {
               .catch();
 
             const collector = workoutButton.createMessageComponentCollector({
-              time: 10800000,
+              time: 43200000,
               max: 10,
             });
 
@@ -204,19 +191,7 @@ module.exports = {
                 i.user.id === '868040521136873503'
               ) {
                 const iCollect = i.customId.split('#');
-                if (iCollect[0] === 'workout_approve') {
-                  const row = new MessageActionRow().addComponents(
-                    new MessageButton()
-                      .setCustomId('workout_approve_deactive#')
-                      .setLabel('APPROVED ✅')
-                      .setStyle('PRIMARY')
-                      .setDisabled(true)
-                  );
-                  await i.update({
-                    content: '`✅` workout daily saved.',
-                    components: [row],
-                  });
-                } else {
+                if (iCollect[0] === 'workout_reject') {
                   const row = new MessageActionRow().addComponents(
                     new MessageButton()
                       .setCustomId('workout_reject_deactive#')
