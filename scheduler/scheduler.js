@@ -149,12 +149,9 @@ function getTimeToDay() {
   };
 }
 
-
-
-
 function checkTimeMeeting() {
   const dateTimeNow = new Date();
-  dateTimeNow.setHours(dateTimeNow.getHours());
+  dateTimeNow.setHours(dateTimeNow.getHours() + 7);
   const day = dateTimeNow.getDay();
   const hourDateNow = dateTimeNow.getHours();
   const dateNow = dateTimeNow.toLocaleDateString('en-US');
@@ -285,9 +282,6 @@ function formatDateTimeReminder(date) {
 
   return `${d} ${t}`;
 }
-
-
-
 
 async function sendMessageReminder(
   client,
@@ -868,343 +862,343 @@ async function tagMeeting(client) {
           currentDate.setDate(today.getDate());
           currentDate.setMonth(today.getMonth());
           switch (item.repeat) {
-          case 'once':
-            if (
-              isSameDate(dateCreatedTimestamp) &&
+            case 'once':
+              if (
+                isSameDate(dateCreatedTimestamp) &&
                 isSameMinute(minuteDb, dateScheduler)
-            ) {
-              const onceFetchChannel = await client.channels.fetch(
-                item.channelId
-              );
-              if (roomVoice.length !== 0) {
-                onceFetchChannel
-                  .send(`@here our meeting room is <#${roomVoice[0]}>`)
-                  .catch(console.error);
-                const onceShift = roomVoice.shift(roomVoice[0]);
-                const channelNameOnce = await client.channels.fetch(
-                  onceShift
+              ) {
+                const onceFetchChannel = await client.channels.fetch(
+                  item.channelId
                 );
-                let originalNameOnce = channelNameOnce.name;
-                const searchTermOnce = '(';
-                const indexOfFirstOnce =
+                if (roomVoice.length !== 0) {
+                  onceFetchChannel
+                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                    .catch(console.error);
+                  const onceShift = roomVoice.shift(roomVoice[0]);
+                  const channelNameOnce = await client.channels.fetch(
+                    onceShift
+                  );
+                  let originalNameOnce = channelNameOnce.name;
+                  const searchTermOnce = '(';
+                  const indexOfFirstOnce =
                     originalNameOnce.indexOf(searchTermOnce);
-                if (indexOfFirstOnce > 0) {
-                  originalNameOnce = originalNameOnce.slice(
-                    0,
-                    indexOfFirstOnce - 1
-                  );
-                  await channelNameOnce.setName(
-                    `${originalNameOnce} (${item.task})`
-                  );
+                  if (indexOfFirstOnce > 0) {
+                    originalNameOnce = originalNameOnce.slice(
+                      0,
+                      indexOfFirstOnce - 1
+                    );
+                    await channelNameOnce.setName(
+                      `${originalNameOnce} (${item.task})`
+                    );
+                  } else {
+                    await channelNameOnce.setName(
+                      `${channelNameOnce.name} (${item.task})`
+                    );
+                  }
+                  const newRoomOnce = channelNameOnce.name;
+                  await new voiceChannelData({
+                    id: channelNameOnce.id,
+                    originalName: originalNameOnce,
+                    newRoomName: newRoomOnce,
+                    createdTimestamp: Date.now(),
+                  })
+                    .save()
+                    .catch((err) => console.log(err));
                 } else {
-                  await channelNameOnce.setName(
-                    `${channelNameOnce.name} (${item.task})`
-                  );
+                  await onceFetchChannel
+                    .send('@here voice channel full')
+                    .catch(console.error);
                 }
-                const newRoomOnce = channelNameOnce.name;
-                await new voiceChannelData({
-                  id: channelNameOnce.id,
-                  originalName: originalNameOnce,
-                  newRoomName: newRoomOnce,
-                  createdTimestamp: Date.now(),
-                })
-                  .save()
-                  .catch((err) => console.log(err));
-              } else {
-                await onceFetchChannel
-                  .send('@here voice channel full')
-                  .catch(console.error);
+                await meetingData
+                  .updateOne({ _id: item._id }, { reminder: true })
+                  .catch((err) => console.log('updateone error once', err));
               }
-              await meetingData
-                .updateOne({ _id: item._id }, { reminder: true })
-                .catch((err) => console.log('updateone error once', err));
-            }
-            return;
-          case 'daily':
-            if (isSameDay()) return;
-            if (isSameMinute(minuteDb, dateScheduler)) {
-              const dailyFetchChannel = await client.channels.fetch(
-                item.channelId
-              );
-              if (roomVoice.length !== 0) {
-                dailyFetchChannel
-                  .send(`@here our meeting room is <#${roomVoice[0]}>`)
-                  .catch(console.error);
-                const dailyShift = roomVoice.shift(roomVoice[0]);
-                const channelNameDaily = await client.channels.fetch(
-                  dailyShift
+              return;
+            case 'daily':
+              if (isSameDay()) return;
+              if (isSameMinute(minuteDb, dateScheduler)) {
+                const dailyFetchChannel = await client.channels.fetch(
+                  item.channelId
                 );
-                let originalNameDaily = channelNameDaily.name;
-                const searchTermDaily = '(';
-                const indexOfFirstDaily =
+                if (roomVoice.length !== 0) {
+                  dailyFetchChannel
+                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                    .catch(console.error);
+                  const dailyShift = roomVoice.shift(roomVoice[0]);
+                  const channelNameDaily = await client.channels.fetch(
+                    dailyShift
+                  );
+                  let originalNameDaily = channelNameDaily.name;
+                  const searchTermDaily = '(';
+                  const indexOfFirstDaily =
                     originalNameDaily.indexOf(searchTermDaily);
-                if (indexOfFirstDaily > 0) {
-                  originalNameDaily = originalNameDaily.slice(
-                    0,
-                    indexOfFirstDaily - 1
-                  );
-                  await channelNameDaily.setName(
-                    `${originalNameDaily} (${item.task})`
+                  if (indexOfFirstDaily > 0) {
+                    originalNameDaily = originalNameDaily.slice(
+                      0,
+                      indexOfFirstDaily - 1
+                    );
+                    await channelNameDaily.setName(
+                      `${originalNameDaily} (${item.task})`
+                    );
+                  } else {
+                    await channelNameDaily.setName(
+                      `${channelNameDaily.name} (${item.task})`
+                    );
+                  }
+                  const newRoomDaily = channelNameDaily.name;
+                  await new voiceChannelData({
+                    id: channelNameDaily.id,
+                    originalName: originalNameDaily,
+                    newRoomName: newRoomDaily,
+                    createdTimestamp: Date.now(),
+                  })
+                    .save()
+                    .catch((err) => console.log(err));
+                  console.log(
+                    `wait for update ${item.task} daily ${item.channelId}`
                   );
                 } else {
-                  await channelNameDaily.setName(
-                    `${channelNameDaily.name} (${item.task})`
-                  );
+                  await dailyFetchChannel
+                    .send('@here voice channel full')
+                    .catch(console.error);
                 }
-                const newRoomDaily = channelNameDaily.name;
-                await new voiceChannelData({
-                  id: channelNameDaily.id,
-                  originalName: originalNameDaily,
-                  newRoomName: newRoomDaily,
-                  createdTimestamp: Date.now(),
-                })
-                  .save()
-                  .catch((err) => console.log(err));
-                console.log(
-                  `wait for update ${item.task} daily ${item.channelId}`
-                );
-              } else {
-                await dailyFetchChannel
-                  .send('@here voice channel full')
-                  .catch(console.error);
-              }
 
-              let newCreatedTimestamp = item.createdTimestamp;
-              newCreatedTimestamp = currentDate.setDate(
-                currentDate.getDate() + 1
-              );
-
-              while (await checkHolidayMeeting(currentDate)) {
+                let newCreatedTimestamp = item.createdTimestamp;
                 newCreatedTimestamp = currentDate.setDate(
                   currentDate.getDate() + 1
                 );
-              }
-              await meetingData
-                .updateOne(
-                  { _id: item._id },
-                  { reminder: true, createdTimestamp: newCreatedTimestamp }
-                )
-                .catch((err) => console.log('updateone error daily', err));
 
-              const findMeetingAfter = await meetingData.find({
-                channelId: item.channelId,
-                task: item.task,
-                repeat: item.repeat,
-              });
-              console.log(findMeetingAfter, 'findMeetingAfterUpdate');
-            }
-            return;
-          case 'weekly':
-            if (
-              isSameMinute(minuteDb, dateScheduler) &&
-                isDiffDay(dateScheduler, 7) &&
-                isTimeDay(dateScheduler)
-            ) {
-              const weeklyFetchChannel = await client.channels.fetch(
-                item.channelId
-              );
-              if (roomVoice.length !== 0) {
-                weeklyFetchChannel
-                  .send(`@here our meeting room is <#${roomVoice[0]}>`)
-                  .catch(console.error);
-                const weeklyShift = roomVoice.shift(roomVoice[0]);
-                const channelNameWeekly = await client.channels.fetch(
-                  weeklyShift
-                );
-                let originalNameWeekly = channelNameWeekly.name;
-                const searchTermWeekly = '(';
-                const indexOfFirstWeekly =
-                    originalNameWeekly.indexOf(searchTermWeekly);
-                if (indexOfFirstWeekly > 0) {
-                  originalNameWeekly = originalNameWeekly.slice(
-                    0,
-                    indexOfFirstWeekly - 1
-                  );
-                  await channelNameWeekly.setName(
-                    `${originalNameWeekly} (${item.task})`
-                  );
-                } else {
-                  await channelNameWeekly.setName(
-                    `${channelNameWeekly.name} (${item.task})`
+                while (await checkHolidayMeeting(currentDate)) {
+                  newCreatedTimestamp = currentDate.setDate(
+                    currentDate.getDate() + 1
                   );
                 }
-                const newRoomWeekly = channelNameWeekly.name;
-                await new voiceChannelData({
-                  id: channelNameWeekly.id,
-                  originalName: originalNameWeekly,
-                  newRoomName: newRoomWeekly,
-                  createdTimestamp: Date.now(),
-                })
-                  .save()
-                  .catch((err) => console.log(err));
-              } else {
-                await weeklyFetchChannel
-                  .send('@here voice channel full')
-                  .catch(console.error);
+                await meetingData
+                  .updateOne(
+                    { _id: item._id },
+                    { reminder: true, createdTimestamp: newCreatedTimestamp }
+                  )
+                  .catch((err) => console.log('updateone error daily', err));
+
+                const findMeetingAfter = await meetingData.find({
+                  channelId: item.channelId,
+                  task: item.task,
+                  repeat: item.repeat,
+                });
+                console.log(findMeetingAfter, 'findMeetingAfterUpdate');
               }
-              let newCreatedTimestampWeekly = item.createdTimestamp;
-              newCreatedTimestampWeekly = currentDate.setDate(
-                currentDate.getDate() + 7
-              );
-              while (await checkHolidayMeeting(currentDate)) {
+              return;
+            case 'weekly':
+              if (
+                isSameMinute(minuteDb, dateScheduler) &&
+                isDiffDay(dateScheduler, 7) &&
+                isTimeDay(dateScheduler)
+              ) {
+                const weeklyFetchChannel = await client.channels.fetch(
+                  item.channelId
+                );
+                if (roomVoice.length !== 0) {
+                  weeklyFetchChannel
+                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                    .catch(console.error);
+                  const weeklyShift = roomVoice.shift(roomVoice[0]);
+                  const channelNameWeekly = await client.channels.fetch(
+                    weeklyShift
+                  );
+                  let originalNameWeekly = channelNameWeekly.name;
+                  const searchTermWeekly = '(';
+                  const indexOfFirstWeekly =
+                    originalNameWeekly.indexOf(searchTermWeekly);
+                  if (indexOfFirstWeekly > 0) {
+                    originalNameWeekly = originalNameWeekly.slice(
+                      0,
+                      indexOfFirstWeekly - 1
+                    );
+                    await channelNameWeekly.setName(
+                      `${originalNameWeekly} (${item.task})`
+                    );
+                  } else {
+                    await channelNameWeekly.setName(
+                      `${channelNameWeekly.name} (${item.task})`
+                    );
+                  }
+                  const newRoomWeekly = channelNameWeekly.name;
+                  await new voiceChannelData({
+                    id: channelNameWeekly.id,
+                    originalName: originalNameWeekly,
+                    newRoomName: newRoomWeekly,
+                    createdTimestamp: Date.now(),
+                  })
+                    .save()
+                    .catch((err) => console.log(err));
+                } else {
+                  await weeklyFetchChannel
+                    .send('@here voice channel full')
+                    .catch(console.error);
+                }
+                let newCreatedTimestampWeekly = item.createdTimestamp;
                 newCreatedTimestampWeekly = currentDate.setDate(
                   currentDate.getDate() + 7
                 );
-              }
-
-              await meetingData
-                .updateOne(
-                  { _id: item._id },
-                  {
-                    reminder: true,
-                    createdTimestamp: newCreatedTimestampWeekly,
-                  }
-                )
-                .catch((err) => console.log('updateone error weekly', err));
-            }
-            return;
-          case 'monthly':
-            if (
-              isSameMinute(minuteDb, dateScheduler) &&
-                isDiffDay(dateScheduler, 30) &&
-                isTimeDay(dateScheduler)
-            ) {
-              const monthlyFetchChannel = await client.channels.fetch(
-                item.channelId
-              );
-              if (roomVoice.length !== 0) {
-                monthlyFetchChannel
-                  .send(`@here our meeting room is <#${roomVoice[0]}>`)
-                  .catch(console.error);
-                const monthlyShift = roomVoice.shift(roomVoice[0]);
-                const channelNameMonthly = await client.channels.fetch(
-                  monthlyShift
-                );
-                let originalNameMonthly = channelNameMonthly.name;
-                const searchTermMonthly = '(';
-                const indexOfFirstMonthly =
-                    originalNameMonthly.indexOf(searchTermMonthly);
-                if (indexOfFirstMonthly > 0) {
-                  originalNameMonthly = originalNameMonthly.slice(
-                    0,
-                    indexOfFirstMonthly - 1
-                  );
-                  await channelNameMonthly.setName(
-                    `${originalNameMonthly} (${item.task})`
-                  );
-                } else {
-                  await channelNameMonthly.setName(
-                    `${channelNameMonthly.name} (${item.task})`
+                while (await checkHolidayMeeting(currentDate)) {
+                  newCreatedTimestampWeekly = currentDate.setDate(
+                    currentDate.getDate() + 7
                   );
                 }
-                const newRoomMonthly = channelNameMonthly.name;
-                await new voiceChannelData({
-                  id: channelNameMonthly.id,
-                  originalName: originalNameMonthly,
-                  newRoomName: newRoomMonthly,
-                  createdTimestamp: Date.now(),
-                })
-                  .save()
-                  .catch((err) => console.log(err));
-              } else {
-                await monthlyFetchChannel
-                  .send('@here voice channel full')
-                  .catch(console.error);
-              }
-              let newCreatedTimestampMonthly = Number(item.createdTimestamp);
 
-              newCreatedTimestampMonthly = currentDate.setMonth(
-                currentDate.getMonth() + 1
-              );
-              while (await checkHolidayMeeting(currentDate)) {
+                await meetingData
+                  .updateOne(
+                    { _id: item._id },
+                    {
+                      reminder: true,
+                      createdTimestamp: newCreatedTimestampWeekly,
+                    }
+                  )
+                  .catch((err) => console.log('updateone error weekly', err));
+              }
+              return;
+            case 'monthly':
+              if (
+                isSameMinute(minuteDb, dateScheduler) &&
+                isDiffDay(dateScheduler, 30) &&
+                isTimeDay(dateScheduler)
+              ) {
+                const monthlyFetchChannel = await client.channels.fetch(
+                  item.channelId
+                );
+                if (roomVoice.length !== 0) {
+                  monthlyFetchChannel
+                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                    .catch(console.error);
+                  const monthlyShift = roomVoice.shift(roomVoice[0]);
+                  const channelNameMonthly = await client.channels.fetch(
+                    monthlyShift
+                  );
+                  let originalNameMonthly = channelNameMonthly.name;
+                  const searchTermMonthly = '(';
+                  const indexOfFirstMonthly =
+                    originalNameMonthly.indexOf(searchTermMonthly);
+                  if (indexOfFirstMonthly > 0) {
+                    originalNameMonthly = originalNameMonthly.slice(
+                      0,
+                      indexOfFirstMonthly - 1
+                    );
+                    await channelNameMonthly.setName(
+                      `${originalNameMonthly} (${item.task})`
+                    );
+                  } else {
+                    await channelNameMonthly.setName(
+                      `${channelNameMonthly.name} (${item.task})`
+                    );
+                  }
+                  const newRoomMonthly = channelNameMonthly.name;
+                  await new voiceChannelData({
+                    id: channelNameMonthly.id,
+                    originalName: originalNameMonthly,
+                    newRoomName: newRoomMonthly,
+                    createdTimestamp: Date.now(),
+                  })
+                    .save()
+                    .catch((err) => console.log(err));
+                } else {
+                  await monthlyFetchChannel
+                    .send('@here voice channel full')
+                    .catch(console.error);
+                }
+                let newCreatedTimestampMonthly = Number(item.createdTimestamp);
+
                 newCreatedTimestampMonthly = currentDate.setMonth(
                   currentDate.getMonth() + 1
                 );
-              }
-              await meetingData
-                .updateOne(
-                  { _id: item._id },
-                  {
-                    reminder: true,
-                    createdTimestamp: newCreatedTimestampMonthly,
-                  }
-                )
-                .catch((err) => console.log('updateone error monthly', err));
-            }
-            return;
-          case 'repeat':
-            if (
-              isSameMinute(minuteDb, dateScheduler) &&
-                isDiffDay(dateScheduler, item.repeatTime) &&
-                isTimeDay(dateScheduler)
-            ) {
-              const repeatFetchChannel = await client.channels.fetch(
-                item.channelId
-              );
-              if (roomVoice.length !== 0) {
-                repeatFetchChannel
-                  .send(`@here our meeting room is <#${roomVoice[0]}>`)
-                  .catch(console.error);
-                const repeatShift = roomVoice.shift(roomVoice[0]);
-                const channelNameRepeat = await client.channels.fetch(
-                  repeatShift
-                );
-                let originalNameRepeat = channelNameRepeat.name;
-                const searchTermRepeat = '(';
-                const indexOfFirstRepeat =
-                    originalNameRepeat.indexOf(searchTermRepeat);
-                if (indexOfFirstRepeat > 0) {
-                  originalNameRepeat = originalNameRepeat.slice(
-                    0,
-                    indexOfFirstRepeat - 1
-                  );
-                  await channelNameRepeat.setName(
-                    `${originalNameRepeat} (${item.task})`
-                  );
-                } else {
-                  await channelNameRepeat.setName(
-                    `${channelNameRepeat.name} (${item.task})`
+                while (await checkHolidayMeeting(currentDate)) {
+                  newCreatedTimestampMonthly = currentDate.setMonth(
+                    currentDate.getMonth() + 1
                   );
                 }
-                const newRoomRepeat = channelNameRepeat.name;
-                await new voiceChannelData({
-                  id: channelNameRepeat.id,
-                  originalName: originalNameRepeat,
-                  newRoomName: newRoomRepeat,
-                  createdTimestamp: Date.now(),
-                })
-                  .save()
-                  .catch((err) => console.log(err));
-              } else {
-                await repeatFetchChannel
-                  .send('@here voice channel full')
-                  .catch(console.error);
+                await meetingData
+                  .updateOne(
+                    { _id: item._id },
+                    {
+                      reminder: true,
+                      createdTimestamp: newCreatedTimestampMonthly,
+                    }
+                  )
+                  .catch((err) => console.log('updateone error monthly', err));
               }
+              return;
+            case 'repeat':
+              if (
+                isSameMinute(minuteDb, dateScheduler) &&
+                isDiffDay(dateScheduler, item.repeatTime) &&
+                isTimeDay(dateScheduler)
+              ) {
+                const repeatFetchChannel = await client.channels.fetch(
+                  item.channelId
+                );
+                if (roomVoice.length !== 0) {
+                  repeatFetchChannel
+                    .send(`@here our meeting room is <#${roomVoice[0]}>`)
+                    .catch(console.error);
+                  const repeatShift = roomVoice.shift(roomVoice[0]);
+                  const channelNameRepeat = await client.channels.fetch(
+                    repeatShift
+                  );
+                  let originalNameRepeat = channelNameRepeat.name;
+                  const searchTermRepeat = '(';
+                  const indexOfFirstRepeat =
+                    originalNameRepeat.indexOf(searchTermRepeat);
+                  if (indexOfFirstRepeat > 0) {
+                    originalNameRepeat = originalNameRepeat.slice(
+                      0,
+                      indexOfFirstRepeat - 1
+                    );
+                    await channelNameRepeat.setName(
+                      `${originalNameRepeat} (${item.task})`
+                    );
+                  } else {
+                    await channelNameRepeat.setName(
+                      `${channelNameRepeat.name} (${item.task})`
+                    );
+                  }
+                  const newRoomRepeat = channelNameRepeat.name;
+                  await new voiceChannelData({
+                    id: channelNameRepeat.id,
+                    originalName: originalNameRepeat,
+                    newRoomName: newRoomRepeat,
+                    createdTimestamp: Date.now(),
+                  })
+                    .save()
+                    .catch((err) => console.log(err));
+                } else {
+                  await repeatFetchChannel
+                    .send('@here voice channel full')
+                    .catch(console.error);
+                }
 
-              let newCreatedTimestampRepeat = item.createdTimestamp;
-              newCreatedTimestampRepeat = currentDate.setDate(
-                currentDate.getDate() + item.repeatTime
-              );
-
-              while (await checkHolidayMeeting(currentDate)) {
+                let newCreatedTimestampRepeat = item.createdTimestamp;
                 newCreatedTimestampRepeat = currentDate.setDate(
                   currentDate.getDate() + item.repeatTime
                 );
-              }
 
-              await meetingData
-                .updateOne(
-                  { _id: item._id },
-                  {
-                    reminder: true,
-                    createdTimestamp: newCreatedTimestampRepeat,
-                  }
-                )
-                .catch((err) => console.log('updateone error repeat', err));
-            }
-            return;
-          default:
-            break;
+                while (await checkHolidayMeeting(currentDate)) {
+                  newCreatedTimestampRepeat = currentDate.setDate(
+                    currentDate.getDate() + item.repeatTime
+                  );
+                }
+
+                await meetingData
+                  .updateOne(
+                    { _id: item._id },
+                    {
+                      reminder: true,
+                      createdTimestamp: newCreatedTimestampRepeat,
+                    }
+                  )
+                  .catch((err) => console.log('updateone error repeat', err));
+              }
+              return;
+            default:
+              break;
           }
         }
       });
@@ -1219,7 +1213,7 @@ async function updateReminderMeeting(client) {
   });
 
   const dateTimeNow = new Date();
-  dateTimeNow.setHours(dateTimeNow.getHours());
+  dateTimeNow.setHours(dateTimeNow.getHours() + 7);
   const hourDateNow = dateTimeNow.getHours();
   const minuteDateNow = dateTimeNow.getMinutes();
 
@@ -1486,7 +1480,6 @@ async function dating(client) {
       randomTwo = Math.floor(Math.random() * arr.length);
       arrWoman = arr[randomTwo];
 
-
       userMan.map((man) => {
         if (man.branch === arrMan && man.email) checkCaseMan.push(man.email);
       });
@@ -1698,13 +1691,13 @@ async function sendQuizEnglish(client) {
   }
 }
 
-async function sendMesageRemind(client) {
+async function sendMessageRemind(client) {
   try {
     if (await checkHoliday()) return;
     const data = await remindData.find({ cancel: false });
 
     const now = new Date();
-    now.setHours(now.getHours());
+    now.setHours(now.getHours() + 7);
     const hourDateNow = now.getHours();
     const dateNow = now.toLocaleDateString('en-US');
     const minuteDateNow = now.getMinutes();
@@ -2031,8 +2024,19 @@ async function pingReminder(client) {
         new Date(Number(item.createdTimestamp))
       );
       switch (item.repeat) {
-      case 'once':
-        if (isSameDate(dateCreatedTimestamp)) {
+        case 'once':
+          if (isSameDate(dateCreatedTimestamp)) {
+            await sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              null
+            );
+          }
+          return;
+        case 'daily':
+          if (isSameDay()) return;
           await sendMessageReminder(
             client,
             item.channelId,
@@ -2040,62 +2044,51 @@ async function pingReminder(client) {
             dateTime,
             null
           );
-        }
-        return;
-      case 'daily':
-        if (isSameDay()) return;
-        await sendMessageReminder(
-          client,
-          item.channelId,
-          item.task,
-          dateTime,
-          null
-        );
-        return;
-      case 'weekly':
-        if (isDiffDay(dateScheduler, 7) && isTimeDay(dateScheduler)) {
-          await sendMessageReminder(
-            client,
-            item.channelId,
-            item.task,
-            dateTime,
-            null
-          );
-        }
-        return;
-      case 'montly':
-        if (isDiffDay(dateScheduler, 30) && isTimeDay(dateScheduler)) {
-          await sendMessageReminder(
-            client,
-            item.channelId,
-            item.task,
-            dateTime,
-            item.repeatTime,
-          );
-        }
-        return;
-      case 'repeat':
-        if (
-          isDiffDay(dateScheduler, item.repeatTime) &&
+          return;
+        case 'weekly':
+          if (isDiffDay(dateScheduler, 7) && isTimeDay(dateScheduler)) {
+            await sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              null
+            );
+          }
+          return;
+        case 'montly':
+          if (isDiffDay(dateScheduler, 30) && isTimeDay(dateScheduler)) {
+            await sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              item.repeatTime
+            );
+          }
+          return;
+        case 'repeat':
+          if (
+            isDiffDay(dateScheduler, item.repeatTime) &&
             isTimeDay(dateScheduler)
-        ) {
+          ) {
+            await sendMessageReminder(
+              client,
+              item.channelId,
+              item.task,
+              dateTime,
+              item.repeatTime
+            );
+          }
+          return;
+        default:
           await sendMessageReminder(
             client,
             item.channelId,
-            item.task,
+            item.content,
             dateTime,
-            item.repeatTime
+            item.mentionUserId
           );
-        }
-        return;
-      default:
-        await sendMessageReminder(
-          client,
-          item.channelId,
-          item.content,
-          dateTime,
-          item.mentionUserId
-        );
       }
     });
   }
@@ -2242,7 +2235,7 @@ async function sendReportWorkout(client) {
 }
 
 function cronJobOneMinute(client) {
-  sendMesageRemind(client);
+  sendMessageRemind(client);
   kickMemberVoiceChannel(client);
   updateReminderMeeting(client);
 }
