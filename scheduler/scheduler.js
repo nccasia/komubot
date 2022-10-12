@@ -2208,6 +2208,9 @@ async function sendReportWorkout(client) {
         userId: 1,
       },
     },
+    {
+      $sort: { total: -1 },
+    },
   ]);
 
   let mess;
@@ -2223,7 +2226,9 @@ async function sendReportWorkout(client) {
       .setTitle('Top workout')
       .setColor('RED')
       .setDescription(`${mess}`);
-    const userDiscord = await client.channels.fetch('965033649508614194');
+    const userDiscord = await client.channels.fetch(
+      process.env.KOMUBOTREST_WORKOUT_CHANNEL_ID
+    );
     userDiscord.send({ embeds: [Embed] }).catch(console.error);
   }
 }

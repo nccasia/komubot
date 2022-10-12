@@ -107,6 +107,9 @@ module.exports = {
                 userId: 1,
               },
             },
+            {
+              $sort: { total: -1 },
+            },
           ]);
 
           let mess;
@@ -149,6 +152,14 @@ module.exports = {
           .catch(console.error);
       } else {
         const links = [];
+        if (
+          message.channel.parentId !=
+            process.env.KOMUBOTREST_WORKOUT_CHANNEL_ID &&
+          message.channel.id != process.env.KOMUBOTREST_WORKOUT_CHANNEL_ID
+        ) {
+          return message.reply('Workout faild').catch(console.error);
+        }
+
         if (message.attachments && message.attachments.first()) {
           message.attachments.forEach((attachment) => {
             try {
