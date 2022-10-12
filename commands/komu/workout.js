@@ -84,6 +84,7 @@ module.exports = {
           const userCheckWorkout = await workoutData.aggregate([
             {
               $match: {
+                channelId: message.channelId,
                 createdTimestamp: {
                   $gte: firstDay.getTime(),
                   $lte: lastDay.getTime(),
@@ -96,6 +97,7 @@ module.exports = {
                 _id: '$userId',
                 total: { $sum: 1 },
                 email: { $first: '$email' },
+                channelId: { $first: '$channelId' },
                 userId: { $first: '$userId' },
               },
             },
@@ -104,6 +106,7 @@ module.exports = {
                 _id: 0,
                 total: 1,
                 email: 1,
+                channelId: 1,
                 userId: 1,
               },
             },
@@ -192,7 +195,7 @@ module.exports = {
               createdTimestamp: Date.now(),
               attachment: true,
               status: 'approve',
-              channelId: message.channel.id,
+              channelId: '965033649508614194',
             })
               .save()
               .catch((err) => console.log(err));
