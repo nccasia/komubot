@@ -3,6 +3,32 @@ const userData = require('../../models/userData');
 const workoutData = require('../../models/workoutData');
 const { sendErrorToDevTest } = require('../../util/komubotrest');
 
+function withoutFirstTime(dateTime) {
+  const date = new Date(dateTime);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function withoutLastTime(dateTime) {
+  const date = new Date(dateTime);
+  date.setHours(23, 59, 59, 999);
+  return date;
+}
+
+function getYesterdayDate() {
+  const today = new Date();
+  const yesterday = new Date(withoutLastTime(today));
+  yesterday.setDate(yesterday.getDate() - 1);
+  return new Date(yesterday).valueOf();
+}
+
+function getTomorrowDate() {
+  const today = new Date();
+  const yesterday = new Date(withoutFirstTime(today));
+  yesterday.setDate(yesterday.getDate() + 1);
+  return new Date(yesterday).valueOf();
+}
+
 const monthSupport = [
   '1',
   '2',
@@ -58,7 +84,6 @@ module.exports = {
           const userCheckWorkout = await workoutData.aggregate([
             {
               $match: {
-                channelId: message.channelId,
                 createdTimestamp: {
                   $gte: firstDay.getTime(),
                   $lte: lastDay.getTime(),
@@ -71,7 +96,6 @@ module.exports = {
                 _id: '$userId',
                 total: { $sum: 1 },
                 email: { $first: '$email' },
-                channelId: { $first: '$channelId' },
                 userId: { $first: '$userId' },
               },
             },
@@ -80,7 +104,6 @@ module.exports = {
                 _id: 0,
                 total: 1,
                 email: 1,
-                channelId: 1,
                 userId: 1,
               },
             },
@@ -136,6 +159,19 @@ module.exports = {
             }
           });
           if (links.length > 0) {
+            const checkWorkout = await workoutData.find({
+              createdTimestamp: {
+                $gte: getYesterdayDate(),
+                $lte: getTomorrowDate(),
+              },
+              status: 'approve',
+              userId: message.author.id,
+            });
+            if (checkWorkout.length > 0) {
+              return message
+                .reply('You submitted your workout today')
+                .catch(console.error);
+            }
             const workout = await new workoutData({
               userId: message.author.id,
               email:
