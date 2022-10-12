@@ -84,7 +84,7 @@ module.exports = {
           const userCheckWorkout = await workoutData.aggregate([
             {
               $match: {
-                channelId: message.channelId,
+                // channelId: message.channelId,
                 createdTimestamp: {
                   $gte: firstDay.getTime(),
                   $lte: lastDay.getTime(),
@@ -97,7 +97,7 @@ module.exports = {
                 _id: '$userId',
                 total: { $sum: 1 },
                 email: { $first: '$email' },
-                channelId: { $first: '$channelId' },
+                // channelId: { $first: '$channelId' },
                 userId: { $first: '$userId' },
               },
             },
@@ -106,7 +106,7 @@ module.exports = {
                 _id: 0,
                 total: 1,
                 email: 1,
-                channelId: 1,
+                // channelId: 1,
                 userId: 1,
               },
             },
@@ -160,7 +160,7 @@ module.exports = {
             process.env.KOMUBOTREST_WORKOUT_CHANNEL_ID &&
           message.channel.id != process.env.KOMUBOTREST_WORKOUT_CHANNEL_ID
         ) {
-          return message.reply('Workout faild').catch(console.error);
+          return message.reply('Workout failed').catch(console.error);
         }
 
         if (message.attachments && message.attachments.first()) {
