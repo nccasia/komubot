@@ -3,6 +3,32 @@ const userData = require('../../models/userData');
 const workoutData = require('../../models/workoutData');
 const { sendErrorToDevTest } = require('../../util/komubotrest');
 
+function withoutFirstTime(dateTime) {
+  const date = new Date(dateTime);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function withoutLastTime(dateTime) {
+  const date = new Date(dateTime);
+  date.setHours(23, 59, 59, 999);
+  return date;
+}
+
+function getYesterdayDate() {
+  const today = new Date();
+  const yesterday = new Date(withoutLastTime(today));
+  yesterday.setDate(yesterday.getDate() - 1);
+  return new Date(yesterday).valueOf();
+}
+
+function getTomorrowDate() {
+  const today = new Date();
+  const yesterday = new Date(withoutFirstTime(today));
+  yesterday.setDate(yesterday.getDate() + 1);
+  return new Date(yesterday).valueOf();
+}
+
 const monthSupport = [
   '1',
   '2',
@@ -84,6 +110,9 @@ module.exports = {
                 userId: 1,
               },
             },
+            {
+              $sort: { total: -1 },
+            },
           ]);
 
           let mess;
@@ -126,6 +155,14 @@ module.exports = {
           .catch(console.error);
       } else {
         const links = [];
+        if (
+          message.channel.parentId !=
+            process.env.KOMUBOTREST_WORKOUT_CHANNEL_ID &&
+          message.channel.id != process.env.KOMUBOTREST_WORKOUT_CHANNEL_ID
+        ) {
+          return message.reply('Workout faild').catch(console.error);
+        }
+
         if (message.attachments && message.attachments.first()) {
           message.attachments.forEach((attachment) => {
             try {
@@ -136,6 +173,19 @@ module.exports = {
             }
           });
           if (links.length > 0) {
+            const checkWorkout = await workoutData.find({
+              createdTimestamp: {
+                $gte: getYesterdayDate(),
+                $lte: getTomorrowDate(),
+              },
+              status: 'approve',
+              userId: message.author.id,
+            });
+            if (checkWorkout.length > 0) {
+              return message
+                .reply('You submitted your workout today')
+                .catch(console.error);
+            }
             const workout = await new workoutData({
               userId: message.author.id,
               email:
@@ -145,7 +195,7 @@ module.exports = {
               createdTimestamp: Date.now(),
               attachment: true,
               status: 'approve',
-              channelId: message.channel.id,
+              channelId: process.env.KOMUBOTREST_WORKOUT_CHANNEL_ID,
             })
               .save()
               .catch((err) => console.log(err));

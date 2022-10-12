@@ -2193,12 +2193,10 @@ async function sendReportWorkout(client) {
     {
       $group: {
         _id: {
-          channelId: '$channelId',
           userId: '$userId',
         },
         total: { $sum: 1 },
         email: { $first: '$email' },
-        channelId: { $first: '$channelId' },
         userId: { $first: '$userId' },
       },
     },
@@ -2207,31 +2205,32 @@ async function sendReportWorkout(client) {
         _id: 0,
         total: 1,
         email: 1,
-        channelId: 1,
         userId: 1,
       },
+    },
+    {
+      $sort: { total: -1 },
     },
   ]);
 
   let mess;
-  const data = groupBy(userCheckWorkout, 'channelId');
-  Object.keys(data).forEach(async function (item) {
-    for (let i = 0; i <= Math.ceil(userCheckWorkout.length / 50); i += 1) {
-      if (userCheckWorkout.slice(i * 50, (i + 1) * 50).length === 0) {
-        break;
-      }
-      mess = data[item]
-        .slice(i * 50, (i + 1) * 50)
-        .map((list) => `${list.email} (${list.total})`)
-        .join('\n');
-      const Embed = new MessageEmbed()
-        .setTitle('Top workout')
-        .setColor('RED')
-        .setDescription(`${mess}`);
-      const userDiscord = await client.channels.fetch(item);
-      userDiscord.send({ embeds: [Embed] }).catch(console.error);
+  for (let i = 0; i <= Math.ceil(userCheckWorkout.length / 50); i += 1) {
+    if (userCheckWorkout.slice(i * 50, (i + 1) * 50).length === 0) {
+      break;
     }
-  });
+    mess = userCheckWorkout
+      .slice(i * 50, (i + 1) * 50)
+      .map((list) => `${list.email} (${list.total})`)
+      .join('\n');
+    const Embed = new MessageEmbed()
+      .setTitle('Top workout')
+      .setColor('RED')
+      .setDescription(`${mess}`);
+    const userDiscord = await client.channels.fetch(
+      process.env.KOMUBOTREST_WORKOUT_CHANNEL_ID
+    );
+    userDiscord.send({ embeds: [Embed] }).catch(console.error);
+  }
 }
 
 function cronJobOneMinute(client) {
@@ -2285,7 +2284,7 @@ exports.scheduler = {
     // //   'Asia/Ho_Chi_Minh'
     // // ).start();
     new cron.CronJob(
-      '*/1 * * * *',
+      '*/3 * * * *',
       () => tagMeeting(client),
       null,
       false,
