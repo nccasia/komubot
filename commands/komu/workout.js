@@ -195,7 +195,7 @@ module.exports = {
               createdTimestamp: Date.now(),
               attachment: true,
               status: 'approve',
-              channelId: '965033649508614194',
+              channelId: process.env.KOMUBOTREST_WORKOUT_CHANNEL_ID,
             })
               .save()
               .catch((err) => console.log(err));
